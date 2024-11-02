@@ -1,0 +1,38 @@
+Package: R.AI
+Type: Package
+Title: Use LLM APIs from within R
+Version: 0.1.0
+Authors@R: 
+    person(given = "Xavier",
+           family = "Marquez",
+           role = c("aut", "cre"),
+           email = "marquez.x@gmail.com",
+           comment = c(ORCID = "0000-0001-7653-9334"))
+Description: This package contains functions to call a number of LLM APIs, 
+    including OpenAI, Groq, Anthropic (Claude), and Gemini. It also helps manage 
+    your prompts.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    checkmate,
+    cli,
+    dplyr,
+    httr,
+    jsonlite,
+    openai,
+    purrr,
+    readr,
+    rlang,
+    stringr,
+    tibble
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Suggests: 
+    rstudioapi,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    config
+Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
