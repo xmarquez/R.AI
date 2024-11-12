@@ -26,9 +26,10 @@ test_that("call_api works correctly for Groq API", {
   # Define the roles and API
   roles <- c("system", "user")
   api <- "groq"
+  num_prompts <- 10
 
   # Create a test data frame
-  test_data <- data.frame(country = c("USA", "Canada", "Mexico"))
+  test_data <- dplyr::tibble(country = unique(countrycode::codelist$country.name.en)[1:num_prompts])
 
   # Create test prompts using build_prompts_from_files
   prompts <- build_prompts_from_files(
@@ -39,7 +40,7 @@ test_that("call_api works correctly for Groq API", {
   )
 
   # Define model and other parameters
-  model <- get_default_model(api)
+  model <- "gemma-7b-it"
   temperature <- 0.2
   max_tokens <- 300
 
@@ -48,10 +49,12 @@ test_that("call_api works correctly for Groq API", {
 
   # Check the structure of the returned responses
   expect_true(is.data.frame(responses))
-  expect_true("prompt_id" %in% names(responses))
+  expect_equal(nrow(responses), num_prompts)
+  expect_true("id" %in% names(responses))
   expect_true("api" %in% names(responses))
   expect_true("model" %in% names(responses))
   expect_true("response" %in% names(responses))
+  expect_type(responses$response, "list")
 })
 
 test_that("call_api works correctly for OpenAI API", {
@@ -80,9 +83,10 @@ test_that("call_api works correctly for OpenAI API", {
   # Define the roles and API
   roles <- c("system", "user")
   api <- "openai"
+  num_prompts <- 24
 
   # Create a test data frame
-  test_data <- data.frame(country = c("USA", "Canada", "Mexico"))
+  test_data <- dplyr::tibble(country = unique(countrycode::codelist$country.name.en)[1:num_prompts])
 
   # Create test prompts using build_prompts_from_files
   prompts <- build_prompts_from_files(
@@ -102,10 +106,12 @@ test_that("call_api works correctly for OpenAI API", {
 
   # Check the structure of the returned responses
   expect_true(is.data.frame(responses))
-  expect_true("prompt_id" %in% names(responses))
+  expect_equal(nrow(responses), num_prompts)
+  expect_true("id" %in% names(responses))
   expect_true("api" %in% names(responses))
   expect_true("model" %in% names(responses))
   expect_true("response" %in% names(responses))
+  expect_type(responses$response, "list")
 })
 
 test_that("call_api works correctly for Claude API", {
@@ -132,9 +138,10 @@ test_that("call_api works correctly for Claude API", {
   # Define the roles and API
   roles <- c("user")
   api <- "claude"
+  num_prompts <- 10
 
   # Create a test data frame
-  test_data <- data.frame(country = c("USA", "Canada", "Mexico"))
+  test_data <- dplyr::tibble(country = unique(countrycode::codelist_panel$country.name.en)[1:num_prompts])
 
   # Create test prompts using build_prompts_from_files
   prompts <- build_prompts_from_files(
@@ -154,10 +161,12 @@ test_that("call_api works correctly for Claude API", {
 
   # Check the structure of the returned responses
   expect_true(is.data.frame(responses))
-  expect_true("prompt_id" %in% names(responses))
+  expect_equal(nrow(responses), num_prompts)
+  expect_true("id" %in% names(responses))
   expect_true("api" %in% names(responses))
   expect_true("model" %in% names(responses))
   expect_true("response" %in% names(responses))
+  expect_type(responses$response, "list")
 })
 
 test_that("call_api works correctly for Gemini API", {
@@ -184,9 +193,10 @@ test_that("call_api works correctly for Gemini API", {
   # Define the roles and API
   roles <- c("user")
   api <- "gemini"
+  num_prompts <- 10
 
   # Create a test data frame
-  test_data <- data.frame(country = c("USA", "Canada", "Mexico"))
+  test_data <- dplyr::tibble(country = unique(countrycode::codelist_panel$country.name.en)[1:num_prompts])
 
   # Create test prompts using build_prompts_from_files
   prompts <- build_prompts_from_files(
@@ -206,8 +216,10 @@ test_that("call_api works correctly for Gemini API", {
 
   # Check the structure of the returned responses
   expect_true(is.data.frame(responses))
-  expect_true("prompt_id" %in% names(responses))
+  expect_equal(nrow(responses), num_prompts)
+  expect_true("id" %in% names(responses))
   expect_true("api" %in% names(responses))
   expect_true("model" %in% names(responses))
   expect_true("response" %in% names(responses))
+  expect_type(responses$response, "list")
 })
