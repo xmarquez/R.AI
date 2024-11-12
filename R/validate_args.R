@@ -19,29 +19,64 @@ validate_args_build_prompt_from_file <- function(files,
 validate_args_call_api <- function(prompts,
                                    model,
                                    prompt_name,
-                                   rate_limit,
+                                   n_candidates,
                                    max_retries,
                                    temperature,
                                    max_tokens,
                                    json_mode,
-                                   system) {
+                                   system,
+                                   pause_cap,
+                                   log) {
+
+  # Extract the api name from the prompts
+  api <- class(prompts)[1]
+
+  # Validate prompts - must be one of the supported API classes
   checkmate::assert_multi_class(prompts, classes = c("groq", "openai", "claude", "gemini"))
-  if(!missing(model)) {
+
+  # Validate model if provided
+  if (!missing(model)) {
     checkmate::assert_scalar(model)
-    checkmate::assert_choice(model, models_df$model[models_df$api == class(prompts)[1]])
+    checkmate::assert_choice(model, models_df$model[models_df$api == api])
   }
-  if(!missing(prompt_name)) {
+
+  # Validate prompt_name if provided
+  if (!missing(prompt_name)) {
     checkmate::assert_scalar(prompt_name)
   }
-  checkmate::assert_number(rate_limit, lower = 0, finite = TRUE)
-  checkmate::assert_number(max_retries, lower = 1, finite = TRUE)
-  checkmate::assert_number(temperature, lower = 0, finite = TRUE)
-  checkmate::assert_number(max_tokens, lower = 1, finite = TRUE)
+
+  # Validate n_candidates - must be a positive integer. Can only be 1 for groq
+  if(api == "groq") {
+    checkmate::assert_int(n_candidates, lower = 1, upper = 1)
+  } else {
+    checkmate::assert_count(n_candidates, positive = TRUE)
+  }
+
+  # Validate max_retries - must be a non-negative integer
+  checkmate::assert_int(max_retries, lower = 1)
+
+  # Validate temperature - must be between 0 and 2
+  checkmate::assert_number(temperature, lower = 0, upper = 2, finite = TRUE)
+
+  # Validate max_tokens - must be a positive integer
+  model_max_tokens <- models_df$max_output_tokens[models_df$model == model]
+  if(!checkmate::check_int(max_tokens, lower = 1, upper = model_max_tokens)) {
+    cli::cli_abort("{.var max_tokens} for model {models_df$model} must be ",
+                   "an integer between 1 and {model_max_tokens}")
+  }
+
+  # Validate json_mode - must be a logical scalar
   checkmate::assert_logical(json_mode, len = 1)
-  if(!is.null(system)) {
+
+  # Validate system message if provided
+  if (!is.null(system)) {
     checkmate::assert_scalar(system)
   }
 
+  # Validate pause_cap - must be a non-negative numeric value
+  checkmate::assert_number(pause_cap, lower = 0)
 
+  # Validate log - must be a logical scalar
+  checkmate::assert_logical(log, len = 1)
 }
 
