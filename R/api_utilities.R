@@ -35,29 +35,9 @@ get_default_model <- function(api, type = "cheapest") {
   checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini"))
   type <- match.arg(type, c("cheapest", "largest", "best"))
 
-  api_models <- models_df[models_df$api == api, ]
+  model <- preferred_models[preferred_models$api == api, ] |>
+    dplyr::pull(dplyr::all_of(c(type)))
 
-  if (type == "cheapest") {
-    api_models <- api_models[api_models$input_cost == min(api_models$input_cost), ]
-    if (api == "groq") {
-      api_models <- api_models[api_models$model == "llama3-8b-8192", ]
-    }
-  } else if (type == "largest") {
-    if (api == "groq") {
-      api_models <- api_models[api_models$model == "llama3-70b-8192", ]
-    } else {
-      api_models <- api_models[api_models$input_cost == max(api_models$input_cost), ]
-    }
-  } else if (type == "best") {
-    if (api == "groq") {
-      api_models <- api_models[api_models$model == "llama3-70b-8192", ]
-    } else if (api == "claude") {
-      api_models <- api_models[api_models$model == "claude-3-5-sonnet-20240620", ]
-    } else {
-      api_models <- api_models[api_models$input_cost == max(api_models$input_cost), ]
-    }
-  }
-  model <- api_models$model[1]
   cli::cli_inform(c("i" = "Using the {type} model for the {api} API, {model}.",
                     "i" = "Get available models with {.fun get_available_models}."))
   model
@@ -96,7 +76,7 @@ get_default_model <- function(api, type = "cheapest") {
 get_available_models <- function(api) {
   if (!missing(api)) {
     checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini"))
-    models <- models_df[models_df$api == api, ]
+    models <- models_df[models_df$api == api & models_df$mode == "chat", ]
   } else {
     models <- models_df
   }
