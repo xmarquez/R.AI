@@ -131,6 +131,7 @@ default_combined_prompt_builder <- function(prompts_df) {
 }
 
 # Helper function to print combined_prompts objects
+#' @export
 print.combined_prompts <- function(x, ...) {
   cat("Combined Prompts:\n")
   purrr::walk(x, function(prompt) {
