@@ -8,6 +8,14 @@
 \description{
 This package contains functions to call a number of LLM APIs, including OpenAI, Groq, Anthropic (Claude), and Gemini. It also helps manage your prompts.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/xmarquez/R.AI}
+  \item Report bugs at \url{https://github.com/xmarquez/R.AI/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Xavier Marquez \email{marquez.x@gmail.com} (\href{https://orcid.org/0000-0001-7653-9334}{ORCID})
 
