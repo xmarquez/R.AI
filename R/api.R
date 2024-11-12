@@ -18,8 +18,6 @@
 #'   function called {api}_clean_data_response_validation and a function called
 #'   {api}_clean_data_content_extraction that perform the validation of your
 #'   response and extraction of the content.
-#' @param rate_limit A numeric value specifying the minimum time (in seconds)
-#'   between API calls. Default is 2.
 #' @param max_retries An integer specifying the maximum number of retries for
 #'   failed API calls. Default is 10.
 #' @param temperature A numeric value between 0 and 1 controlling the randomness
@@ -30,6 +28,10 @@
 #' @param json_mode A logical value indicating whether the response should be in
 #'   JSON format. Default is TRUE.
 #' @param system An optional system message (for Claude only).
+#' @param pause_cap Maximum number of seconds to wait before retrying a request.
+#'   Default is 1200s, about 20 minutes.
+#' @param log Whether to provide informative messages for a [crew] log (when
+#'   using [target]), or print them to the screen.
 #'
 #' @return A tibble containing the API responses and usage information,
 #'   including:
@@ -78,15 +80,65 @@
 call_api <- function(prompts,
                      model,
                      prompt_name,
-                     rate_limit,
-                     max_retries,
-                     temperature,
-                     max_tokens,
-                     json_mode,
-                     system) {
-
+                     ...) {
 
   UseMethod("call_api", prompts)
+
+}
+
+#' @export
+call_api.default <- function(prompts,
+                             model,
+                             prompt_name,
+                             n_candidates,
+                             max_retries,
+                             temperature,
+                             max_tokens,
+                             json_mode,
+                             system,
+                             pause_cap,
+                             single_request_fun,
+                             response_validation_fun,
+                             content_extraction_fun,
+                             log) {
+
+  ids <- names(prompts)
+
+  responses <- tibble()
+
+  prompt_set <- digest::digest(ids)
+
+  for(i in 1:length(prompts)) {
+    if(log) {
+      if(targets::tar_active()) {
+        # Prints log message in a format that can be read by crew_log_raw and crew_log_summary if using with the targets package
+        message(glue::glue("___LOG___|{lubridate::now()}|{class(prompts)[1]}|{prompt_name}|{prompt_set}|{model}|{i}|{length(prompts)}|___LOG___"))
+      } else {
+        # Prints log message to screen
+        message(glue::glue("{lubridate::now()}: Now using {class(prompts)[1]} api model {model} to process prompt `{prompt_name}`, {i} of {length(prompts)}"))
+      }
+    }
+    response <- do.call(single_request_fun,
+                        list(prompt = prompts[[i]],
+                             model = model,
+                             n_candidates = n_candidates,
+                             max_retries = max_retries,
+                             temperature = temperature,
+                             max_tokens = max_tokens,
+                             json_mode = json_mode,
+                             system = system,
+                             response_validation_fun = response_validation_fun,
+                             content_extraction_fun = content_extraction_fun,
+                             pause_cap = pause_cap,
+                             quiet = !log))
+    response$id <- ids[i]
+    responses <- dplyr::bind_rows(responses, response)
+  }
+
+  responses |>
+    dplyr::mutate(api = class(prompts)[1]) |>
+    dplyr::relocate(dplyr::all_of(c("id", "api", "model", "response")),
+                    .before = dplyr::everything())
 
 }
 
@@ -94,12 +146,14 @@ call_api <- function(prompts,
 call_api.groq <- function(prompts,
                           model,
                           prompt_name,
-                          rate_limit = 2,
+                          n_candidates = 1,
                           max_retries = 10,
                           temperature = 0.2,
                           max_tokens = 300,
                           json_mode = TRUE,
-                          system = NULL) {
+                          system = NULL,
+                          pause_cap = 1200,
+                          log = TRUE) {
 
   if(missing(model)) {
     model <- get_default_model(class(prompts)[1])
@@ -113,155 +167,53 @@ call_api.groq <- function(prompts,
     }
   }
 
-  validate_args_call_api(prompts,
-                         model,
-                         prompt_name,
-                         rate_limit,
-                         max_retries,
-                         temperature,
-                         max_tokens,
-                         json_mode,
-                         system)
+  validate_args_call_api(prompts = prompts,
+                         model = model,
+                         prompt_name = prompt_name,
+                         n_candidates = n_candidates,
+                         max_retries = max_retries,
+                         temperature = temperature,
+                         max_tokens = max_tokens,
+                         json_mode = json_mode,
+                         system = system,
+                         pause_cap = pause_cap,
+                         log = log)
 
+  single_request_fun <- paste("groq_single_request")
   response_validation_fun <- paste("groq", prompt_name, "response_validation", sep = "_")
   content_extraction_fun <- paste("groq", prompt_name, "content_extraction", sep = "_")
 
-  prompts |>
-    purrr::map(\(x) groq_single_request(x,
-                                        model = model,
-                                        rate_limit = rate_limit,
-                                        max_retries = max_retries,
-                                        temperature = temperature,
-                                        max_tokens = max_tokens,
-                                        json_mode = json_mode,
-                                        response_validation_fun = response_validation_fun,
-                                        content_extraction_fun = content_extraction_fun)) |>
-    purrr::list_rbind(names_to = "prompt_id")
+  NextMethod(prompts,
+             model = model,
+             prompt_name = prompt_name,
+             max_retries = max_retries,
+             n_candidates = n_candidates,
+             temperature = temperature,
+             max_tokens = max_tokens,
+             json_mode = json_mode,
+             system = system,
+             pause_cap = pause_cap,
+             response_validation_fun = response_validation_fun,
+             content_extraction_fun = content_extraction_fun,
+             single_request_fun = single_request_fun,
+             log = log)
 
 }
 
-groq_single_request <- function(prompt,
-                                model,
-                                rate_limit,
-                                max_retries,
-                                temperature,
-                                max_tokens,
-                                json_mode,
-                                response_validation_fun,
-                                content_extraction_fun) {
-
-  if(json_mode) {
-    response_format = jsonlite::toJSON(list(type = "json_object"),
-                                       auto_unbox = TRUE)
-  } else {
-    response_format = NULL
-  }
-
-  body <- jsonlite::toJSON(
-    list(
-      messages = prompt,
-      model = model,
-      max_tokens = max_tokens,
-      temperature = temperature
-    ),
-    auto_unbox = TRUE,
-    pretty = TRUE
-  )
-
-  for(i in 1:max_retries) {
-    response <- httr::POST(
-      url = "https://api.groq.com/openai/v1/chat/completions",
-      httr::add_headers("Authorization" = paste("Bearer", Sys.getenv("GROQ_API_KEY")),
-                        "content-type" = "application/json",
-                        "response_format" = response_format
-      ),
-      body = body,
-      encode = "json"
-    )
-    if(httr::http_error(response)) {
-      Sys.sleep(i*10)
-    } else if(!do.call(response_validation_fun, list(response))) {
-      Sys.sleep(i*10)
-    } else {
-      break
-    }
-  }
-
-  httr::stop_for_status(response)
-  res <- httr::content(response)
-  hdr <- httr::headers(response)
-
-  usage <- groq_usage(res)
-  content <- do.call(content_extraction_fun, list(res))
-  usage$response <- content
-
-  reset_tokens <- hdr$`x-ratelimit-reset-tokens`
-  if(stringr::str_detect(reset_tokens, "ms")) {
-    reset_tokens <- reset_tokens |>
-      readr::parse_number()
-    reset_tokens <- reset_tokens/1000
-  } else {
-    reset_tokens <- reset_tokens |>
-      readr::parse_number()
-  }
-
-  remaining_tokens <- hdr$`x-ratelimit-remaining-tokens` |>
-    readr::parse_number()
-
-  if(reset_tokens > 20 || remaining_tokens < 2000) {
-    Sys.sleep(reset_tokens)
-  }
-
-  Sys.sleep(rate_limit)
-
-  usage
-
-}
-
-groq_default_response_validation <- function(response) {
-  return(TRUE)
-}
-
-groq_default_content_extraction <- function(response_content) {
-  response_content$choices[[1]]$message$content
-}
-
-groq_json_response_validation <- function(response) {
-  httr::content(response) |>
-    groq_default_content_extraction() |>
-    default_json_content_cleaning() |>
-    jsonlite::validate()
-}
-
-groq_json_content_extraction <- function(response_content) {
-  response_content |>
-    groq_default_content_extraction() |>
-    default_json_content_extraction()
-}
-
-groq_usage <- function(response) {
-  response$usage |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(model = response$model) |>
-    dplyr::left_join(models_df, by = "model") |>
-    dplyr::rename(input_tokens = .data$prompt_tokens,
-                  output_tokens = .data$completion_tokens) |>
-    dplyr::mutate(input_cost = .data$input_cost * .data$input_tokens/1e6,
-                  output_cost = .data$output_cost * .data$output_tokens/1e6,
-                  total_cost = .data$input_cost + .data$output_cost) |>
-    dplyr::relocate(.data$api, .data$model)
-}
 
 #' @export
 call_api.claude <- function(prompts,
                             model,
                             prompt_name,
-                            rate_limit = 2,
+                            n_candidates = 1,
                             max_retries = 10,
                             temperature = 0.2,
                             max_tokens = 300,
                             json_mode = TRUE,
-                            system = NULL) {
+                            system = NULL,
+                            pause_cap = 1200,
+                            log = TRUE) {
+
   if(missing(model)) {
     model <- get_default_model(class(prompts)[1])
   }
@@ -274,133 +226,51 @@ call_api.claude <- function(prompts,
     }
   }
 
-  validate_args_call_api(prompts,
-                         model,
-                         prompt_name,
-                         rate_limit,
-                         max_retries,
-                         temperature,
-                         max_tokens,
-                         json_mode,
-                         system)
+  validate_args_call_api(prompts = prompts,
+                         model = model,
+                         prompt_name = prompt_name,
+                         n_candidates = n_candidates,
+                         max_retries = max_retries,
+                         temperature = temperature,
+                         max_tokens = max_tokens,
+                         json_mode = json_mode,
+                         system = system,
+                         pause_cap = pause_cap,
+                         log = log)
 
+  single_request_fun <- paste("claude_single_request")
   response_validation_fun <- paste("claude", prompt_name, "response_validation", sep = "_")
   content_extraction_fun <- paste("claude", prompt_name, "content_extraction", sep = "_")
 
-  prompts |>
-    purrr::map(\(x) claude_single_request(x,
-                                          model = model,
-                                          rate_limit = rate_limit,
-                                          max_retries = max_retries,
-                                          temperature = temperature,
-                                          max_tokens = max_tokens,
-                                          system = system,
-                                          response_validation_fun = response_validation_fun,
-                                          content_extraction_fun = content_extraction_fun)) |>
-    purrr::list_rbind(names_to = "prompt_id")
+  NextMethod(prompts,
+             model = model,
+             prompt_name = prompt_name,
+             max_retries = max_retries,
+             n_candidates = n_candidates,
+             temperature = temperature,
+             max_tokens = max_tokens,
+             json_mode = json_mode,
+             system = system,
+             pause_cap = pause_cap,
+             response_validation_fun = response_validation_fun,
+             content_extraction_fun = content_extraction_fun,
+             single_request_fun = single_request_fun,
+             log = log)
 
-}
-
-claude_single_request <- function(prompt,
-                                  model,
-                                  rate_limit,
-                                  max_retries,
-                                  temperature,
-                                  max_tokens,
-                                  system,
-                                  response_validation_fun,
-                                  content_extraction_fun) {
-
-  body <- jsonlite::toJSON(
-    list(
-      messages = prompt,
-      model = model,
-      max_tokens = max_tokens,
-      temperature = temperature
-    ),
-    auto_unbox = TRUE,
-    pretty = TRUE
-  )
-
-  for(i in 1:max_retries) {
-    response <- httr::POST(
-      url = "https://api.anthropic.com/v1/messages",
-      httr::add_headers("x-api-key" = Sys.getenv("ANTHROPIC_API_KEY"),
-                        "anthropic-version" = "2023-06-01",
-                        "system" = system,
-                        "content-type" = "application/json"),
-      body = body,
-      encode = "json",
-      httr::timeout(30)
-    )
-    if(httr::http_error(response)) {
-      msg <- stringr::str_glue("Claude had an error - trying again in {i*10} secs: {httr::content(response)}.")
-      cli::cli_warn(msg)
-      Sys.sleep(i*10)
-    } else if(!do.call(response_validation_fun, list(response))) {
-      msg <- stringr::str_glue("Validation error - trying again in {i*10} secs: {claude_default_content_extraction(httr::content(response))}.")
-      cli::cli_warn(msg)
-      Sys.sleep(i*10)
-    } else {
-      break
-    }
-  }
-
-  httr::stop_for_status(response)
-  res <- httr::content(response)
-
-  usage <- claude_usage(res)
-  content <- do.call(content_extraction_fun, list(res))
-  usage$response <- content
-
-  Sys.sleep(rate_limit)
-
-  usage
-
-}
-
-claude_default_response_validation <- function(response) {
-  return(TRUE)
-}
-
-claude_json_response_validation <- function(response) {
-  httr::content(response) |>
-    claude_default_content_extraction() |>
-    default_json_content_cleaning() |>
-    jsonlite::validate()
-}
-
-claude_default_content_extraction <- function(response_content) {
-  response_content$content[[1]]$text
-}
-
-claude_json_content_extraction <- function(response_content) {
-  response_content |>
-    claude_default_content_extraction() |>
-    default_json_content_extraction()
-}
-
-claude_usage <- function(response) {
-  response$usage |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(model = response$model) |>
-    dplyr::left_join(models_df, by = "model") |>
-    dplyr::mutate(input_cost = .data$input_cost * .data$input_tokens/1e6,
-                  output_cost = .data$output_cost * .data$output_tokens/1e6,
-                  total_cost = .data$input_cost + .data$output_cost) |>
-    dplyr::relocate(.data$api, .data$model)
 }
 
 #' @export
 call_api.openai <- function(prompts,
                             model,
                             prompt_name,
-                            rate_limit = 0,
+                            n_candidates = 1,
                             max_retries = 10,
                             temperature = 0.2,
                             max_tokens = 300,
                             json_mode = TRUE,
-                            system = NULL) {
+                            system = NULL,
+                            pause_cap = 1200,
+                            log = TRUE) {
 
   if(missing(model)) {
     model <- get_default_model(class(prompts)[1])
@@ -414,98 +284,51 @@ call_api.openai <- function(prompts,
     }
   }
 
-  validate_args_call_api(prompts,
-                         model,
-                         prompt_name,
-                         rate_limit,
-                         max_retries,
-                         temperature,
-                         max_tokens,
-                         json_mode,
-                         system)
+  validate_args_call_api(prompts = prompts,
+                         model = model,
+                         prompt_name = prompt_name,
+                         n_candidates = n_candidates,
+                         max_retries = max_retries,
+                         temperature = temperature,
+                         max_tokens = max_tokens,
+                         json_mode = json_mode,
+                         system = system,
+                         pause_cap = pause_cap,
+                         log = log)
 
+  single_request_fun <- paste("openai_single_request")
   response_validation_fun <- paste("openai", prompt_name, "response_validation", sep = "_")
   content_extraction_fun <- paste("openai", prompt_name, "content_extraction", sep = "_")
 
-  prompts |>
-    purrr::map(\(x) openai_single_request(x,
-                                          model = model,
-                                          rate_limit = rate_limit,
-                                          temperature = temperature,
-                                          max_tokens = max_tokens,
-                                          response_validation_fun = response_validation_fun,
-                                          content_extraction_fun = content_extraction_fun)) |>
-    purrr::list_rbind(names_to = "prompt_id")
+  NextMethod(prompts,
+             model = model,
+             prompt_name = prompt_name,
+             max_retries = max_retries,
+             n_candidates = n_candidates,
+             temperature = temperature,
+             max_tokens = max_tokens,
+             json_mode = json_mode,
+             system = system,
+             response_validation_fun = response_validation_fun,
+             content_extraction_fun = content_extraction_fun,
+             single_request_fun = single_request_fun,
+             pause_cap = pause_cap,
+             log = log)
 
-}
-
-openai_single_request <- function(prompt,
-                                  model,
-                                  rate_limit,
-                                  temperature,
-                                  max_tokens,
-                                  response_validation_fun,
-                                  content_extraction_fun) {
-
-  res <- openai::create_chat_completion(model = model,
-                                        messages = prompt,
-                                        temperature = temperature,
-                                        max_tokens = max_tokens)
-
-  usage <- openai_usage(res)
-  content <- do.call(content_extraction_fun, list(res))
-  usage$response <- content
-
-  Sys.sleep(rate_limit)
-
-  usage
-
-}
-
-openai_default_response_validation <- function(response) {
-  return(TRUE)
-}
-
-openai_json_response_validation <- function(response) {
-  response |>
-    openai_default_content_extraction() |>
-    default_json_content_cleaning() |>
-    jsonlite::validate()
-}
-
-openai_default_content_extraction <- function(response_content) {
-  response_content$choices$message.content
-}
-
-openai_json_content_extraction <- function(response_content) {
-  response_content |>
-    openai_default_content_extraction() |>
-    default_json_content_extraction()
-}
-
-openai_usage <- function(response) {
-  response$usage |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(model = response$model) |>
-    dplyr::left_join(models_df, by = "model") |>
-    dplyr::rename(input_tokens = .data$prompt_tokens,
-                  output_tokens = .data$completion_tokens) |>
-    dplyr::mutate(input_cost = .data$input_cost * .data$input_tokens/1e6,
-                  output_cost = .data$output_cost * .data$output_tokens/1e6,
-                  total_cost = .data$input_cost + .data$output_cost) |>
-    dplyr::relocate(.data$api, .data$model)
 }
 
 #' @export
 call_api.gemini <- function(prompts,
                             model,
                             prompt_name,
-                            rate_limit = 2,
+                            n_candidates = 1,
                             max_retries = 10,
                             temperature = 0.2,
                             max_tokens = 300,
                             json_mode = TRUE,
-                            system = NULL) {
+                            system = NULL,
+                            pause_cap = 1200,
+                            log = TRUE) {
 
   if(missing(model)) {
     model <- get_default_model(class(prompts)[1])
@@ -519,117 +342,46 @@ call_api.gemini <- function(prompts,
     }
   }
 
-  validate_args_call_api(prompts,
-                         model,
-                         prompt_name,
-                         rate_limit,
-                         max_retries,
-                         temperature,
-                         max_tokens,
-                         json_mode,
-                         system)
+  validate_args_call_api(prompts = prompts,
+                         model = model,
+                         prompt_name = prompt_name,
+                         n_candidates = n_candidates,
+                         max_retries = max_retries,
+                         temperature = temperature,
+                         max_tokens = max_tokens,
+                         json_mode = json_mode,
+                         system = system,
+                         pause_cap = pause_cap,
+                         log = log)
 
+  single_request_fun <- paste("gemini_single_request")
   response_validation_fun <- paste("gemini", prompt_name, "response_validation", sep = "_")
   content_extraction_fun <- paste("gemini", prompt_name, "content_extraction", sep = "_")
 
-  prompts |>
-    purrr::map(\(x) gemini_single_request(x,
-                                          model = model,
-                                          rate_limit = rate_limit,
-                                          max_retries = max_retries,
-                                          temperature = temperature,
-                                          max_tokens = max_tokens,
-                                          response_validation_fun = response_validation_fun,
-                                          content_extraction_fun = content_extraction_fun)) |>
-    purrr::list_rbind(names_to = "prompt_id")
+  NextMethod(prompts,
+             model = model,
+             prompt_name = prompt_name,
+             max_retries = max_retries,
+             n_candidates = n_candidates,
+             temperature = temperature,
+             max_tokens = max_tokens,
+             json_mode = json_mode,
+             system = system,
+             response_validation_fun = response_validation_fun,
+             content_extraction_fun = content_extraction_fun,
+             single_request_fun = single_request_fun,
+             pause_cap = pause_cap,
+             log = log)
+
 
 }
 
-gemini_single_request <- function(prompt,
-                                  model,
-                                  rate_limit,
-                                  max_retries,
-                                  temperature,
-                                  max_tokens,
-                                  response_validation_fun,
-                                  content_extraction_fun) {
-
-  model_query <- paste0(model, ":generateContent")
-
-  body <- jsonlite::toJSON(
-    list(
-      contents = prompt,
-      generationConfig = list(
-        temperature = temperature,
-        maxOutputTokens = max_tokens
-      )
-    ),
-    auto_unbox = TRUE,
-    pretty = TRUE
-  )
-
-
- response <- httr::POST(
-      url = paste0("https://generativelanguage.googleapis.com/v1beta/models/", model_query),
-      query = list(key = Sys.getenv("GEMINI_API_KEY")),
-      httr::content_type_json(),
-      encode = "json",
-      body = body
-    )
-
- httr::stop_for_status(response)
- res <- httr::content(response)
- usage <- gemini_usage(res, model)
- content <- do.call(content_extraction_fun, list(res))
- usage$response <- content
-
- Sys.sleep(rate_limit)
-
- usage
-}
-
-gemini_default_response_validation <- function(response) {
-  return(TRUE)
-}
-
-gemini_json_response_validation <- function(response) {
-  response |>
-    gemini_default_content_extraction() |>
-    default_json_content_cleaning() |>
-    jsonlite::validate()
-}
-
-gemini_default_content_extraction <- function(response_content) {
-  response_content$candidates[[1]]$content$parts[[1]]$text
-}
-
-gemini_json_content_extraction <- function(response_content) {
-  response_content |>
-    gemini_default_content_extraction() |>
-    default_json_content_extraction()
-}
-
-gemini_usage <- function(response, model) {
-  if(is.null(response$usageMetadata$candidatesTokenCount)) {
-    response$usageMetadata$candidatesTokenCount <- 0
-  }
-  response$usageMetadata |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(model = model) |>
-    dplyr::left_join(models_df, by = "model") |>
-    dplyr::rename(input_tokens = .data$promptTokenCount,
-                  output_tokens = .data$candidatesTokenCount,
-                  total_tokens = .data$totalTokenCount) |>
-    dplyr::mutate(input_cost = .data$input_cost * .data$input_tokens/1e6,
-                  output_cost = .data$output_cost * .data$output_tokens/1e6,
-                  total_cost = .data$input_cost + .data$output_cost) |>
-    dplyr::relocate(.data$api, .data$model)
-}
 default_json_content_extraction <- function(json_string) {
   json_string |>
-    default_json_content_cleaning() |>
-    jsonlite::fromJSON() |>
-    dplyr::as_tibble()
+    purrr::map(default_json_content_cleaning) |>
+    purrr::map(jsonlite::fromJSON) |>
+    purrr::map(dplyr::as_tibble) |>
+    purrr::list_rbind()
 }
 
 default_json_content_cleaning <- function(json_string) {
@@ -639,4 +391,27 @@ default_json_content_cleaning <- function(json_string) {
     stringr::str_replace(stringr::regex("\\}\n.+", dotall = TRUE), "}")
 }
 
+retry_response <- function(base_url,
+                           api_key,
+                           response_format,
+                           body,
+                           max_retries,
+                           pause_cap,
+                           quiet) {
+  res <- httr::RETRY(
+    verb = "POST",
+    url = base_url,
+    config = httr::add_headers("Authorization" = paste("Bearer", api_key),
+                               "content-type" = "application/json",
+                               "response_format" = response_format),
+    body = body,
+    encode = "json",
+    times = max_retries,
+    pause_base = 1,
+    pause_cap = pause_cap,
+    quiet = quiet
+  )
 
+  res
+
+}
