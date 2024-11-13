@@ -12,11 +12,28 @@ models <- jsonlite::fromJSON(json_file) |>
 
 models_df <- models |>
   filter(litellm_provider %in% c("groq", "openai", "gemini", "anthropic")) |>
-  mutate(api = case_when(litellm_provider == "anthropic" ~ "claude",
+  mutate(api = dplyr::case_when(litellm_provider == "anthropic" ~ "claude",
                          TRUE ~ litellm_provider),
-         model = str_remove(model, "anthropic/|gemini/|groq/"),
+         model = stringr::str_remove(model, "anthropic/|gemini/|groq/"),
          input_cost = input_cost_per_token,
          output_cost = output_cost_per_token) |>
   distinct()
 
-usethis::use_data(models_df, overwrite = TRUE, internal = TRUE)
+preferred_models <- models_df |>
+  dplyr::filter(mode == "chat") |>
+  dplyr::mutate(cheapest = dplyr::case_when(api == "groq" ~ "llama-3.1-8b-instant",
+                                            api == "claude" ~ "claude-3-haiku-20240307",
+                                            api == "openai" ~ "gpt-4o-mini",
+                                            api == "gemini" ~ "gemini-1.5-flash-latest"),
+                largest = dplyr::case_when(api == "groq" ~ "llama-3.2-90b-text-preview",
+                                           api == "claude" ~ "claude-3-opus-20240229",
+                                           api == "openai" ~ "gpt-4o",
+                                           api == "gemini" ~ "gemini-1.5-pro-latest"),
+                best = dplyr::case_when(api == "groq" ~ "llama-3.1-70b-versatile",
+                                        api == "claude" ~ "claude-3-5-sonnet-20241022",
+                                        api == "openai" ~ "gpt-4o",
+                                        api == "gemini" ~ "gemini-1.5-pro-latest")) |>
+  dplyr::select(dplyr::all_of(c("api", "cheapest", "largest", "best"))) |>
+  dplyr::distinct()
+
+usethis::use_data(models_df, preferred_models, overwrite = TRUE, internal = TRUE)
