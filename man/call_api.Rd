@@ -4,17 +4,7 @@
 \alias{call_api}
 \title{Call Language Model API}
 \usage{
-call_api(
-  prompts,
-  model,
-  prompt_name,
-  rate_limit,
-  max_retries,
-  temperature,
-  max_tokens,
-  json_mode,
-  system
-)
+call_api(prompts, model, prompt_name, ...)
 }
 \arguments{
 \item{prompts}{A list of prompts to send to the API. The class of this object
@@ -34,9 +24,6 @@ function called {api}_clean_data_response_validation and a function called
 {api}_clean_data_content_extraction that perform the validation of your
 response and extraction of the content.}
 
-\item{rate_limit}{A numeric value specifying the minimum time (in seconds)
-between API calls. Default is 2.}
-
 \item{max_retries}{An integer specifying the maximum number of retries for
 failed API calls. Default is 10.}
 
@@ -51,6 +38,12 @@ model's response. Default is 300.}
 JSON format. Default is TRUE.}
 
 \item{system}{An optional system message (for Claude only).}
+
+\item{pause_cap}{Maximum number of seconds to wait before retrying a request.
+Default is 1200s, about 20 minutes.}
+
+\item{log}{Whether to provide informative messages for a \link{crew} log (when
+using \link{target}), or print them to the screen.}
 }
 \value{
 A tibble containing the API responses and usage information,
