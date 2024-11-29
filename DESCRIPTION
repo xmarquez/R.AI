@@ -17,15 +17,20 @@ LazyData: true
 Imports: 
     checkmate,
     cli,
+    digest,
     dplyr,
+    fs,
+    glue,
+    here,
     httr,
     jsonlite,
-    openai,
+    lubridate,
     purrr,
     readr,
     rlang,
     stringr,
-    tibble
+    tibble,
+    tidyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
@@ -34,7 +39,8 @@ Suggests:
     testthat (>= 3.0.0),
     config,
     targets,
-    crew
+    crew,
+    countrycode
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
