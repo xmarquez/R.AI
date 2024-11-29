@@ -4,7 +4,7 @@ validate_args_build_prompt_from_file <- function(files,
                                                  data) {
   checkmate::assert_file(files)
   checkmate::assert_subset(roles, c("user", "system", "assistant"))
-  checkmate::assert_choice(api, choices = c("groq", "openai", "claude", "gemini"))
+  checkmate::assert_choice(api, choices = c("groq", "openai", "claude", "gemini", "local_llamafile"))
   if(length(roles) != 1 && length(roles) != length(files)) {
     cli::cli_abort("{.var roles} must be of length one or the same length as {.var file}.")
   }
@@ -26,18 +26,22 @@ validate_args_call_api <- function(prompts,
                                    json_mode,
                                    system,
                                    pause_cap,
-                                   log) {
+                                   log,
+                                   llamafile_path) {
 
   # Extract the api name from the prompts
   api <- class(prompts)[1]
 
   # Validate prompts - must be one of the supported API classes
-  checkmate::assert_multi_class(prompts, classes = c("groq", "openai", "claude", "gemini"))
+  checkmate::assert_multi_class(prompts, classes = c("groq", "openai", "claude", "gemini", "local_llamafile"))
 
   # Validate model if provided
-  if (!missing(model)) {
+  if (!missing(model) && !"local_llamafile" %in% class(prompts) ) {
     checkmate::assert_scalar(model)
     checkmate::assert_choice(model, models_df$model[models_df$api == api])
+  } else if (!missing(model) && "local_llamafile" %in% class(prompts) ) {
+    checkmate::assert_scalar(model)
+    checkmate::assert_choice(model, "LLaMA_CPP")
   }
 
   # Validate prompt_name if provided
@@ -60,10 +64,13 @@ validate_args_call_api <- function(prompts,
 
   # Validate max_tokens - must be a positive integer
   model_max_tokens <- models_df$max_output_tokens[models_df$model == model]
-  if(!checkmate::check_int(max_tokens, lower = 1, upper = model_max_tokens)) {
-    cli::cli_abort("{.var max_tokens} for model {models_df$model} must be ",
-                   "an integer between 1 and {model_max_tokens}")
+  if(length(model_max_tokens) > 0) {
+    if(!checkmate::check_int(max_tokens, lower = 1, upper = model_max_tokens)) {
+      cli::cli_abort("{.var max_tokens} for model {models_df$model} must be ",
+                     "an integer between 1 and {model_max_tokens}")
+    }
   }
+
 
   # Validate json_mode - must be a logical scalar
   checkmate::assert_logical(json_mode, len = 1)
@@ -78,5 +85,10 @@ validate_args_call_api <- function(prompts,
 
   # Validate log - must be a logical scalar
   checkmate::assert_logical(log, len = 1)
+
+  # Valudate llamafile path if provided
+  if (!missing(llamafile_path)) {
+    checkmate::assert_file_exists(llamafile_path)
+  }
 }
 
