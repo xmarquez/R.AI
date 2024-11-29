@@ -74,6 +74,6 @@ groq_usage <- function(response) {
   response$usage |>
     dplyr::as_tibble() |>
     dplyr::mutate(model = response$model) |>
-    dplyr::rename(input_tokens = .data$prompt_tokens,
-                  output_tokens = .data$completion_tokens)
+    dplyr::rename(input_tokens = "prompt_tokens",
+                  output_tokens = "completion_tokens")
 }

@@ -78,8 +78,8 @@ gemini_usage <- function(response, model) {
   response$usageMetadata |>
     dplyr::as_tibble() |>
     dplyr::mutate(model = model) |>
-    dplyr::rename(input_tokens = .data$promptTokenCount,
-                  output_tokens = .data$candidatesTokenCount,
-                  total_tokens = .data$totalTokenCount) |>
-    dplyr::relocate(.data$model)
+    dplyr::rename(input_tokens = "promptTokenCount",
+                  output_tokens = "candidatesTokenCount",
+                  total_tokens = "totalTokenCount") |>
+    dplyr::relocate("model")
 }
