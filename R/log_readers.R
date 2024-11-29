@@ -1,9 +1,10 @@
 #' Extract Raw Log Data
 #'
-#' This function extracts raw log data created by the package [crew] when
-#' running in a [targets] pipeline from the specified directory. It looks for
-#' log files matching the given pattern and reads lines containing log entries
-#' marked with "___LOG___".
+#' This function extracts raw log data created by the package
+#' [crew](https://cran.r-project.org/package=crew) when running in a
+#' [targets](https://cran.r-project.org/package=targets) pipeline from the
+#' specified directory. It looks for log files matching the given pattern and
+#' reads lines containing log entries marked with "___LOG___".
 #'
 #' @param path The path to the directory containing log files. Defaults to the
 #'   current directory (".").
@@ -57,9 +58,10 @@ crew_log_raw <- function(path = ".", glob = "crew-*.log") {
 #' Extract Log Data for API Retries
 #'
 #' This function extracts log data related to failed API requests created by the
-#' package [crew] when running in a [targets] pipeline from the specified
-#' directory. It looks for lines indicating failed requests and retrieves the
-#' error codes and retry intervals.
+#' package [crew](https://cran.r-project.org/package=crew) when running in a
+#' [targets](https://cran.r-project.org/package=targets) pipeline from the
+#' specified directory. It looks for lines indicating failed requests and
+#' retrieves the error codes and retry intervals.
 #'
 #' @param path The path to the directory containing log files. Defaults to the
 #'   current directory (".").
@@ -106,27 +108,50 @@ crew_log_retries <- function(path = ".", glob = "crew-*.log") {
 
 #' Summarize Log Data
 #'
-#' This function provides a summary of log data created by the package [crew]
-#' when running in a [targets] pipeline extracted from the specified directory.
-#' It includes information such as the number of prompts processed, the time of
-#' the first and last activity, the total processing time, and an estimate of
-#' prompts processed per hour (pph).
+#' This function provides a summary of log data created by the package
+#' [crew](https://cran.r-project.org/package=crew) when running in a
+#' [targets](https://cran.r-project.org/package=targets) pipeline extracted from
+#' the specified directory. The summary includes the number of prompts
+#' processed, the time of the first and last activity, the total processing
+#' time, and an estimate of prompts processed per hour (PPH).
 #'
-#' @param path The path to the directory containing log files. Defaults to the
-#'   current directory (".").
+#' @param path A character string specifying the directory containing log files.
+#'   Defaults to the current directory (".").
 #' @param glob A pattern to match the log files. Defaults to "crew-*.log".
 #'
-#' @return A tibble summarizing log data with columns: `model`, `api`,
-#'   `prompt_name`, `prompt_set`, `file`, `prompts_processed`, `first_activity`,
-#'   `last_activity`, `total_time`, `pph`, `eta`, `last_error_code`, and
-#'   `last_retry_interval`.
+#' @return A tibble summarizing the log data with the following columns:
+#'   - `model`: The model used for processing.
+#'   - `api`: The API used for the requests.
+#'   - `prompt_name`: The name of the prompt being processed.
+#'   - `prompt_set`: The unique identifier for the set of prompts.
+#'   - `file`: The log file where the data was recorded.
+#'   - `prompts_processed`: The total number of prompts processed.
+#'   - `first_activity`: The timestamp of the first recorded activity.
+#'   - `last_activity`: The timestamp of the last recorded activity.
+#'   - `total_time`: The total time taken for processing, calculated as a
+#'   lubridate period.
+#'   - `pph`: The number of prompts processed per hour.
+#'   - `eta`: The estimated time remaining to process all prompts.
+#'   - `last_error_code`: The last error code recorded (if any).
+#'   - `last_retry_interval`: The duration of the last retry interval (if any).
 #'
-#' @examples
-#' # Summarize log data from the current directory
-#' crew_log_summary()
+#' @details The function first extracts raw log data using [crew_log_raw()] and
+#' then aggregates it by `model`, `api`, `prompt_name`, `prompt_set`, and `file`
+#' to compute summary statistics. It also integrates retry information from
+#' [crew_log_retries()] if applicable.
+#'
+#' If no logs are found matching the specified `path` and `glob`, the function
+#' returns an empty tibble.
+#'
+#' @seealso [crew_log_raw()] for extracting raw log data and
+#' [crew_log_retries()] for retry-specific information.
 #'
 #' @export
 crew_log_summary <- function(path = ".", glob = "crew-*.log") {
+  model <- api <- prompt_name <- prompt_set <- current_prompt <- time <- NULL
+  last_activity <- prompts_processed <- total_time <- total_prompts <- pph <- NULL
+  first_activity <- last_retry_interval <- NULL
+
   # Extract raw log data from the specified directory
   log_summary <- crew_log_raw(path = path, glob = glob) |>
     # Group data by model, api, prompt_name, prompt_set, and file
