@@ -30,6 +30,9 @@
 #' @param system An optional system message (for Claude only).
 #' @param pause_cap Maximum number of seconds to wait before retrying a request.
 #'   Default is 1200s, about 20 minutes.
+#' @param llamafile_path A path to a local
+#'   [llamafile](https://github.com/Mozilla-Ocho/llamafile), if using local
+#'   inference.
 #' @param log Whether to provide informative messages for a [crew] log (when
 #'   using [target]), or print them to the screen.
 #'
@@ -52,6 +55,8 @@
 #' - call_api.claude
 #' - call_api.openai
 #' - call_api.gemini
+#' - call_api.mistral
+#' - call_api.local_llamafile (for a local [llamafile](https://github.com/Mozilla-Ocho/llamafile))
 #'
 #'   Each method handles API-specific details such as endpoint URLs,
 #'   authentication, and response parsing.
@@ -100,6 +105,7 @@ call_api.default <- function(prompts,
                              single_request_fun,
                              response_validation_fun,
                              content_extraction_fun,
+                             llamafile_path,
                              log) {
 
   ids <- names(prompts)
@@ -107,6 +113,12 @@ call_api.default <- function(prompts,
   responses <- tibble()
 
   prompt_set <- digest::digest(ids)
+
+  if(!missing(llamafile_path)) {
+    if(!is_llamafile_running()) {
+      start_llamafile(llamafile_path = llamafile_path)
+    }
+  }
 
   for(i in 1:length(prompts)) {
     if(log) {
@@ -376,6 +388,67 @@ call_api.gemini <- function(prompts,
 
 }
 
+#' @export
+call_api.local_llamafile <- function(prompts,
+                           model,
+                           prompt_name,
+                           n_candidates = 1,
+                           max_retries = 10,
+                           temperature = 0.2,
+                           max_tokens = 300,
+                           json_mode = TRUE,
+                           system = NULL,
+                           pause_cap = 1200,
+                           llamafile_path,
+                           log = TRUE) {
+
+  if (missing(model)) {
+    model <- "LLaMA_CPP"
+  }
+
+  if (missing(prompt_name)) {
+    if (json_mode) {
+      prompt_name <- "json"
+    } else {
+      prompt_name <- "default"
+    }
+  }
+
+  validate_args_call_api(prompts = prompts,
+                         model = model,
+                         prompt_name = prompt_name,
+                         n_candidates = n_candidates,
+                         max_retries = max_retries,
+                         temperature = temperature,
+                         max_tokens = max_tokens,
+                         json_mode = json_mode,
+                         system = system,
+                         pause_cap = pause_cap,
+                         log = log,
+                         llamafile_path = llamafile_path)
+
+  single_request_fun <- "llamafile_single_request"
+  response_validation_fun <- paste("llamafile", prompt_name, "response_validation", sep = "_")
+  content_extraction_fun <- paste("llamafile", prompt_name, "content_extraction", sep = "_")
+
+  NextMethod(prompts,
+             model = model,
+             prompt_name = prompt_name,
+             max_retries = max_retries,
+             n_candidates = n_candidates,
+             temperature = temperature,
+             max_tokens = max_tokens,
+             json_mode = json_mode,
+             system = system,
+             response_validation_fun = response_validation_fun,
+             content_extraction_fun = content_extraction_fun,
+             single_request_fun = single_request_fun,
+             llamafile_path = llamafile_path,
+             pause_cap = pause_cap,
+             log = log)
+}
+
+
 default_json_content_extraction <- function(json_string) {
   json_string |>
     purrr::map(default_json_content_cleaning) |>
@@ -388,7 +461,8 @@ default_json_content_cleaning <- function(json_string) {
   json_string |>
     stringr::str_remove("```$") |>
     stringr::str_remove("```json( )?")  |>
-    stringr::str_replace(stringr::regex("\\}\n.+", dotall = TRUE), "}")
+    stringr::str_replace(stringr::regex("\\}\n.+", dotall = TRUE), "}")|>
+    stringr::str_remove("<\\|eot_id\\|>$")
 }
 
 retry_response <- function(base_url,
