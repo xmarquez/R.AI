@@ -1,16 +1,18 @@
 #' Call Language Model API
 #'
-#' This generic function sends prompts to various language model APIs and retrieves
-#' responses. It supports multiple APIs, including Groq, OpenAI, Claude (Anthropic),
-#' and Gemini.
+#' This generic function sends prompts to various language model APIs and
+#' retrieves responses. It supports multiple APIs, including Groq, OpenAI,
+#' Claude (Anthropic), and Gemini.
 #'
 #' @param prompts A list of prompts to send to the API. The class of this object
-#'   should match one of the supported APIs: "groq", "claude", "openai", or "gemini".
+#'   should match one of the supported APIs: "groq", "claude" (for the Anthropic
+#'   API), "openai", "gemini", or "local_llamafile" (for local
+#'   [llamafiles](https://github.com/mozilla-ocho/llamafile/)).
 #' @param model A string specifying the model to use.
 #' @param prompt_name An optional string specifying the type of prompt.
-#' @param ... Additional arguments passed to specific `call_api` methods, such as
-#'   `max_retries`, `temperature`, `max_tokens`, `json_mode`, `system`, `pause_cap`,
-#'   `llamafile_path`, or `log`.
+#' @param ... Additional arguments passed to specific `call_api` methods, such
+#'   as `max_retries`, `temperature`, `max_tokens`, `json_mode`, `system`,
+#'   `pause_cap`, `llamafile_path`, or `log`.
 #'
 #' @return A tibble containing the API responses and usage information.
 #' @details This function is implemented as a generic with methods for different
@@ -22,8 +24,8 @@
 #' - call_api.mistral
 #' - call_api.local_llamafile
 #'
-#' Each method handles API-specific details such as endpoint URLs,
-#' authentication, and response parsing.
+#'   Each method handles API-specific details such as endpoint URLs,
+#'   authentication, and response parsing.
 #'
 #' @seealso [build_prompts_from_files()] for creating prompts to use with this
 #'   function.
