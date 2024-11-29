@@ -127,7 +127,7 @@ claude_list_batches <- function(limit = 20, max_retries = 3, pause_cap = 1200, q
 #' @param batch_response The list returned by [claude_create_batch()], containing the string
 #'   representing the unique ID of the message batch to retrieve. (It's also
 #'   possible to pass the specific object from [claude_list_batches()], e.g.,
-#'   claude_list_batches()$data[[1]]).
+#'   `claude_list_batches()$data[[1]]`).
 #' @param max_retries An integer indicating the maximum number of retry attempts
 #'   in case of request failures. Defaults to 3.
 #' @param pause_cap A numeric value representing the maximum pause duration (in
@@ -178,7 +178,7 @@ claude_check_batch_status <- function(batch_response, max_retries = 3, pause_cap
 #' @param batch_response The list returned by [claude_create_batch()],
 #'   containing the string representing the unique ID of the message batch to
 #'   retrieve. (It's also possible to pass the specific object from
-#'   [claude_list_batches()], e.g., claude_list_batches()$data[[1]]).
+#'   [claude_list_batches()], e.g., `claude_list_batches()$data[[1]]`).
 #' @param max_retries An integer indicating the maximum number of retry attempts
 #'   in case of request failures. Defaults to 3.
 #' @param pause_cap A numeric value representing the maximum pause duration (in
@@ -247,9 +247,9 @@ claude_download_batch_results <- function(batch_response, max_retries = 3, pause
 #' polling again.
 #'
 #' @param batch_response A list returned by [claude_create_batch()] or
-#'   [claude_retrieve_message_batch()] containing batch details. (It's also
+#'   [claude_check_batch_status()] containing batch details. (It's also
 #'   possible to pass the specific object from [claude_list_batches()], e.g.,
-#'   claude_list_batches()$data[[1]]).
+#'   `claude_list_batches()$data[[1]]`).
 #' @param timeout A numeric value representing the time (in seconds) to wait
 #'   between polling attempts. Defaults to 3600 seconds (1 hour).
 #' @param max_retries An integer indicating the maximum number of retry attempts
@@ -326,7 +326,7 @@ claude_format_prompts_for_batch <- function(prompts, model, max_tokens) {
 #' @param batch_response The list returned by [claude_create_batch()], containing the string
 #'   representing the unique ID of the message batch to retrieve. (It's also
 #'   possible to pass the specific object from [claude_list_batches()], e.g.,
-#'   claude_list_batches()$data[[1]]).
+#'   `claude_list_batches()$data[[1]]`).
 #' @param max_retries An integer indicating the maximum number of retry attempts
 #'   in case of request failures. Defaults to 3.
 #' @param pause_cap A numeric value representing the maximum pause duration (in
