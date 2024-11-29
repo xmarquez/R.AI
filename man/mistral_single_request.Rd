@@ -25,45 +25,114 @@ mistral_single_request(
 )
 }
 \arguments{
-\item{prompt}{A list of messages, each with a role (e.g., "user" or
-"assistant") and content, used as input for the model. Must be in the
-format \code{list(list(role = "user", content = "Hello world!"))}.}
+\item{prompt}{A list containing the prompt message(s). Each message should
+be a named list with \code{role} (e.g., "system", "user") and \code{content}.}
 
-\item{model}{The model to use for generating responses, e.g.,
-"gpt-3.5-turbo".}
+\item{model}{A string specifying the model to use. Available models include:
+\itemize{
+\item \strong{Premier Models}:
+\itemize{
+\item \code{"mistral-large-latest"}: Top-tier reasoning model for high-complexity tasks.
+\item \code{"pixtral-large-latest"}: Frontier-class multimodal model.
+\item \code{"ministral-3b-latest"}: Best edge model with high performance/price ratio.
+\item \code{"ministral-8b-latest"}: Powerful edge model with excellent efficiency.
+\item \code{"mistral-small-latest"}: Enterprise-grade small model for cost-sensitive applications.
+\item \code{"codestral-latest"}: Language model specialized for coding.
+\item \code{"mistral-moderation-latest"}: Moderation model for harmful content detection.
+}
+\item \strong{Free Models}:
+\itemize{
+\item \code{"pixtral-12b-2409"}: Multimodal model with image and text understanding.
+\item \code{"open-mistral-nemo"}: Multilingual open-source model.
+\item \code{"open-codestral-mamba"}: Open-source coding model.
+}
+\item \strong{Legacy Models} (deprecated as of November 2024, retired by March 2025):
+\itemize{
+\item \code{"open-mistral-7b"}: The first dense model released in September 2023.
+Legacy date: 2024-11-25. Retirement date: 2025-03-30.
+Recommended alternative: \code{"ministral-8b-latest"}.
+\item \code{"open-mixtral-8x7b"}: The first sparse mixture-of-experts model (December 2023).
+Legacy date: 2024-11-25. Retirement date: 2025-03-30.
+Recommended alternative: \code{"mistral-small-latest"}.
+\item \code{"open-mixtral-8x22b"}: Advanced sparse model (April 2024).
+Legacy date: 2024-11-25. Retirement date: 2025-03-30.
+Recommended alternative: \code{"mistral-small-latest"}.
+\item \code{"mistral-medium-2312"}: Model for intermediate reasoning tasks (December 2023).
+Legacy date: 2024-11-25. Retirement date: 2025-03-30.
+Recommended alternative: \code{"mistral-small-latest"}.
+\item \code{"mistral-large-2402"}: An earlier version of the reasoning model (February 2024).
+Legacy date: 2024-11-25. Retirement date: 2025-03-30.
+Recommended alternative: \code{"mistral-large-latest"}.
+}
+}}
 
-\item{n_candidates}{The number of response candidates to generate. Defaults
-to 1.}
+\item{n_candidates}{An integer specifying the number of response candidates
+to generate per prompt. Defaults to 1.}
 
-\item{max_retries}{The maximum number of retry attempts in case of request
-failures. Defaults to 10.}
+\item{max_retries}{Maximum number of retry attempts in case of request failure.
+Defaults to 10.}
 
-\item{temperature}{A numeric value between 0 and 1 that controls the
-randomness of the response. Higher values make the output more random.
-Defaults to 0.2.}
+\item{temperature}{A numeric value controlling randomness in the model's output.
+Higher values (e.g., 1) produce more diverse responses, while lower values
+(e.g., 0.2) make responses more focused. Defaults to 0.2.}
 
-\item{max_tokens}{The maximum number of tokens to include in the response.
+\item{top_p}{A numeric value for nucleus sampling, restricting responses to
+the smallest subset of tokens with cumulative probability \code{top_p}. Defaults to 1.}
+
+\item{max_tokens}{The maximum number of tokens to generate in the response.
 Defaults to 300.}
 
-\item{safe_prompt}{A logical value indicating whether to inject a safety prompt before all conversations.
-Default is \code{FALSE}. When set to \code{TRUE}, an additional safety layer is added to the prompt to ensure content safety.}
+\item{stream}{A logical value indicating whether to stream responses as they
+are generated. Defaults to \code{FALSE}.}
 
-\item{response_validation_fun}{A function to validate the response received
-from the API. Defaults to \code{openai_default_response_validation()} if not
-provided.}
+\item{stop}{A character vector of stop sequences. The model will stop generating
+further tokens when any of the specified sequences is encountered. Defaults to \code{NULL}.}
 
-\item{content_extraction_fun}{A function to extract the desired content from
-the API response. If not provided, a default extraction function is used
-depending on the value of \code{json_mode}.}
+\item{random_seed}{An integer for setting a seed for reproducibility.
+Defaults to \code{NULL} (no fixed seed).}
 
-\item{pause_cap}{A numeric value representing the maximum pause duration (in
-seconds) between retries. Defaults to 1200.}
+\item{presence_penalty}{A numeric value that penalizes the presence of new tokens.
+Values range from -2.0 to 2.0, with higher values encouraging the generation
+of novel tokens. Defaults to 0.}
 
-\item{quiet}{A logical value indicating whether the function should suppress
-messages during retries. Defaults to \code{FALSE}.}
+\item{frequency_penalty}{A numeric value that penalizes the frequency of tokens
+that have already been generated. Values range from -2.0 to 2.0. Defaults to 0.}
+
+\item{safe_prompt}{A logical value indicating whether to validate the prompt
+for safety before sending it to the API. Defaults to \code{FALSE}.}
+
+\item{response_validation_fun}{A function to validate the API's response.
+If not provided, the default validation function will be used.}
+
+\item{content_extraction_fun}{A function to extract content from the API's
+response. If not provided, the default extraction function
+(\code{mistral_default_content_extraction}) will be used.}
+
+\item{pause_cap}{The maximum duration (in seconds) for pauses between retries
+when the API is rate-limited. Defaults to 1200 seconds.}
+
+\item{quiet}{A logical value. If \code{TRUE}, suppresses retry messages. Defaults to \code{FALSE}.}
+}
+\value{
+A tibble containing the following columns:
+\itemize{
+\item \code{response}: The extracted response content.
+\item \code{usage}: Usage details from the API (e.g., tokens used, API cost).
+}
 }
 \description{
-This function sends a single prompt to the Mistral API for processing,
-allowing users to customize parameters such as model, number of candidates,
-and more. It also handles retries and extracts the relevant response content.
+This function sends a single prompt to the Mistral API and retrieves the response.
+It supports various parameters for fine-tuning the behavior of Mistral's models,
+which include premier, free, and legacy options. Mistral's API provides state-of-the-art
+capabilities for text generation, coding, embeddings, and moderation.
+}
+\details{
+This function supports Mistral's premier, free, and legacy models. Legacy
+models are scheduled for deprecation as of November 2024 and retirement by
+March 2025. Users are encouraged to transition to recommended alternatives
+listed above to avoid disruptions.
+
+The function constructs a JSON payload from the provided arguments, sends it to the
+Mistral API using \code{POST}, and processes the response. It supports retries for failed
+requests and allows customization of response validation and extraction.
 }

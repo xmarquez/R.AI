@@ -7,26 +7,48 @@
 crew_log_summary(path = ".", glob = "crew-*.log")
 }
 \arguments{
-\item{path}{The path to the directory containing log files. Defaults to the
-current directory (".").}
+\item{path}{A character string specifying the directory containing log files.
+Defaults to the current directory (".").}
 
 \item{glob}{A pattern to match the log files. Defaults to "crew-*.log".}
 }
 \value{
-A tibble summarizing log data with columns: \code{model}, \code{api},
-\code{prompt_name}, \code{prompt_set}, \code{file}, \code{prompts_processed}, \code{first_activity},
-\code{last_activity}, \code{total_time}, \code{pph}, \code{eta}, \code{last_error_code}, and
-\code{last_retry_interval}.
+A tibble summarizing the log data with the following columns:
+\itemize{
+\item \code{model}: The model used for processing.
+\item \code{api}: The API used for the requests.
+\item \code{prompt_name}: The name of the prompt being processed.
+\item \code{prompt_set}: The unique identifier for the set of prompts.
+\item \code{file}: The log file where the data was recorded.
+\item \code{prompts_processed}: The total number of prompts processed.
+\item \code{first_activity}: The timestamp of the first recorded activity.
+\item \code{last_activity}: The timestamp of the last recorded activity.
+\item \code{total_time}: The total time taken for processing, calculated as a
+lubridate period.
+\item \code{pph}: The number of prompts processed per hour.
+\item \code{eta}: The estimated time remaining to process all prompts.
+\item \code{last_error_code}: The last error code recorded (if any).
+\item \code{last_retry_interval}: The duration of the last retry interval (if any).
+}
 }
 \description{
-This function provides a summary of log data created by the package \link{crew}
-when running in a \link{targets} pipeline extracted from the specified directory.
-It includes information such as the number of prompts processed, the time of
-the first and last activity, the total processing time, and an estimate of
-prompts processed per hour (pph).
+This function provides a summary of log data created by the package
+\href{https://cran.r-project.org/package=crew}{crew} when running in a
+\href{https://cran.r-project.org/package=targets}{targets} pipeline extracted from
+the specified directory. The summary includes the number of prompts
+processed, the time of the first and last activity, the total processing
+time, and an estimate of prompts processed per hour (PPH).
 }
-\examples{
-# Summarize log data from the current directory
-crew_log_summary()
+\details{
+The function first extracts raw log data using \code{\link[=crew_log_raw]{crew_log_raw()}} and
+then aggregates it by \code{model}, \code{api}, \code{prompt_name}, \code{prompt_set}, and \code{file}
+to compute summary statistics. It also integrates retry information from
+\code{\link[=crew_log_retries]{crew_log_retries()}} if applicable.
 
+If no logs are found matching the specified \code{path} and \code{glob}, the function
+returns an empty tibble.
+}
+\seealso{
+\code{\link[=crew_log_raw]{crew_log_raw()}} for extracting raw log data and
+\code{\link[=crew_log_retries]{crew_log_retries()}} for retry-specific information.
 }

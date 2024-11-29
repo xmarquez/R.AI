@@ -18,10 +18,11 @@ A tibble containing log data with columns: \code{time}, \code{api},
 \code{total_prompts}. If no logs are found, returns an empty tibble.
 }
 \description{
-This function extracts raw log data created by the package \link{crew} when
-running in a \link{targets} pipeline from the specified directory. It looks for
-log files matching the given pattern and reads lines containing log entries
-marked with "\emph{\strong{LOG}}".
+This function extracts raw log data created by the package
+\href{https://cran.r-project.org/package=crew}{crew} when running in a
+\href{https://cran.r-project.org/package=targets}{targets} pipeline from the
+specified directory. It looks for log files matching the given pattern and
+reads lines containing log entries marked with "\emph{\strong{LOG}}".
 }
 \examples{
 # Extract log data from the current directory

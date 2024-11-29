@@ -18,9 +18,10 @@ A tibble containing log data with columns: \code{file}, \code{error_codes}, and
 }
 \description{
 This function extracts log data related to failed API requests created by the
-package \link{crew} when running in a \link{targets} pipeline from the specified
-directory. It looks for lines indicating failed requests and retrieves the
-error codes and retry intervals.
+package \href{https://cran.r-project.org/package=crew}{crew} when running in a
+\href{https://cran.r-project.org/package=targets}{targets} pipeline from the
+specified directory. It looks for lines indicating failed requests and
+retrieves the error codes and retry intervals.
 }
 \examples{
 # Extract retry log data from the current directory

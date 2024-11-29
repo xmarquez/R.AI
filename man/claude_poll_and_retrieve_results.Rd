@@ -15,9 +15,9 @@ claude_poll_and_retrieve_results(
 }
 \arguments{
 \item{batch_response}{A list returned by \code{\link[=claude_create_batch]{claude_create_batch()}} or
-\code{\link[=claude_retrieve_message_batch]{claude_retrieve_message_batch()}} containing batch details. (It's also
+\code{\link[=claude_check_batch_status]{claude_check_batch_status()}} containing batch details. (It's also
 possible to pass the specific object from \code{\link[=claude_list_batches]{claude_list_batches()}}, e.g.,
-claude_list_batches()$data[\link{1}]).}
+\code{claude_list_batches()$data[[1]]}).}
 
 \item{timeout}{A numeric value representing the time (in seconds) to wait
 between polling attempts. Defaults to 3600 seconds (1 hour).}

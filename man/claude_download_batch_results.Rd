@@ -16,7 +16,7 @@ claude_download_batch_results(
 \item{batch_response}{The list returned by \code{\link[=claude_create_batch]{claude_create_batch()}},
 containing the string representing the unique ID of the message batch to
 retrieve. (It's also possible to pass the specific object from
-\code{\link[=claude_list_batches]{claude_list_batches()}}, e.g., claude_list_batches()$data[\link{1}]).}
+\code{\link[=claude_list_batches]{claude_list_batches()}}, e.g., \code{claude_list_batches()$data[[1]]}).}
 
 \item{max_retries}{An integer indicating the maximum number of retry attempts
 in case of request failures. Defaults to 3.}
