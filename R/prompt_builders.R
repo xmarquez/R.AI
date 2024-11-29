@@ -151,6 +151,10 @@ openai_combined_prompt_builder <- function(prompts_df) {
   default_combined_prompt_builder(prompts_df)
 }
 
+local_llamafile_combined_prompt_builder <- function(prompts_df) {
+  default_combined_prompt_builder(prompts_df)
+}
+
 claude_combined_prompt_builder <- function(prompts_df) {
   default_combined_prompt_builder(prompts_df)
 }
