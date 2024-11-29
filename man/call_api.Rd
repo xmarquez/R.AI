@@ -42,6 +42,10 @@ JSON format. Default is TRUE.}
 \item{pause_cap}{Maximum number of seconds to wait before retrying a request.
 Default is 1200s, about 20 minutes.}
 
+\item{llamafile_path}{A path to a local
+\href{https://github.com/Mozilla-Ocho/llamafile}{llamafile}, if using local
+inference.}
+
 \item{log}{Whether to provide informative messages for a \link{crew} log (when
 using \link{target}), or print them to the screen.}
 }
@@ -74,6 +78,8 @@ APIs:
 \item call_api.claude
 \item call_api.openai
 \item call_api.gemini
+\item call_api.mistral
+\item call_api.local_llamafile (for a local \href{https://github.com/Mozilla-Ocho/llamafile}{llamafile})
 
 Each method handles API-specific details such as endpoint URLs,
 authentication, and response parsing.
