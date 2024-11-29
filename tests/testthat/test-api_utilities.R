@@ -5,9 +5,9 @@ test_that("get_default_model works correctly", {
   skip_on_cran()
 
   # Check the default model for various APIs and types
-  expect_equal(get_default_model("groq", "cheapest"), "llama3-8b-8192")
-  expect_equal(get_default_model("groq", "largest"), "llama3-70b-8192")
-  expect_equal(get_default_model("claude", "best"), "claude-3-5-sonnet-20240620")
+  expect_equal(get_default_model("groq", "cheapest"), "llama-3.1-8b-instant")
+  expect_equal(get_default_model("groq", "largest"), "llama-3.2-90b-text-preview")
+  expect_equal(get_default_model("claude", "best"), "claude-3-5-sonnet-20241022")
 })
 
 test_that("get_available_models works correctly", {
