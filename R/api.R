@@ -6,7 +6,7 @@
 #'
 #' @param prompts A list of prompts to send to the API. The class of this object
 #'   should match one of the supported APIs: "groq", "claude" (for the Anthropic
-#'   API), "openai", "gemini", or "local_llamafile" (for local
+#'   API), "openai", "gemini", or "llamafile" (for local
 #'   [llamafiles](https://github.com/mozilla-ocho/llamafile/)).
 #' @param model A string specifying the model to use.
 #' @param prompt_name An optional string specifying the type of prompt.
@@ -22,7 +22,7 @@
 #' - call_api.openai
 #' - call_api.gemini
 #' - call_api.mistral
-#' - call_api.local_llamafile
+#' - call_api.llamafile
 #'
 #'   Each method handles API-specific details such as endpoint URLs,
 #'   authentication, and response parsing.
@@ -72,6 +72,8 @@ call_api.default <- function(prompts,
 
   # Start Llamafile if applicable and not already running
   if (!is.null(llamafile_path) && !is_llamafile_running()) {
+    browser()
+    message("Starting LLamafile: ", llamafile_path)
     start_llamafile(llamafile_path)
   }
 
@@ -401,7 +403,7 @@ call_api.gemini <- function(prompts, model, prompt_name, ...) {
 
 
 #' @export
-call_api.local_llamafile <- function(prompts, model, prompt_name, ...) {
+call_api.llamafile <- function(prompts, model, prompt_name, ...) {
   # Extract additional arguments from ...
   args <- list(...)
   n_candidates <- args$n_candidates %||% 1
@@ -496,4 +498,52 @@ retry_response <- function(base_url,
 
   res
 
+}
+
+#' Call Language Model Batch API
+#'
+#' This generic function sends batch requests to various language model APIs. It
+#' supports multiple APIs, including OpenAI, Claude (Anthropic), and Mistral.
+#'
+#' @param prompts A list of prompts to send to the API. The class of this object
+#'   should match one of the supported APIs: "mistral", "claude" (for the
+#'   Anthropic API), or "openai".
+#' @param model A string specifying the model to use.
+#' @param prompt_name An optional string specifying the type of prompt.
+#' @param max_tokens The maximum number of output tokens for each item in the
+#'   batch. Defaults to 300.
+#' @param quiet A logical value indicating whether the function should suppress
+#'   messages during retries. Defaults to FALSE.
+#'
+#' @return A list containing the response details, including batch ID,
+#'   processing status, and the URL for retrieving results (if ready).
+#' @details This function is implemented as a generic with methods for different
+#'   APIs:
+#' - call_batch_api.claude
+#' - call_batch_api.openai
+#' - call_batch_api.mistral
+#'
+#'   Each method handles API-specific details such as endpoint URLs,
+#'   authentication, and response parsing.
+#'
+#' @seealso [build_prompts_from_files()] for creating prompts to use with this
+#'   function.
+#' @export
+call_batch_api <- function(prompts, model, max_tokens, quiet) {
+  UseMethod("call_batch_api", prompts)
+}
+
+#' @export
+call_batch_api.claude <- function(prompts, model, max_tokens = 300, quiet = FALSE) {
+  claude_batch_job(prompts = prompts, model = model, max_tokens = max_tokens, quiet = quiet)
+}
+
+#' @export
+call_batch_api.openai <- function(prompts, model, max_tokens = 300, quiet = FALSE) {
+  openai_batch_job(prompts = prompts, model = model, max_tokens = max_tokens, quiet = quiet)
+}
+
+#' @export
+call_batch_api.mistral <- function(prompts, model, max_tokens = 300, quiet = FALSE) {
+  mistral_batch_job(prompts = prompts, model = model, max_tokens = max_tokens, quiet = quiet)
 }
