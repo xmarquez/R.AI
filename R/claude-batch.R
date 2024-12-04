@@ -400,3 +400,17 @@ claude_batch <- function(prompts, model, timeout = 3600, max_tokens = 300, tidy 
                                              quiet = quiet)
   result
 }
+
+#' Create a Message Batch Using the Anthropic API
+#'
+#' This function sends a batch of message creation requests to the Anthropic API
+#' using the [Message Batches
+#' endpoint](https://docs.anthropic.com/en/api/creating-message-batches). It
+#' allows you to process multiple requests at once, useful for scenarios
+#' requiring bulk message completions.
+#'
+#' @inheritParams claude_create_batch
+#' @export
+claude_batch_job <- function(prompts, model, max_tokens = 300, quiet = FALSE) {
+  claude_create_batch(prompts = prompts, model = model, max_tokens = tokens, quiet = quiet)
+}
