@@ -9,7 +9,7 @@ call_api(prompts, model, prompt_name, ...)
 \arguments{
 \item{prompts}{A list of prompts to send to the API. The class of this object
 should match one of the supported APIs: "groq", "claude" (for the Anthropic
-API), "openai", "gemini", or "local_llamafile" (for local
+API), "openai", "gemini", or "llamafile" (for local
 \href{https://github.com/mozilla-ocho/llamafile/}{llamafiles}).}
 
 \item{model}{A string specifying the model to use.}
@@ -37,7 +37,7 @@ APIs:
 \item call_api.openai
 \item call_api.gemini
 \item call_api.mistral
-\item call_api.local_llamafile
+\item call_api.llamafile
 
 Each method handles API-specific details such as endpoint URLs,
 authentication, and response parsing.

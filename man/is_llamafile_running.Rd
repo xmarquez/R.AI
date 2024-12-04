@@ -7,8 +7,9 @@
 is_llamafile_running()
 }
 \value{
-TRUE if the Llamafile instance is running, otherwise FALSE.
+TRUE if any Llamafile instance is running, otherwise FALSE.
 }
 \description{
-This function checks if a Llamafile instance is currently running at localhost:8080.
+This function checks if a Llamafile instance is currently running at
+localhost:8080.
 }

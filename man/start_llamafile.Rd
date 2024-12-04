@@ -4,9 +4,7 @@
 \alias{start_llamafile}
 \title{Start Llamafile Instance}
 \usage{
-start_llamafile(
-  llamafile_path = here::here("models", "Llama-3.2-1B-Instruct.Q6_K.llamafile.exe")
-)
+start_llamafile(llamafile_path)
 }
 \arguments{
 \item{llamafile_path}{The path to the Llamafile executable.}
