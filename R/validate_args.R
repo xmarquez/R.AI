@@ -4,7 +4,7 @@ validate_args_build_prompt_from_file <- function(files,
                                                  data) {
   checkmate::assert_file(files)
   checkmate::assert_subset(roles, c("user", "system", "assistant"))
-  checkmate::assert_choice(api, choices = c("groq", "openai", "claude", "gemini", "local_llamafile"))
+  checkmate::assert_choice(api, choices = c("groq", "openai", "claude", "gemini", "llamafile"))
   if(length(roles) != 1 && length(roles) != length(files)) {
     cli::cli_abort("{.var roles} must be of length one or the same length as {.var file}.")
   }
@@ -33,15 +33,17 @@ validate_args_call_api <- function(prompts,
   api <- class(prompts)[1]
 
   # Validate prompts - must be one of the supported API classes
-  checkmate::assert_multi_class(prompts, classes = c("groq", "openai", "claude", "gemini", "local_llamafile"))
+  checkmate::assert_multi_class(prompts, classes = c("groq", "openai", "claude", "gemini", "llamafile"))
 
   # Validate model if provided
-  if (!missing(model) && !"local_llamafile" %in% class(prompts) ) {
+  if (!missing(model) && !"llamafile" %in% class(prompts) ) {
     checkmate::assert_scalar(model)
     checkmate::assert_choice(model, models_df$model[models_df$api == api])
-  } else if (!missing(model) && "local_llamafile" %in% class(prompts) ) {
+  } else if (!missing(model) && "llamafile" %in% class(prompts) ) {
     checkmate::assert_scalar(model)
-    checkmate::assert_choice(model, "LLaMA_CPP")
+    checkmate::assert_choice(model,
+                             c("LLaMA_CPP",
+                               stringr::str_remove(basename(llamafile_path), "\\.llamafile.*$")))
   }
 
   # Validate prompt_name if provided
