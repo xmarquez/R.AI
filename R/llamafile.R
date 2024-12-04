@@ -124,9 +124,10 @@ llamafile_usage <- function(response) {
 
 #' Check if Llamafile is Running on localhost:8080
 #'
-#' This function checks if a Llamafile instance is currently running at localhost:8080.
+#' This function checks if a Llamafile instance is currently running at
+#' localhost:8080.
 #'
-#' @return TRUE if the Llamafile instance is running, otherwise FALSE.
+#' @return TRUE if any Llamafile instance is running, otherwise FALSE.
 #' @export
 is_llamafile_running <- function() {
   res <- try(httr::GET("http://localhost:8080/v1/models"), silent = TRUE)
@@ -142,11 +143,67 @@ is_llamafile_running <- function() {
 #'
 #' @param llamafile_path The path to the Llamafile executable.
 #' @export
-start_llamafile <- function(llamafile_path = here::here("models", "Llama-3.2-1B-Instruct.Q6_K.llamafile.exe")) {
+start_llamafile <- function(llamafile_path) {
+  checkmate::assert_file_exists(llamafile_path)
+  if(is_llamafile_running()) {
+    running_model <- which_llamafile_running()
+    stop(glue::glue("{running_model} is already running on http://localhost:8080. Kill the current llamafile before starting a new one."))
+  }
   if (.Platform$OS.type == "windows") {
-    shell(sprintf("start /min cmd /c %s", llamafile_path), wait = FALSE, invisible = TRUE)
+    shell.exec(shQuote(fs::path_real(llamafile_path)))
   } else {
-    system(sprintf("nohup %s > /dev/null 2>&1 &", llamafile_path), wait = FALSE, invisible = TRUE)
+    system(sprintf("nohup %s > /dev/null 2>&1 &", shQuote(llamafile_path)), wait = FALSE, invisible = TRUE)
+  }
+}
+
+#' Kill the Running Llamafile Process
+#'
+#' This function checks if a Llamafile instance is running and attempts to terminate it.
+#'
+#' @return TRUE if the Llamafile process was successfully terminated, FALSE otherwise.
+#' @export
+kill_llamafile <- function() {
+  if(!is_llamafile_running()) {
+    warning("No llamafile instance appears to be running.")
+    return(FALSE)
+  }
+
+  running_model <- which_llamafile_running()
+
+  if (.Platform$OS.type == "windows") {
+    # Terminate process on Windows
+    system(glue::glue("taskkill /F /IM {running_model}.llamafile.exe"), show.output.on.console = FALSE)
+  } else {
+    # Terminate process on Unix-like systems
+    system(glue::glue("pkill -f {running_model}.llamafile"), wait = FALSE, ignore.stdout = TRUE, ignore.stderr = TRUE)
+  }
+
+  # Re-check if Llamafile is still running
+  if (!is_llamafile_running()) {
+    message("Llamafile instance successfully terminated.")
+    return(TRUE)
+  } else {
+    warning("Failed to terminate the Llamafile instance.")
+    return(FALSE)
+  }
+}
+
+#' Determines which llamfile model is running
+#'
+#' Determines which llamafile model is running, if any.
+#'
+#' @return The name of the runnning llamafile model, or `NA` if no llamafile is
+#'   running.
+#' @export
+which_llamafile_running <- function() {
+  if(is_llamafile_running()) {
+    res <- httr::GET("http://localhost:8080/v1/models")
+    running_model <- httr::content(res)$data[[1]]$id |>
+      stringr::str_remove(".gguf")
+    return(running_model)
+  } else {
+    warning("No llamafile instance running.")
+    return(NA_character_)
   }
 }
 
