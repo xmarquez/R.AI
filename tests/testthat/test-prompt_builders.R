@@ -19,8 +19,8 @@ test_that("build_prompts_from_files works correctly", {
   groq_user_file <- test_path("test-prompts/groq_user.md")
   openai_system_file <- test_path("test-prompts/groq_system.md")
   openai_user_file <- test_path("test-prompts/groq_user.md")
-  local_llamafile_system_file <- test_path("test-prompts/groq_system.md")
-  local_llamafile_user_file <- test_path("test-prompts/groq_user.md")
+  llamafile_system_file <- test_path("test-prompts/groq_system.md")
+  llamafile_user_file <- test_path("test-prompts/groq_user.md")
 
   # Ensure the test files exist
   expect_true(file.exists(claude_user_file))
@@ -29,8 +29,8 @@ test_that("build_prompts_from_files works correctly", {
   expect_true(file.exists(groq_user_file))
 
   # Define the roles and API
-  groq_roles <- openai_roles <- local_llamafile_roles <- c("system", "user")
-  api <- "local_llamafile"
+  groq_roles <- openai_roles <- llamafile_roles <- c("system", "user")
+  api <- "llamafile"
 
   # Create a test data frame
   test_data <- data.frame(country = c("USA", "Canada", "Mexico"))
