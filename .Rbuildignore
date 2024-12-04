@@ -4,3 +4,4 @@
 ^prompts$
 ^models$
 ^codebase\.txt$
+^rstudio.sh$
