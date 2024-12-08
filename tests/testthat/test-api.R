@@ -46,6 +46,8 @@ test_that("call_api works correctly for Groq API", {
 
   # Call the API
   responses <- call_api(prompts, model = model, temperature = temperature, max_tokens = max_tokens)
+  responses <- call_api(prompts, model = model, prompt_name = "test_prompt", temperature = temperature, max_tokens = max_tokens)
+
 
   # Check the structure of the returned responses
   expect_true(is.data.frame(responses))
