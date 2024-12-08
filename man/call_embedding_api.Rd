@@ -19,6 +19,7 @@ Supported values are:
 \item \code{"mistral"} - Dispatches to the Mistral embedding API.
 \item \code{"openai"} - Dispatches to the OpenAI embedding API.
 \item \code{"cohere"} - Dispatches to the Cohere embedding API.
+\item \code{"voyage"} - Dispatches to the Voyage embedding API.
 \item \code{"llamafile"} - Dispatches to a local LlamaFile instance.
 }}
 
@@ -44,9 +45,34 @@ the value of \code{api}.
 
 Additional arguments for specific APIs include:
 \itemize{
-\item \code{llamafile}: \code{llamafile_path} (path to the LlamaFile model), \code{quiet} (logical, suppresses logging).
-\item \code{cohere}: \code{input_type} (type of input for embeddings, e.g., "search_document"), \code{embedding_types} (list of desired embedding types, e.g., "float"), \code{quiet} (logical, suppresses logging).
-\item \code{openai} and \code{mistral}: No additional arguments beyond \code{quiet}.
+\item \strong{LlamaFile}:
+\itemize{
+\item \code{llamafile_path}: Path to the LlamaFile model.
+\item \code{quiet}: Logical, suppresses logging (default: \code{FALSE}).
+}
+\item \strong{Cohere}:
+\itemize{
+\item \code{input_type}: Type of input for embeddings (e.g., \code{"search_document"}).
+\item \code{embedding_types}: List of desired embedding types (e.g., \code{"float"}).
+\item \code{quiet}: Logical, suppresses logging (default: \code{FALSE}).
+}
+\item \strong{OpenAI}:
+\itemize{
+\item \code{quiet}: Logical, suppresses logging (default: \code{FALSE}).
+}
+\item \strong{Mistral}:
+\itemize{
+\item \code{quiet}: Logical, suppresses logging (default: \code{FALSE}).
+}
+\item \strong{Voyage}:
+\itemize{
+\item \code{input_type}: Specifies whether the input is \code{"query"}, \code{"document"}, or \code{NULL} (default: \code{"document"}).
+\item \code{truncation}: Logical, whether to truncate input texts (default: \code{TRUE}).
+\item \code{output_dimension}: Integer, specifies the output embedding dimension (optional).
+\item \code{output_dtype}: Data type for embeddings (e.g., \code{"float"}, \code{"int8"}, etc., default: \code{"float"}).
+\item \code{encoding_format}: Format for encoding embeddings (e.g., \code{"base64"} or \code{NULL} for raw lists).
+\item \code{quiet}: Logical, suppresses logging (default: \code{FALSE}).
+}
 }
 }
 \seealso{
