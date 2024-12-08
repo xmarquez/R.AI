@@ -11,7 +11,7 @@
 #'   If multiple roles are provided, the length must match the number of files.
 #'   Only one "system" role is allowed.
 #' @param api A string specifying the API to use. Must be one of "groq", "openai",
-#'   "claude", or "gemini".
+#'   "claude", "mistral", "llamafile", or "gemini".
 #' @param data An optional data frame containing variables to be
 #'   interpolated into the prompts using `stringr::str_glue_data()`.
 #'
@@ -148,6 +148,10 @@ groq_combined_prompt_builder <- function(prompts_df) {
 }
 
 openai_combined_prompt_builder <- function(prompts_df) {
+  default_combined_prompt_builder(prompts_df)
+}
+
+mistral_combined_prompt_builder <- function(prompts_df) {
   default_combined_prompt_builder(prompts_df)
 }
 
