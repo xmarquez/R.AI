@@ -147,3 +147,30 @@ get_available_apis <- function() {
     key_available = api_key_status
   )
 }
+
+resolve_functions <- function(api, prompt_name) {
+  # Set default prompt_name if missing or invalid
+  if (missing(prompt_name) ||
+      !exists(paste0(api, "_", prompt_name, "_content_extraction"), inherits = TRUE)) {
+    prompt_name <- "default"
+  }
+
+  # Generate function names dynamically
+  single_request_fun_name <- paste0(api, "_single_request")
+  content_extraction_fun_name <- paste0(api, "_", prompt_name, "_content_extraction")
+  response_validation_fun_name <- paste0(api, "_", prompt_name, "_response_validation")
+
+  # Ensure the required single_request_fun exists
+  if (!exists(single_request_fun_name, inherits = TRUE)) {
+    stop(glue::glue("The function {single_request_fun_name} does not exist."))
+  }
+
+  # Retrieve functions, inheriting from parent environments if necessary
+  list(
+    single_request_fun = get(single_request_fun_name, inherits = TRUE),
+    content_extraction_fun = get(content_extraction_fun_name, inherits = TRUE),
+    response_validation_fun = get(response_validation_fun_name, inherits = TRUE)
+  )
+}
+
+

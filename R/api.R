@@ -72,7 +72,6 @@ call_api.default <- function(prompts,
 
   # Start Llamafile if applicable and not already running
   if (!is.null(llamafile_path) && !is_llamafile_running()) {
-    browser()
     message("Starting LLamafile: ", llamafile_path)
     start_llamafile(llamafile_path)
   }
@@ -156,10 +155,8 @@ call_api.groq <- function(prompts,
                          pause_cap = pause_cap,
                          log = log)
 
-  # Set function names for Groq-specific processing
-  single_request_fun <- "groq_single_request"
-  response_validation_fun <- paste("groq", prompt_name, "response_validation", sep = "_")
-  content_extraction_fun <- paste("groq", prompt_name, "content_extraction", sep = "_")
+  # Resolve functions using the helper
+  resolved_functions <- resolve_functions("groq", prompt_name)
 
   # Call the generic NextMethod to handle the request
   NextMethod(prompts,
@@ -171,9 +168,9 @@ call_api.groq <- function(prompts,
              max_tokens = max_tokens,
              json_mode = json_mode,
              system = system,
-             response_validation_fun = response_validation_fun,
-             content_extraction_fun = content_extraction_fun,
-             single_request_fun = single_request_fun,
+             response_validation_fun = resolved_functions$response_validation_fun,
+             content_extraction_fun = resolved_functions$content_extraction_fun,
+             single_request_fun = resolved_functions$single_request_fun,
              pause_cap = pause_cap,
              log = log)
 }
@@ -212,9 +209,8 @@ call_api.claude <- function(prompts, model, prompt_name, ...) {
                          pause_cap = pause_cap,
                          log = log)
 
-  single_request_fun <- "claude_single_request"
-  response_validation_fun <- paste("claude", prompt_name, "response_validation", sep = "_")
-  content_extraction_fun <- paste("claude", prompt_name, "content_extraction", sep = "_")
+  # Resolve functions using the helper
+  resolved_functions <- resolve_functions("claude", prompt_name)
 
   NextMethod(prompts,
              model = model,
@@ -225,9 +221,9 @@ call_api.claude <- function(prompts, model, prompt_name, ...) {
              max_tokens = max_tokens,
              json_mode = json_mode,
              system = system,
-             response_validation_fun = response_validation_fun,
-             content_extraction_fun = content_extraction_fun,
-             single_request_fun = single_request_fun,
+             response_validation_fun = resolved_functions$response_validation_fun,
+             content_extraction_fun = resolved_functions$content_extraction_fun,
+             single_request_fun = resolved_functions$single_request_fun,
              pause_cap = pause_cap,
              log = log)
 }
@@ -269,9 +265,8 @@ call_api.mistral <- function(prompts, model, prompt_name, ...) {
                          pause_cap = pause_cap,
                          log = log)
 
-  single_request_fun <- "mistral_single_request"
-  response_validation_fun <- paste("mistral", prompt_name, "response_validation", sep = "_")
-  content_extraction_fun <- paste("mistral", prompt_name, "content_extraction", sep = "_")
+  # Resolve functions using the helper
+  resolved_functions <- resolve_functions("mistral", prompt_name)
 
   NextMethod(prompts,
              model = model,
@@ -288,9 +283,9 @@ call_api.mistral <- function(prompts, model, prompt_name, ...) {
              safe_prompt = safe_prompt,
              json_mode = args$json_mode %||% TRUE,
              pause_cap = pause_cap,
-             response_validation_fun = response_validation_fun,
-             content_extraction_fun = content_extraction_fun,
-             single_request_fun = single_request_fun,
+             response_validation_fun = resolved_functions$response_validation_fun,
+             content_extraction_fun = resolved_functions$content_extraction_fun,
+             single_request_fun = resolved_functions$single_request_fun,
              log = log)
 }
 
@@ -328,9 +323,8 @@ call_api.openai <- function(prompts, model, prompt_name, ...) {
                          pause_cap = pause_cap,
                          log = log)
 
-  single_request_fun <- "openai_single_request"
-  response_validation_fun <- paste("openai", prompt_name, "response_validation", sep = "_")
-  content_extraction_fun <- paste("openai", prompt_name, "content_extraction", sep = "_")
+  # Resolve functions using the helper
+  resolved_functions <- resolve_functions("openai", prompt_name)
 
   NextMethod(prompts,
              model = model,
@@ -341,9 +335,9 @@ call_api.openai <- function(prompts, model, prompt_name, ...) {
              max_tokens = max_tokens,
              json_mode = json_mode,
              system = system,
-             response_validation_fun = response_validation_fun,
-             content_extraction_fun = content_extraction_fun,
-             single_request_fun = single_request_fun,
+             response_validation_fun = resolved_functions$response_validation_fun,
+             content_extraction_fun = resolved_functions$content_extraction_fun,
+             single_request_fun = resolved_functions$single_request_fun,
              pause_cap = pause_cap,
              log = log)
 }
@@ -381,9 +375,8 @@ call_api.gemini <- function(prompts, model, prompt_name, ...) {
                          pause_cap = pause_cap,
                          log = log)
 
-  single_request_fun <- "gemini_single_request"
-  response_validation_fun <- paste("gemini", prompt_name, "response_validation", sep = "_")
-  content_extraction_fun <- paste("gemini", prompt_name, "content_extraction", sep = "_")
+  # Resolve functions using the helper
+  resolved_functions <- resolve_functions("gemini", prompt_name)
 
   NextMethod(prompts,
              model = model,
@@ -394,9 +387,9 @@ call_api.gemini <- function(prompts, model, prompt_name, ...) {
              max_tokens = max_tokens,
              json_mode = json_mode,
              system = system,
-             response_validation_fun = response_validation_fun,
-             content_extraction_fun = content_extraction_fun,
-             single_request_fun = single_request_fun,
+             response_validation_fun = resolved_functions$response_validation_fun,
+             content_extraction_fun = resolved_functions$content_extraction_fun,
+             single_request_fun = resolved_functions$single_request_fun,
              pause_cap = pause_cap,
              log = log)
 }
@@ -437,9 +430,8 @@ call_api.llamafile <- function(prompts, model, prompt_name, ...) {
                          log = log,
                          llamafile_path = llamafile_path)
 
-  single_request_fun <- "llamafile_single_request"
-  response_validation_fun <- paste("llamafile", prompt_name, "response_validation", sep = "_")
-  content_extraction_fun <- paste("llamafile", prompt_name, "content_extraction", sep = "_")
+  # Resolve functions using the helper
+  resolved_functions <- resolve_functions("llamafile", prompt_name)
 
   NextMethod(prompts,
              model = model,
@@ -451,9 +443,9 @@ call_api.llamafile <- function(prompts, model, prompt_name, ...) {
              json_mode = json_mode,
              system = system,
              llamafile_path = llamafile_path,
-             response_validation_fun = response_validation_fun,
-             content_extraction_fun = content_extraction_fun,
-             single_request_fun = single_request_fun,
+             response_validation_fun = resolved_functions$response_validation_fun,
+             content_extraction_fun = resolved_functions$content_extraction_fun,
+             single_request_fun = resolved_functions$single_request_fun,
              pause_cap = pause_cap,
              log = log)
 }
@@ -498,52 +490,4 @@ retry_response <- function(base_url,
 
   res
 
-}
-
-#' Call Language Model Batch API
-#'
-#' This generic function sends batch requests to various language model APIs. It
-#' supports multiple APIs, including OpenAI, Claude (Anthropic), and Mistral.
-#'
-#' @param prompts A list of prompts to send to the API. The class of this object
-#'   should match one of the supported APIs: "mistral", "claude" (for the
-#'   Anthropic API), or "openai".
-#' @param model A string specifying the model to use.
-#' @param prompt_name An optional string specifying the type of prompt.
-#' @param max_tokens The maximum number of output tokens for each item in the
-#'   batch. Defaults to 300.
-#' @param quiet A logical value indicating whether the function should suppress
-#'   messages during retries. Defaults to FALSE.
-#'
-#' @return A list containing the response details, including batch ID,
-#'   processing status, and the URL for retrieving results (if ready).
-#' @details This function is implemented as a generic with methods for different
-#'   APIs:
-#' - call_batch_api.claude
-#' - call_batch_api.openai
-#' - call_batch_api.mistral
-#'
-#'   Each method handles API-specific details such as endpoint URLs,
-#'   authentication, and response parsing.
-#'
-#' @seealso [build_prompts_from_files()] for creating prompts to use with this
-#'   function.
-#' @export
-call_batch_api <- function(prompts, model, max_tokens, quiet) {
-  UseMethod("call_batch_api", prompts)
-}
-
-#' @export
-call_batch_api.claude <- function(prompts, model, max_tokens = 300, quiet = FALSE) {
-  claude_batch_job(prompts = prompts, model = model, max_tokens = max_tokens, quiet = quiet)
-}
-
-#' @export
-call_batch_api.openai <- function(prompts, model, max_tokens = 300, quiet = FALSE) {
-  openai_batch_job(prompts = prompts, model = model, max_tokens = max_tokens, quiet = quiet)
-}
-
-#' @export
-call_batch_api.mistral <- function(prompts, model, max_tokens = 300, quiet = FALSE) {
-  mistral_batch_job(prompts = prompts, model = model, max_tokens = max_tokens, quiet = quiet)
 }
