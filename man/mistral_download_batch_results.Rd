@@ -2,27 +2,54 @@
 % Please edit documentation in R/mistral-batch.R
 \name{mistral_download_batch_results}
 \alias{mistral_download_batch_results}
-\title{Download Results of Mistral Batch Job}
+\title{Download the Results of a Mistral Message Batch}
 \usage{
 mistral_download_batch_results(
-  output_file_id,
+  batch_response,
   max_retries = 3,
   pause_cap = 1200,
-  quiet = FALSE
+  quiet = FALSE,
+  tidy = TRUE
 )
 }
 \arguments{
-\item{output_file_id}{The output file ID to download the results for.}
+\item{batch_response}{A \code{list} containing details about the batch, typically
+returned by \code{\link[=mistral_create_batch]{mistral_create_batch()}} or \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}}. The
+\code{batch_response} must include a valid \code{output_file}.}
 
-\item{max_retries}{An integer indicating the maximum number of retry attempts in case of request failures. Defaults to 3.}
+\item{max_retries}{An integer specifying the maximum number of retry attempts
+in case of request failures. Defaults to \code{3}.}
 
-\item{pause_cap}{A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to 1200.}
+\item{pause_cap}{A numeric value representing the maximum pause duration (in
+seconds) between retries. Defaults to \code{1200}.}
 
-\item{quiet}{A logical value indicating whether the function should suppress messages during retries. Defaults to \code{FALSE}.}
+\item{quiet}{A logical value indicating whether to suppress log messages
+during retries. Defaults to \code{FALSE}.}
+
+\item{tidy}{A logical value indicating whether to return the results in a
+tidy format (e.g., a \code{data.frame}). Defaults to \code{TRUE}.}
 }
 \value{
-A character vector containing each line of the .jsonl result file.
+A \code{list} or \code{data.frame} containing the batch results:
+\itemize{
+\item If \code{tidy = TRUE}, results are returned in a structured format, typically as a \code{data.frame} where each row corresponds to a prompt-completion pair.
+\item If \code{tidy = FALSE}, raw results are returned as received from the API.
+}
 }
 \description{
-This function downloads the results of a completed batch request using the output file ID from the Mistral Batch API.
+This function retrieves the results of a completed message batch processed by
+the Mistral API. It supports retrying failed requests and returning results
+in a tidy format.
+}
+\details{
+The function downloads batch results using the Mistral API's \href{https://docs.mistral.ai/capabilities/batch/}{batch output endpoint}. The returned
+results typically include model completions for each prompt submitted in the
+batch.
+}
+\seealso{
+\itemize{
+\item \code{\link[=mistral_create_batch]{mistral_create_batch()}} for initiating batch requests.
+\item \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}} for verifying the status of a batch before downloading results.
+\item \code{\link[=download_results]{download_results()}} for generic batch result handling.
+}
 }

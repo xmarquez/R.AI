@@ -2,7 +2,7 @@
 % Please edit documentation in R/claude-batch.R
 \name{claude_download_batch_results}
 \alias{claude_download_batch_results}
-\title{Retrieve Message Batch Results Using the Anthropic API}
+\title{Download the Results of a Claude Message Batch}
 \usage{
 claude_download_batch_results(
   batch_response,
@@ -13,29 +13,43 @@ claude_download_batch_results(
 )
 }
 \arguments{
-\item{batch_response}{The list returned by \code{\link[=claude_create_batch]{claude_create_batch()}},
-containing the string representing the unique ID of the message batch to
-retrieve. (It's also possible to pass the specific object from
-\code{\link[=claude_list_batches]{claude_list_batches()}}, e.g., \code{claude_list_batches()$data[[1]]}).}
+\item{batch_response}{A \code{list} containing details about the batch, typically
+returned by \code{\link[=claude_batch_job]{claude_batch_job()}} or \code{\link[=claude_check_batch_status]{claude_check_batch_status()}}. The
+\code{batch_response} must include a valid \code{results_url}.}
 
-\item{max_retries}{An integer indicating the maximum number of retry attempts
-in case of request failures. Defaults to 3.}
+\item{max_retries}{An integer specifying the maximum number of retry attempts
+in case of request failures. Defaults to \code{3}.}
 
 \item{pause_cap}{A numeric value representing the maximum pause duration (in
-seconds) between retries. Defaults to 1200.}
+seconds) between retries. Defaults to \code{1200}.}
 
-\item{quiet}{A logical value indicating whether the function should suppress
-messages during retries. Defaults to \code{FALSE}.}
+\item{quiet}{A logical value indicating whether to suppress log messages
+during retries. Defaults to \code{FALSE}.}
 
-\item{tidy}{A logical value indicating whether to attempt to tidy the
-resulting json into a tidy \link{tibble}. Default is \code{TRUE}; \code{FALSE} is useful
-if you want to do the tidying separately or prefer the raw json.}
+\item{tidy}{A logical value indicating whether to return the results in a
+tidy format (e.g., a \code{data.frame}). Defaults to \code{TRUE}.}
 }
 \value{
-A character vector containing each line of the .jsonl result file.
+A \code{list} or \code{data.frame} containing the batch results:
+\itemize{
+\item If \code{tidy = TRUE}, results are returned in a structured format, typically as a \code{data.frame} where each row corresponds to a prompt-completion pair.
+\item If \code{tidy = FALSE}, raw results are returned as received from the API.
+}
 }
 \description{
-This function retrieves the results for a specific message batch using the
-\href{https://docs.anthropic.com/en/api/message-batches-beta}{Message Batch endpoint}. The
-results are streamed as a .jsonl file.
+This function retrieves the results of a completed message batch processed by
+the Claude API. It supports retrying failed requests and returning results in
+a tidy format.
+}
+\details{
+The function downloads batch results using the Claude API's \href{https://docs.anthropic.com/en/api/message-batches-beta}{message batch results endpoint}. The
+returned results typically include model completions for each prompt
+submitted in the batch.
+}
+\seealso{
+\itemize{
+\item \code{\link[=claude_batch_job]{claude_batch_job()}} for initiating batch requests.
+\item \code{\link[=claude_check_batch_status]{claude_check_batch_status()}} for verifying the status of a batch before downloading results.
+\item \code{\link[=download_results]{download_results()}} for generic batch result handling.
+}
 }

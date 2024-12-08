@@ -2,7 +2,7 @@
 % Please edit documentation in R/openai-batch.R
 \name{openai_check_batch_status}
 \alias{openai_check_batch_status}
-\title{Check Status of OpenAI Batch Request}
+\title{Check the Status of a Message Batch Using the OpenAI API}
 \usage{
 openai_check_batch_status(
   batch_response,
@@ -12,23 +12,68 @@ openai_check_batch_status(
 )
 }
 \arguments{
-\item{batch_response}{The response object returned by \code{\link[=openai_create_batch]{openai_create_batch()}}
-containing the batch ID.}
+\item{batch_response}{A \code{list} returned by \code{\link[=openai_batch_job]{openai_batch_job()}} containing
+the batch details. Alternatively, pass an object from
+\code{\link[=openai_list_batches]{openai_list_batches()}}, such as \code{openai_list_batches()$data[[1]]}.}
 
-\item{max_retries}{An integer indicating the maximum number of retry attempts
-in case of request failures. Defaults to 3.}
+\item{max_retries}{An integer specifying the maximum number of retry attempts
+in case of request failures. Defaults to \code{3}.}
 
 \item{pause_cap}{A numeric value representing the maximum pause duration (in
-seconds) between retries. Defaults to 1200.}
+seconds) between retries. Defaults to \code{1200}.}
 
-\item{quiet}{A logical value indicating whether the function should suppress
-messages during retries. Defaults to \code{FALSE}.}
+\item{quiet}{A logical value indicating whether to suppress log messages
+during retries. Defaults to \code{FALSE}.}
 }
 \value{
-A list containing the current status of the batch, including the
-status field.
+A \code{list} containing detailed information about the specified message
+batch. The fields in the result include:
+\itemize{
+\item \strong{\code{id}}: A unique identifier for the batch.
+\item \strong{\code{object}}: The type of object returned (e.g., \code{"batch"}).
+\item \strong{\code{endpoint}}: The API endpoint used for the batch.
+\item \strong{\code{errors}}: A list of errors encountered during processing, if any.
+\item \strong{\code{input_file_id}}: The ID of the file containing input data for the batch.
+\item \strong{\code{completion_window}}: The time window for completing the batch (e.g., \code{"24h"}).
+\item \strong{\code{status}}: The current processing status of the batch (e.g., \code{"completed"}, \code{"in_progress"}, \code{"failed"}).
+\item \strong{\code{output_file_id}}: The ID of the file containing the batch's completed output.
+\item \strong{\code{error_file_id}}: The ID of the file containing error logs, if available.
+\item \strong{\code{created_at}}: A UNIX timestamp indicating when the batch was created.
+\item \strong{\code{in_progress_at}}: A UNIX timestamp indicating when processing began.
+\item \strong{\code{expires_at}}: A UNIX timestamp indicating when the batch will expire.
+\item \strong{\code{finalizing_at}}: A UNIX timestamp indicating when the batch began finalization.
+\item \strong{\code{completed_at}}: A UNIX timestamp indicating when the batch was completed.
+\item \strong{\code{failed_at}}: A UNIX timestamp indicating when the batch failed, if applicable.
+\item \strong{\code{expired_at}}: A UNIX timestamp indicating when the batch expired, if applicable.
+\item \strong{\code{cancelling_at}}: A UNIX timestamp indicating when the batch began cancellation, if applicable.
+\item \strong{\code{cancelled_at}}: A UNIX timestamp indicating when the batch was cancelled, if applicable.
+\item \strong{\code{request_counts}}: A summary of request counts in the batch:
+\itemize{
+\item \strong{\code{total}}: Total number of requests in the batch.
+\item \strong{\code{completed}}: Number of successfully completed requests.
+\item \strong{\code{failed}}: Number of failed requests.
+}
+\item \strong{\code{metadata}}: Additional metadata about the batch, including:
+\itemize{
+\item \strong{\code{customer_id}}: A customer-provided identifier for tracking (e.g., \code{"user_123456789"}).
+\item \strong{\code{batch_description}}: A description of the batch (e.g., \code{"Nightly eval job"}).
+}
+}
 }
 \description{
-This function checks the status of an existing batch request using the OpenAI
-Batch API.
+This function retrieves details about a specific message batch using the
+OpenAI API. It is used to poll the status of a batch, monitor its progress,
+or retrieve associated metadata.
+}
+\details{
+This function uses the \href{https://platform.openai.com/docs/api-reference/batch}{OpenAI Batch API} to retrieve
+detailed status information for a batch. The \code{status} field can indicate one
+of several states, such as \code{"in_progress"}, \code{"completed"}, or \code{"failed"}.
+}
+\seealso{
+\itemize{
+\item \code{\link[=openai_batch_job]{openai_batch_job()}} for batch creation.
+\item \code{\link[=openai_download_batch_results]{openai_download_batch_results()}} for retrieving completed results.
+\item \code{\link[=openai_list_batches]{openai_list_batches()}} for listing existing batches.
+}
 }

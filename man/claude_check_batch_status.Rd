@@ -2,7 +2,7 @@
 % Please edit documentation in R/claude-batch.R
 \name{claude_check_batch_status}
 \alias{claude_check_batch_status}
-\title{Retrieve the status of a specific Message Batch Using the Anthropic API}
+\title{Check the Status of a Message Batch Using the Claude API}
 \usage{
 claude_check_batch_status(
   batch_response,
@@ -12,26 +12,60 @@ claude_check_batch_status(
 )
 }
 \arguments{
-\item{batch_response}{The list returned by \code{\link[=claude_create_batch]{claude_create_batch()}}, containing the string
-representing the unique ID of the message batch to retrieve. (It's also
-possible to pass the specific object from \code{\link[=claude_list_batches]{claude_list_batches()}}, e.g.,
-\code{claude_list_batches()$data[[1]]}).}
+\item{batch_response}{A \code{list} returned by \code{\link[=claude_batch_job]{claude_batch_job()}} containing
+the batch details. Alternatively, pass an object from
+\code{\link[=claude_list_batches]{claude_list_batches()}}, such as \code{claude_list_batches()$data[[1]]}.}
 
-\item{max_retries}{An integer indicating the maximum number of retry attempts
-in case of request failures. Defaults to 3.}
+\item{max_retries}{An integer specifying the maximum number of retry attempts
+in case of request failures. Defaults to \code{3}.}
 
 \item{pause_cap}{A numeric value representing the maximum pause duration (in
-seconds) between retries. Defaults to 1200.}
+seconds) between retries. Defaults to \code{1200}.}
 
-\item{quiet}{A logical value indicating whether the function should suppress
-messages during retries. Defaults to \code{FALSE}.}
+\item{quiet}{A logical value indicating whether to suppress log messages
+during retries. Defaults to \code{FALSE}.}
 }
 \value{
-A list containing information about the specified message batch,
-including processing status and result URLs.
+A \code{list} containing detailed information about the specified message
+batch. The fields in the result include:
+\itemize{
+\item \strong{\code{id}}: A unique identifier for the batch (e.g., \code{"msgbatch_013Zva2CMHLNnXjNJJKqJ2EF"}).
+\item \strong{\code{type}}: The type of the object (e.g., \code{"message_batch"}).
+\item \strong{\code{processing_status}}: The current processing status of the batch (e.g., \code{"in_progress"}, \code{"ended"}, \code{"canceling"}).
+\item \strong{\code{request_counts}}: A breakdown of requests in the batch:
+\itemize{
+\item \strong{\code{processing}}: Number of requests currently being processed.
+\item \strong{\code{succeeded}}: Number of successfully completed requests.
+\item \strong{\code{errored}}: Number of requests that resulted in errors.
+\item \strong{\code{canceled}}: Number of requests that were canceled.
+\item \strong{\code{expired}}: Number of requests that expired.
+}
+\item \strong{\code{ended_at}}: A timestamp indicating when the batch processing ended, if applicable (e.g., \code{"2024-08-20T18:37:24.100435Z"}).
+\item \strong{\code{created_at}}: A timestamp indicating when the batch was created (e.g., \code{"2024-08-20T18:37:24.100435Z"}).
+\item \strong{\code{expires_at}}: A timestamp indicating when the batch will expire, if applicable (e.g., \code{"2024-08-20T18:37:24.100435Z"}).
+\item \strong{\code{archived_at}}: A timestamp indicating when the batch was archived, if applicable (e.g., \code{"2024-08-20T18:37:24.100435Z"}).
+\item \strong{\code{cancel_initiated_at}}: A timestamp indicating when cancellation of the batch was initiated, if applicable (e.g., \code{"2024-08-20T18:37:24.100435Z"}).
+\item \strong{\code{results_url}}: A URL to download the results for the batch if processing is complete (e.g., \code{"https://api.anthropic.com/v1/messages/batches/msgbatch_013Zva2CMHLNnXjNJJKqJ2EF/results"}).
+}
 }
 \description{
-This function retrieves details for a specific message batch using the
-\href{https://docs.anthropic.com/en/api/message-batches-beta}{Message Batch endpoint}. It can be
-used to poll for batch completion or to access the batch metadata.
+This function retrieves details about a specific message batch using the
+Claude API. It is useful for monitoring batch progress, identifying errors,
+or retrieving the URL for completed results.
+}
+\details{
+This function uses the \href{https://docs.anthropic.com/en/api/message-batches-beta}{Anthropic Message Batch API} to retrieve
+detailed status information for a batch. The \code{processing_status} field
+indicates the current state of the batch and can include values such as
+\code{"in_progress"}, \code{"ended"}, or \code{"canceling"}.
+
+The \code{request_counts} field provides a detailed breakdown of the status of
+individual requests within the batch.
+}
+\seealso{
+\itemize{
+\item \code{\link[=claude_batch_job]{claude_batch_job()}} for batch creation.
+\item \code{\link[=claude_download_batch_results]{claude_download_batch_results()}} for retrieving completed results.
+\item \code{\link[=claude_list_batches]{claude_list_batches()}} for listing existing batches.
+}
 }

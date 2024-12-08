@@ -5,23 +5,23 @@
 \title{List Mistral Batch Jobs}
 \usage{
 mistral_list_batches(
+  page = 0,
+  page_size = 100,
+  model = NULL,
   status = NULL,
-  limit = 10,
-  max_retries = 3,
-  pause_cap = 1200,
   quiet = FALSE
 )
 }
 \arguments{
 \item{status}{An optional filter to specify the status of jobs to return. Defaults to NULL (returns all statuses).}
 
+\item{quiet}{A logical value indicating whether the function should suppress messages during retries. Defaults to \code{FALSE}.}
+
 \item{limit}{An integer specifying the maximum number of batches to return. Defaults to 10.}
 
 \item{max_retries}{An integer indicating the maximum number of retry attempts in case of request failures. Defaults to 3.}
 
 \item{pause_cap}{A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to 1200.}
-
-\item{quiet}{A logical value indicating whether the function should suppress messages during retries. Defaults to \code{FALSE}.}
 }
 \value{
 A list containing the details of the batches.

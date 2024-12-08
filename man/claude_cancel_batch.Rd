@@ -2,7 +2,7 @@
 % Please edit documentation in R/claude-batch.R
 \name{claude_cancel_batch}
 \alias{claude_cancel_batch}
-\title{Cancel a Message Batch Using the Anthropic API}
+\title{Cancel a Claude Message Batch}
 \usage{
 claude_cancel_batch(
   batch_response,
@@ -12,27 +12,35 @@ claude_cancel_batch(
 )
 }
 \arguments{
-\item{batch_response}{The list returned by \code{\link[=claude_create_batch]{claude_create_batch()}}, containing the string
-representing the unique ID of the message batch to retrieve. (It's also
-possible to pass the specific object from \code{\link[=claude_list_batches]{claude_list_batches()}}, e.g.,
-\code{claude_list_batches()$data[[1]]}).}
+\item{batch_response}{A \code{list} containing details about the batch to cancel, typically returned by
+\code{\link[=claude_batch_job]{claude_batch_job()}} or \code{\link[=claude_check_batch_status]{claude_check_batch_status()}}.}
 
-\item{max_retries}{An integer indicating the maximum number of retry attempts
-in case of request failures. Defaults to 3.}
+\item{max_retries}{An integer specifying the maximum number of retry attempts in case of request failures. Defaults to \code{3}.}
 
-\item{pause_cap}{A numeric value representing the maximum pause duration (in
-seconds) between retries. Defaults to 1200.}
+\item{pause_cap}{A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to \code{1200}.}
 
-\item{quiet}{A logical value indicating whether the function should suppress
-messages during retries. Defaults to \code{FALSE}.}
+\item{quiet}{A logical value indicating whether to suppress log messages during retries. Defaults to \code{FALSE}.}
 }
 \value{
-A list containing the response details, including batch ID,
-processing status, and counts of canceled requests.
+A \code{list} containing the updated batch status after the cancellation attempt. Typical fields include:
+\itemize{
+\item \strong{\code{id}}: A unique identifier for the batch.
+\item \strong{\code{status}}: The new status of the batch (e.g., \code{"canceling"}, \code{"canceled"}).
+\item Additional metadata as provided by the Claude API.
+}
 }
 \description{
-This function cancels a message batch that is currently in progress using the
-\href{https://docs.anthropic.com/en/api/message-batches-beta}{Cancel a Message Batch endpoint}. The batch
-may enter a canceling state, during which any in-progress, non-interruptible
-requests may still complete.
+This function cancels a batch of requests submitted to the Claude API.
+The operation attempts to stop further processing of the batch.
+}
+\details{
+This function uses the Claude API's \href{https://docs.anthropic.com/en/api/message-batches-beta}{cancel batch endpoint}
+to attempt cancellation of the specified batch. The operation's outcome depends on the batch's current state.
+}
+\seealso{
+\itemize{
+\item \code{\link[=claude_batch_job]{claude_batch_job()}} for initiating batch requests.
+\item \code{\link[=claude_check_batch_status]{claude_check_batch_status()}} for checking the status of a batch.
+\item \code{\link[=download_results]{download_results()}} for retrieving results from a batch.
+}
 }

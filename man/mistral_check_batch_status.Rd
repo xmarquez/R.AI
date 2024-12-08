@@ -2,27 +2,67 @@
 % Please edit documentation in R/mistral-batch.R
 \name{mistral_check_batch_status}
 \alias{mistral_check_batch_status}
-\title{Check Status of Mistral Batch Job}
+\title{Check the Status of a Message Batch Using the Mistral API}
 \usage{
-mistral_check_batch_status(
-  job_id,
-  max_retries = 3,
-  pause_cap = 1200,
-  quiet = FALSE
-)
+mistral_check_batch_status(batch_response, quiet = FALSE)
 }
 \arguments{
-\item{job_id}{The batch job ID to check the status for.}
+\item{batch_response}{A \code{list} returned by \code{\link[=mistral_create_batch]{mistral_create_batch()}}
+containing the batch details. Alternatively, pass an object from
+\code{\link[=mistral_list_batches]{mistral_list_batches()}}, such as \code{mistral_list_batches()$data[[1]]}.}
 
-\item{max_retries}{An integer indicating the maximum number of retry attempts in case of request failures. Defaults to 3.}
+\item{quiet}{A logical value indicating whether to suppress log messages
+during retries. Defaults to \code{FALSE}.}
 
-\item{pause_cap}{A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to 1200.}
+\item{max_retries}{An integer specifying the maximum number of retry attempts
+in case of request failures. Defaults to \code{3}.}
 
-\item{quiet}{A logical value indicating whether the function should suppress messages during retries. Defaults to \code{FALSE}.}
+\item{pause_cap}{A numeric value representing the maximum pause duration (in
+seconds) between retries. Defaults to \code{1200}.}
 }
 \value{
-A list containing the current status of the batch.
+A \code{list} containing detailed information about the specified message
+batch. The fields in the result include:
+\itemize{
+\item \strong{\code{id}}: A unique identifier for the batch.
+\item \strong{\code{object}}: The type of object returned (e.g., \code{"batch"}).
+\item \strong{\code{input_files}}: A list of input file IDs associated with the batch.
+\item \strong{\code{metadata}}: A list containing metadata associated with the batch (if provided).
+\item \strong{\code{endpoint}}: The API endpoint used for the batch.
+\item \strong{\code{model}}: The model specified for the batch.
+\item \strong{\code{output_file}}: The ID of the file containing the batch's output.
+\item \strong{\code{error_file}}: The ID of the file containing the error logs, if available.
+\item \strong{\code{errors}}: A list of errors encountered during processing, where each error includes:
+\itemize{
+\item \strong{\code{message}}: A description of the error.
+\item \strong{\code{count}}: The number of occurrences of the error.
+}
+\item \strong{\code{status}}: The current processing status of the batch (e.g., \code{"QUEUED"}, \code{"IN_PROGRESS"}, \code{"COMPLETED"}, \code{"FAILED"}).
+\item \strong{\code{created_at}}: A UNIX timestamp indicating when the batch was created.
+\item \strong{\code{started_at}}: A UNIX timestamp indicating when processing began.
+\item \strong{\code{completed_at}}: A UNIX timestamp indicating when the batch was completed, if applicable.
+\item \strong{\code{total_requests}}: The total number of requests in the batch.
+\item \strong{\code{completed_requests}}: The number of requests that have been processed.
+\item \strong{\code{succeeded_requests}}: The number of requests that succeeded.
+\item \strong{\code{failed_requests}}: The number of requests that failed.
+}
 }
 \description{
-This function checks the status of an existing batch request using the Mistral Batch API.
+This function retrieves details about a specific message batch using the
+Mistral API. It is useful for monitoring batch progress, checking for errors,
+or accessing output files.
+}
+\details{
+This function uses the \href{https://docs.mistral.ai/capabilities/batch/}{Mistral Batch API} to retrieve detailed status
+information for a batch. The \code{status} field indicates the current state of
+the batch and can include values such as \code{"QUEUED"}, \code{"IN_PROGRESS"},
+\code{"COMPLETED"}, or \code{"FAILED"}. The \code{errors} field provides a breakdown of any
+issues encountered during batch processing.
+}
+\seealso{
+\itemize{
+\item \code{\link[=mistral_create_batch]{mistral_create_batch()}} for batch creation.
+\item \code{\link[=mistral_download_batch_results]{mistral_download_batch_results()}} for retrieving completed results.
+\item \code{\link[=mistral_list_batches]{mistral_list_batches()}} for listing existing batches.
+}
 }

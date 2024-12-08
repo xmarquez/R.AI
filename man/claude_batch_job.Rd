@@ -2,26 +2,48 @@
 % Please edit documentation in R/claude-batch.R
 \name{claude_batch_job}
 \alias{claude_batch_job}
-\title{Create a Message Batch Using the Anthropic API}
+\title{Submit a Batch Job to the Claude API}
 \usage{
-claude_batch_job(prompts, model, max_tokens = 300, quiet = FALSE)
+claude_batch_job(
+  prompts,
+  model,
+  max_tokens = 300,
+  temperature = 0.2,
+  quiet = FALSE
+)
 }
 \arguments{
-\item{prompts}{A list of prompts created by \code{\link[=build_prompts_from_files]{build_prompts_from_files()}}.}
+\item{prompts}{A \code{list} of prompts to process, created using
+\code{\link[=build_prompts_from_files]{build_prompts_from_files()}}.}
 
-\item{model}{The model to use to process the batch. Currently supports only
-Claude 3 Haiku, Claude 3 Opus, and Claude 3.5 Sonnet. Defaults to
-"claude-3-haiku-20240307" (i.e., \code{get_default_model("claude", type = "cheapest")}.}
+\item{model}{A character string specifying the Claude model to use. Refer to
+the \href{https://docs.anthropic.com/en/api/message-batches-beta}{Claude API documentation} for
+available models.}
 
-\item{max_tokens}{The maximum number of output tokens for each item in the
-batch.}
+\item{max_tokens}{An integer specifying the maximum number of output tokens
+per prompt. Defaults to \code{300}.}
 
-\item{quiet}{A logical value indicating whether the function should suppress
-messages during retries. Defaults to \code{FALSE}.}
+\item{temperature}{A number for the temperature per prompt. Defaults to \code{0.2}.}
+
+\item{quiet}{A logical value indicating whether to suppress log messages.
+Defaults to \code{FALSE}.}
+}
+\value{
+A \code{list} containing the batch response details, with class
+\code{"batch_claude"}. Typical fields include:
+\itemize{
+\item \strong{\code{id}}: A unique identifier for the batch.
+\item \strong{\code{status}}: The initial status of the batch (e.g., \code{"queued"} or \code{"in_progress"}).
+\item Additional metadata as provided by the Claude API.
+}
 }
 \description{
-This function sends a batch of message creation requests to the Anthropic API
-using the \href{https://docs.anthropic.com/en/api/creating-message-batches}{Message Batches endpoint}. It
-allows you to process multiple requests at once, useful for scenarios
-requiring bulk message completions.
+This function submits a batch of prompts to the Claude API for processing.
+}
+\seealso{
+\itemize{
+\item \code{\link[=batch_job]{batch_job()}} for the generic batch submission function.
+\item \code{\link[=check_batch_status]{check_batch_status()}} for monitoring the status of a batch.
+\item \code{\link[=download_results]{download_results()}} for retrieving the results of a batch.
+}
 }

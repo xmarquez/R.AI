@@ -16,7 +16,7 @@ If multiple roles are provided, the length must match the number of files.
 Only one "system" role is allowed.}
 
 \item{api}{A string specifying the API to use. Must be one of "groq", "openai",
-"claude", or "gemini".}
+"claude", "mistral", "llamafile", or "gemini".}
 
 \item{data}{An optional data frame containing variables to be
 interpolated into the prompts using \code{stringr::str_glue_data()}.}
