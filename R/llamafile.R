@@ -207,3 +207,32 @@ which_llamafile_running <- function() {
   }
 }
 
+llamafile_embedding <- function(text,
+                                model = "LLaMA_CPP",
+                                max_retries = 2,
+                                pause_cap = 1200,
+                                quiet = FALSE) {
+
+  body <- jsonlite::toJSON(
+    list(
+      messages = list(content = text),
+      model = model
+    ),
+    auto_unbox = TRUE,
+    pretty = TRUE
+  )
+
+  res <- retry_response(base_url = "http://localhost:8080/embedding",
+                        api_key = "no-key",
+                        response_format = NULL,
+                        body = body,
+                        max_retries = max_retries,
+                        pause_cap = pause_cap,
+                        quiet = quiet)
+
+  httr::stop_for_status(res)
+  response <- httr::content(res)
+
+  embedding <- response |> purrr::flatten() |>
+    unlist()
+}

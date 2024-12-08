@@ -170,3 +170,44 @@ mistral_json_content_extraction <- function(response_content) {
     default_json_content_extraction()
 }
 
+mistral_embedding <- function(texts, model, api_key, quiet = FALSE, ...) {
+  url <- "https://api.mistral.ai/v1/embeddings"
+
+  # Prepare the request payload
+  payload <- list(
+    model = model,
+    input = as.list(texts)
+  )
+
+  headers <- httr::add_headers(
+    Authorization = paste("Bearer", api_key),
+    `Content-Type` = "application/json"
+  )
+
+  if (!quiet) message("Sending request to Mistral embedding API...")
+
+  # Use httr::RETRY for robust retry logic
+  response <- httr::RETRY(
+    verb = "POST",
+    url = url,
+    headers,
+    body = jsonlite::toJSON(payload, auto_unbox = TRUE),
+    encode = "json",
+    times = 3, # Number of retries
+    quiet = quiet,
+    terminate_on = c(400, 401, 403, 404) # Terminate on client errors
+  )
+
+  # Handle response
+  httr::stop_for_status(response)
+  result <- httr::content(response)
+
+  # Extract embeddings into a tibble
+  return(
+    dplyr::tibble(
+      id = seq_along(texts),
+      text_set = digest::digest(texts),
+      embedding = purrr::map(result$data, "embedding")
+    )
+  )
+}
