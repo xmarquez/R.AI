@@ -15,6 +15,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    base64enc,
     checkmate,
     cli,
     digest,
