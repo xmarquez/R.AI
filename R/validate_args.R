@@ -16,29 +16,30 @@ validate_args_build_prompt_from_file <- function(files,
   }
 }
 
-validate_args_call_api <- function(prompts,
-                                   model,
-                                   prompt_name,
-                                   n_candidates,
-                                   max_retries,
-                                   temperature,
-                                   max_tokens,
-                                   json_mode,
-                                   system,
-                                   pause_cap,
-                                   log,
-                                   llamafile_path) {
+validate_single_request <- function(prompts, model, prompt_name, ...) {
 
-  # Extract the api name from the prompts
+
+  args <- list(...)
+  llamafile_path <- args$llamafile_path
+  n_candidates <- args$n_candidates
+  max_retries <- args$max_retries %||% 10
+  temperature <- args$temperature %||% 0.2
+  max_tokens <- args$max_tokens %||% 300
+  system <- args$system
+  pause_cap <- args$pause_cap %||% 1200
+  quiet <- args$quiet %||% FALSE
+
   api <- class(prompts)[1]
 
   # Validate prompts - must be one of the supported API classes
   checkmate::assert_multi_class(prompts, classes = c("groq", "openai", "claude", "gemini", "llamafile", "mistral"))
 
+  available_models <- get_available_models(api)
+
   # Validate model if provided
   if (!missing(model) && !"llamafile" %in% class(prompts) ) {
     checkmate::assert_scalar(model)
-    checkmate::assert_choice(model, models_df$model[models_df$api == api])
+    checkmate::assert_choice(model, available_models)
   } else if (!missing(model) && "llamafile" %in% class(prompts) ) {
     checkmate::assert_scalar(model)
     checkmate::assert_choice(model,
@@ -52,10 +53,15 @@ validate_args_call_api <- function(prompts,
   }
 
   # Validate n_candidates - must be a positive integer. Can only be 1 for groq
-  if(api == "groq") {
-    checkmate::assert_int(n_candidates, lower = 1, upper = 1)
-  } else {
-    checkmate::assert_count(n_candidates, positive = TRUE)
+  if(!is.null(n_candidates)) {
+    if(api == "groq") {
+      checkmate::assert_int(n_candidates, lower = 1, upper = 1)
+    }
+    if(api %in% c("openai", "mistral")) {
+      checkmate::assert_count(n_candidates, positive = TRUE)
+    } else {
+      cli::cli_warn("{.var n_candidates} is not implemented in the {api} API.")
+    }
   }
 
   # Validate max_retries - must be a non-negative integer
@@ -73,10 +79,6 @@ validate_args_call_api <- function(prompts,
     }
   }
 
-
-  # Validate json_mode - must be a logical scalar
-  checkmate::assert_logical(json_mode, len = 1)
-
   # Validate system message if provided
   if (!is.null(system)) {
     checkmate::assert_scalar(system)
@@ -85,12 +87,7 @@ validate_args_call_api <- function(prompts,
   # Validate pause_cap - must be a non-negative numeric value
   checkmate::assert_number(pause_cap, lower = 0)
 
-  # Validate log - must be a logical scalar
-  checkmate::assert_logical(log, len = 1)
-
-  # Valudate llamafile path if provided
-  if (!missing(llamafile_path)) {
-    checkmate::assert_file_exists(llamafile_path)
-  }
+  # Validate quiet - must be a logical scalar
+  checkmate::assert_logical(quiet, len = 1)
 }
 
