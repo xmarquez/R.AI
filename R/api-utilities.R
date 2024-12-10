@@ -5,7 +5,8 @@
 #' that contains supported models and their associated APIs.
 #'
 #' @param api A character string specifying the API for which the default model
-#'   is needed. Must be one of "groq", "claude", "openai", or "gemini".
+#'   is needed. Must be one of "groq", "claude", "openai", "mistral", or
+#'   "gemini".
 #' @param type A character string specifying the type of model to return. Must
 #'   be one of "cheapest", "largest", or "best". Default is "cheapest".
 #'
@@ -17,7 +18,7 @@
 #'   given type:
 #'   - "cheapest": Selects the model with the lowest input cost.
 #'   - "largest": Selects the largest model based on predefined choices for
-#'     each API.
+#'   each API.
 #'   - "best": Selects the best model based on predefined choices for each API.
 #'
 #' @examples
@@ -27,12 +28,13 @@
 #' # Get the largest model for the GROQ API
 #' get_default_model("groq", type = "largest")
 #'
-#' @seealso [get_available_models()] for retrieving all available models for
-#'   an API and [get_available_apis()] for retrieving all available APIs.
+#' @seealso [get_available_models()] for retrieving all available models for an
+#'   API and [get_available_apis()] for retrieving all available APIs.
+#' @family model utilities
 #'
 #' @export
 get_default_model <- function(api, type = "cheapest") {
-  checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini"))
+  checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini", "mistral"))
   type <- match.arg(type, c("cheapest", "largest", "best"))
 
   model <- preferred_models[preferred_models$api == api, ] |>
@@ -53,14 +55,18 @@ get_default_model <- function(api, type = "cheapest") {
 #'
 #' @param api An optional character string specifying the API for which the
 #'   available models are needed. Must be one of "groq", "claude", "openai",
-#'   or "gemini". If not provided, the function returns models for all APIs.
+#'   "mistral", or "gemini". If not provided, the function returns models for
+#'   all APIs.
+#' @param mode The model use: must be one of `"chat"`, `"embedding"`, or
+#'   `"rerank"`.
 #'
-#' @return A data frame containing the available models for the specified API,
-#'   or all available models if no API is specified.
+#' @return A character vector containing the available models for the specified
+#'   API, or all available models if no API is specified.
 #'
 #' @details The function checks the `models_df` data frame to find the models
 #'   associated with the specified API. If no API is provided, it returns all
-#'   rows from the `models_df`.
+#'   models from `models_df`. Typing `R.AI:::models_df` should produce the
+#'   models dataframe.
 #'
 #' @examples
 #' # Get available models for the OpenAI API
@@ -71,14 +77,32 @@ get_default_model <- function(api, type = "cheapest") {
 #'
 #' @seealso [get_default_model()] for retrieving the default model for a
 #'   specified API.
+#' @family model utilities
 #'
 #' @export
-get_available_models <- function(api) {
+get_available_models <- function(api, mode = "chat") {
+  checkmate::assert_choice(mode, c("chat", "embedding", "rerank"))
   if (!missing(api)) {
-    checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini"))
-    models <- models_df[models_df$api == api & models_df$mode == "chat", ]
+    checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini", "mistral", "llamafile"))
+    if(api == "llamafile") {
+      llamafile_models <- fs::dir_ls(recurse = TRUE, regexp = "*.llamafile$|*.llamafile.exe", type = "file") |>
+        basename() |>
+        stringr::str_remove(".llamafile.*")
+      return(llamafile_models)
+
+    }
+    models <- models_df[models_df$api == api & models_df$mode == mode, ]$model
+    if(api == "mistral" && mode == "chat") {
+      mistral_models <- list_models("mistral") |>
+        dplyr::filter(completion_chat)
+      models <- unique(c(models, mistral_models$id))
+    }
   } else {
-    models <- models_df
+    llamafile_models <- fs::dir_ls(recurse = TRUE, regexp = "*.llamafile$|*.llamafile.exe", type = "file") |>
+      basename() |>
+      stringr::str_remove(".llamafile.*")
+    models <- models_df[models_df$mode == mode, ]$model
+    models <- unique(c(models, llamafile_models))
   }
   models
 }
@@ -102,9 +126,10 @@ get_available_models <- function(api) {
 #' # Check if an API key is available for the OpenAI API
 #' is_api_key_available("openai")
 #'
+#' @family model utilities
+#'
 #' @export
 is_api_key_available <- function(api) {
-  checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini"))
 
   if(api == "claude") {
     api <- "anthropic"
@@ -136,6 +161,7 @@ is_api_key_available <- function(api) {
 #' # Get the availability of API keys for all APIs
 #' get_available_apis()
 #'
+#' @family model utilities
 #' @export
 get_available_apis <- function() {
   unique_apis <- unique(models_df$api)
@@ -158,7 +184,6 @@ resolve_functions <- function(api, prompt_name) {
   # Generate function names dynamically
   single_request_fun_name <- paste0(api, "_single_request")
   content_extraction_fun_name <- paste0(api, "_", prompt_name, "_content_extraction")
-  response_validation_fun_name <- paste0(api, "_", prompt_name, "_response_validation")
 
   # Ensure the required single_request_fun exists
   if (!exists(single_request_fun_name, inherits = TRUE)) {
@@ -168,8 +193,7 @@ resolve_functions <- function(api, prompt_name) {
   # Retrieve functions, inheriting from parent environments if necessary
   list(
     single_request_fun = get(single_request_fun_name, inherits = TRUE),
-    content_extraction_fun = get(content_extraction_fun_name, inherits = TRUE),
-    response_validation_fun = get(response_validation_fun_name, inherits = TRUE)
+    content_extraction_fun = get(content_extraction_fun_name, inherits = TRUE)
   )
 }
 
