@@ -11,10 +11,12 @@ models <- jsonlite::fromJSON(json_file) |>
                 dplyr::across(dplyr::matches("supports"), as.logical))
 
 models_df <- models |>
-  filter(litellm_provider %in% c("groq", "openai", "gemini", "anthropic")) |>
+  filter(litellm_provider %in% c("groq", "openai", "gemini",
+                                 "anthropic", "mistral", "cohere",
+                                 "voyage")) |>
   mutate(api = dplyr::case_when(litellm_provider == "anthropic" ~ "claude",
                          TRUE ~ litellm_provider),
-         model = stringr::str_remove(model, "anthropic/|gemini/|groq/"),
+         model = stringr::str_remove(model, "anthropic/|gemini/|groq/|mistral/|cohere/|voyage/"),
          input_cost = input_cost_per_token,
          output_cost = output_cost_per_token) |>
   distinct()
@@ -24,15 +26,18 @@ preferred_models <- models_df |>
   dplyr::mutate(cheapest = dplyr::case_when(api == "groq" ~ "llama-3.1-8b-instant",
                                             api == "claude" ~ "claude-3-haiku-20240307",
                                             api == "openai" ~ "gpt-4o-mini",
-                                            api == "gemini" ~ "gemini-1.5-flash-latest"),
+                                            api == "gemini" ~ "gemini-1.5-flash-latest",
+                                            api == "mistral" ~ "ministral-3b-latest"),
                 largest = dplyr::case_when(api == "groq" ~ "llama-3.2-90b-text-preview",
                                            api == "claude" ~ "claude-3-opus-20240229",
                                            api == "openai" ~ "gpt-4o",
-                                           api == "gemini" ~ "gemini-1.5-pro-latest"),
+                                           api == "gemini" ~ "gemini-1.5-pro-latest",
+                                           api == "mistral" ~ "mistral-large-latest"),
                 best = dplyr::case_when(api == "groq" ~ "llama-3.1-70b-versatile",
                                         api == "claude" ~ "claude-3-5-sonnet-20241022",
                                         api == "openai" ~ "gpt-4o",
-                                        api == "gemini" ~ "gemini-1.5-pro-latest")) |>
+                                        api == "gemini" ~ "gemini-1.5-pro-latest",
+                                        api == "gemini" ~ "mistral-medium-latest")) |>
   dplyr::select(dplyr::all_of(c("api", "cheapest", "largest", "best"))) |>
   dplyr::distinct()
 
