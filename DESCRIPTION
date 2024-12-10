@@ -9,8 +9,8 @@ Authors@R:
            email = "marquez.x@gmail.com",
            comment = c(ORCID = "0000-0001-7653-9334"))
 Description: This package contains functions to call a number of LLM APIs, 
-    including OpenAI, Groq, Anthropic (Claude), and Gemini. It also helps manage 
-    your prompts.
+    including OpenAI, Groq, Anthropic (Claude), Mistral, and Gemini. It can also 
+    use local llamafiles. It also helps manage your prompts and embed texts.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -41,7 +41,8 @@ Suggests:
     config,
     targets,
     crew,
-    countrycode
+    countrycode,
+    rtika
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
