@@ -1,62 +1,46 @@
-#' Execute a Single Request to a Llamafile Local API
+#' Send a Single Request to a Llamafile Local API
 #'
 #' This function sends a single prompt to a locally running Llamafile instance
-#' using the OpenAI-compatible API endpoint. It allows users to customize parameters
-#' such as model, number of candidates, and more. It also handles retries and extracts
-#' the relevant response content.
+#' using the OpenAI-compatible API endpoint. It allows users to customize
+#' parameters such as model, number of candidates, and more. It also handles
+#' retries and extracts the relevant response content.
 #'
-#' @param prompt A list of messages, each with a role (e.g., "user" or
-#'   "assistant") and content, used as input for the model. Must be in the
-#'   format `list(list(role = "user", content = "Hello world!"))`.
-#' @param model The model to use for generating responses, e.g.,
-#'   "LLaMA_CPP".
-#' @param n_candidates The number of response candidates to generate. Defaults
-#'   to 1.
-#' @param max_retries The maximum number of retry attempts in case of request
-#'   failures. Defaults to 10.
-#' @param temperature A numeric value between 0 and 1 that controls the
-#'   randomness of the response. Higher values make the output more random.
-#'   Defaults to 0.2.
-#' @param max_tokens The maximum number of tokens to include in the response.
-#'   Defaults to 300.
-#' @param json_mode A logical value indicating whether the response should be
-#'   parsed as JSON. Defaults to `FALSE`.
-#' @param system Optional system message providing instructions or context for
-#'   the model.
-#' @param response_validation_fun A function to validate the response received
-#'   from the API. Defaults to `llamafile_default_response_validation()` if not
-#'   provided.
-#' @param content_extraction_fun A function to extract the desired content from
-#'   the API response. If not provided, a default extraction function is used
-#'   depending on the value of `json_mode`.
-#' @param pause_cap A numeric value representing the maximum pause duration (in
-#'   seconds) between retries. Defaults to 1200.
-#' @param quiet A logical value indicating whether the function should suppress
-#'   messages during retries. Defaults to `FALSE`.
+#' @inheritParams openai_single_request
+#' @param model The model to use for generating responses. The name is typically
+#'   automatically extracted from the llamafile when it is started via
+#'   [start_llamafile()] or [call_api()], and it doesn't much matter. The
+#'   default is `"LlaMA_CPP"`
+#' @param ... Other parameters passed on to the local llamafile server.
+#'   Currently ignored.
 #'
-#' @return A tibble containing the usage statistics (tokens used) and the
-#'   generated response(s).
+#' @inherit openai_single_request return
+#' @details You must start the model manually or via [start_llamafile()] before
+#'   sending a request (if it is not already running on port 8080). For the
+#'   moment only one running model can be accessed at a time; even if you have
+#'   enough memory to run more than one llamafile simultaneously, only the first
+#'   one started on port 8080 will be accessible (so, no model running in 8081
+#'   will be visible to this function).
+#'
+#'
+#' @family llamafile
+#' @family single message
 #' @export
 llamafile_single_request <- function(prompt,
                                      model = "LLaMA_CPP",
-                                     n_candidates = 1,
                                      max_retries = 10,
                                      temperature = 0.2,
                                      max_tokens = 300,
-                                     json_mode = FALSE,
-                                     system,
-                                     response_validation_fun,
                                      content_extraction_fun,
                                      pause_cap = 1200,
-                                     quiet = FALSE) {
+                                     quiet = FALSE,
+                                     ...) {
 
   body <- jsonlite::toJSON(
     list(
       messages = prompt,
       model = model,
       max_tokens = max_tokens,
-      temperature = temperature,
-      n = n_candidates
+      temperature = temperature
     ),
     auto_unbox = TRUE,
     pretty = TRUE
@@ -128,6 +112,8 @@ llamafile_usage <- function(response) {
 #' localhost:8080.
 #'
 #' @return TRUE if any Llamafile instance is running, otherwise FALSE.
+#'
+#' @family llamafile
 #' @export
 is_llamafile_running <- function() {
   res <- try(httr::GET("http://localhost:8080/v1/models"), silent = TRUE)
@@ -142,6 +128,8 @@ is_llamafile_running <- function() {
 #' This function attempts to start the Llamafile executable if it is not already running.
 #'
 #' @param llamafile_path The path to the Llamafile executable.
+#'
+#' @family llamafile
 #' @export
 start_llamafile <- function(llamafile_path) {
   checkmate::assert_file_exists(llamafile_path)
@@ -161,6 +149,8 @@ start_llamafile <- function(llamafile_path) {
 #' This function checks if a Llamafile instance is running and attempts to terminate it.
 #'
 #' @return TRUE if the Llamafile process was successfully terminated, FALSE otherwise.
+#'
+#' @family llamafile
 #' @export
 kill_llamafile <- function() {
   if(!is_llamafile_running()) {
@@ -194,6 +184,8 @@ kill_llamafile <- function() {
 #'
 #' @return The name of the runnning llamafile model, or `NA` if no llamafile is
 #'   running.
+#'
+#' @family llamafile
 #' @export
 which_llamafile_running <- function() {
   if(is_llamafile_running()) {
