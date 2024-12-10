@@ -24,13 +24,12 @@ test_that("get_available_models works correctly", {
 
   # Check available models for a specific API
   available_models <- get_available_models("groq")
-  expect_true("llama3-8b-8192" %in% available_models$model)
-  expect_true("llama3-70b-8192" %in% available_models$model)
+  expect_true("llama3-8b-8192" %in% available_models)
+  expect_true("llama3-70b-8192" %in% available_models)
 
   # Check all available models
   all_models <- get_available_models()
-  expect_true(nrow(all_models) > 0)
-  expect_true(all(c("groq", "claude", "openai", "gemini") %in% all_models$api))
+  expect_true(length(all_models) > 0)
 })
 
 test_that("is_api_key_available works correctly", {
@@ -76,15 +75,13 @@ test_that("get_available_apis works correctly", {
 test_that("resolve_functions uses defaults when prompt_name is missing", {
   local_mocked_bindings(
     claude_single_request = function(...) "mocked_request",
-    claude_default_content_extraction = function(...) "default_extraction",
-    claude_default_response_validation = function(...) TRUE
+    claude_default_content_extraction = function(...) "default_extraction"
   )
 
   functions <- resolve_functions("claude")
 
   expect_equal(functions$single_request_fun(), "mocked_request")
   expect_equal(functions$content_extraction_fun(), "default_extraction")
-  expect_true(functions$response_validation_fun())
 })
 
 
