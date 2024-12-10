@@ -5,6 +5,14 @@
 #' retries and extracts the relevant response content.
 #'
 #' @inheritParams openai_single_request
+#' @param stop_sequences Custom text sequences that will cause the model to stop
+#'   generating. Anthropic's models will normally stop when they have naturally
+#'   completed their turn, which will result in a response stop_reason of
+#'   "end_turn". If you want the model to stop generating when it encounters
+#'   custom strings of text, you can use the `stop_sequences` parameter. If the
+#'   model encounters one of the custom sequences, the response stop_reason
+#'   value will be "stop_sequence" and the response `stop_sequence` value will
+#'   contain the matched stop sequence.
 #' @param system A character string providing additional context or instructions
 #'   for the system. If not provided, the function will attempt to extract it
 #'   from the attribute `system` in `prompt` (if it exists); otherwise it will

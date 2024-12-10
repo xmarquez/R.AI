@@ -9,10 +9,6 @@
 #'   parsed as JSON. Defaults to `FALSE`. In the Groq API, setting `json_mode`
 #'   to `TRUE` should normally result in valid json, as noted in
 #'   [https://console.groq.com/docs/text-chat](https://console.groq.com/docs/text-chat).
-#' @param system A character string providing additional context or instructions
-#'   for the system. If not provided, the function will attempt to extract it
-#'   from the attribute `system` in `prompt` (if it exists); otherwise it will
-#'   default to `NULL`.
 #'
 #' @details See the Groq API documentation at
 #'   [https://console.groq.com/docs/overview](https://console.groq.com/docs/overview)

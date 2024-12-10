@@ -81,6 +81,7 @@ get_default_model <- function(api, type = "cheapest") {
 #'
 #' @export
 get_available_models <- function(api, mode = "chat") {
+  completion_chat <- NULL
   checkmate::assert_choice(mode, c("chat", "embedding", "rerank"))
   if (!missing(api)) {
     checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini", "mistral", "llamafile"))

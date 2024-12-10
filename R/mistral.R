@@ -7,6 +7,10 @@
 #' @param stop A character vector of stop sequences. The model will stop
 #'   generating further tokens when any of the specified sequences is
 #'   encountered. Defaults to `NULL`.
+#' @param top_p Nucleus sampling, where the model considers the results of the
+#'   tokens with top_p probability mass. So 0.1 means only the tokens comprising
+#'   the top 10% probability mass are considered. Mistral generally recommends
+#'   altering this or `temperature` but not both. Default is 1.
 #' @param random_seed An integer for setting a seed for reproducibility.
 #'   Defaults to `NULL` (no fixed seed).
 #' @param presence_penalty A numeric value that penalizes the presence of new

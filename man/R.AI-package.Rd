@@ -6,7 +6,7 @@
 \alias{R.AI-package}
 \title{R.AI: Use LLM APIs from within R}
 \description{
-This package contains functions to call a number of LLM APIs, including OpenAI, Groq, Anthropic (Claude), and Gemini. It also helps manage your prompts.
+This package contains functions to call a number of LLM APIs, including OpenAI, Groq, Anthropic (Claude), Mistral, and Gemini. It can also use local llamafiles. It also helps manage your prompts and embed texts.
 }
 \seealso{
 Useful links:

@@ -52,6 +52,15 @@ seconds) between retries. Defaults to 1200.}
 
 \item{quiet}{A logical value indicating whether the function should suppress
 messages during retries. Defaults to \code{FALSE}.}
+
+\item{stop_sequences}{Custom text sequences that will cause the model to stop
+generating. Anthropic's models will normally stop when they have naturally
+completed their turn, which will result in a response stop_reason of
+"end_turn". If you want the model to stop generating when it encounters
+custom strings of text, you can use the \code{stop_sequences} parameter. If the
+model encounters one of the custom sequences, the response stop_reason
+value will be "stop_sequence" and the response \code{stop_sequence} value will
+contain the matched stop sequence.}
 }
 \value{
 A \code{\link[=tibble]{tibble()}} with a \code{response} column and usage information.

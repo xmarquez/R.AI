@@ -39,6 +39,11 @@ failures. Defaults to 10.}
 randomness of the response. Higher values make the output more random.
 Defaults to 0.2.}
 
+\item{top_p}{Nucleus sampling, where the model considers the results of the
+tokens with top_p probability mass. So 0.1 means only the tokens comprising
+the top 10\% probability mass are considered. Mistral generally recommends
+altering this or \code{temperature} but not both. Default is 1.}
+
 \item{max_tokens}{The maximum number of tokens to include in the response.
 Defaults to 300.}
 

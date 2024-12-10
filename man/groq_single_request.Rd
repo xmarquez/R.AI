@@ -51,11 +51,6 @@ seconds) between retries. Defaults to 1200.}
 
 \item{quiet}{A logical value indicating whether the function should suppress
 messages during retries. Defaults to \code{FALSE}.}
-
-\item{system}{A character string providing additional context or instructions
-for the system. If not provided, the function will attempt to extract it
-from the attribute \code{system} in \code{prompt} (if it exists); otherwise it will
-default to \code{NULL}.}
 }
 \value{
 A \code{\link[=tibble]{tibble()}} with a \code{response} column and usage information.

@@ -10,6 +10,7 @@ llamafile_single_request(
   max_retries = 10,
   temperature = 0.2,
   max_tokens = 300,
+  json_mode = FALSE,
   content_extraction_fun,
   pause_cap = 1200,
   quiet = FALSE,
@@ -34,6 +35,9 @@ Defaults to 0.2.}
 
 \item{max_tokens}{The maximum number of tokens to include in the response.
 Defaults to 300.}
+
+\item{json_mode}{A logical value indicating whether the response should be
+parsed as JSON. Defaults to \code{FALSE}.}
 
 \item{content_extraction_fun}{A function to extract the desired content from
 the API response. If not provided, a default extraction function is used
