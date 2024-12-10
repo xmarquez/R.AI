@@ -31,15 +31,6 @@ from specified files and combining them according to the chosen API's
 requirements.
 }
 \details{
-The function performs the following steps:
-\enumerate{
-\item Validates input arguments using \code{validate_args_build_prompt_from_file()}.
-\item Constructs function names for prompt building based on the API and roles.
-\item Reads and processes each file using the appropriate prompt builder function.
-\item Combines the processed prompts using an API-specific combined prompt builder.
-\item Sets the class and names of the resulting combined prompts.
-}
-
 The function supports different prompt structures for various APIs:
 \itemize{
 \item For OpenAI, Groq, and Claude: Can handle "system", "user", and "assistant" roles.
@@ -54,17 +45,11 @@ Input validation ensures that:
 \item If provided, the data argument is a data frame.
 }
 }
-\examples{
-\dontrun{
-files <- c("system_prompt.txt", "user_prompt.txt")
-roles <- c("system", "user")
-api <- "openai"
-data <- data.frame(variable1 = c("value1", "value2"))
-
-prompts <- build_prompt_from_files(files, roles, api, data)
-}
-
-}
 \seealso{
 \code{\link[=call_api]{call_api()}} for using the generated prompts to make API calls.
+
+Other prompts: 
+\code{\link{prompt}()},
+\code{\link{prompt_list}()}
 }
+\concept{prompts}

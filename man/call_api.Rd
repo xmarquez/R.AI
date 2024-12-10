@@ -10,15 +10,18 @@ call_api(prompts, model, prompt_name, ...)
 \item{prompts}{A list of prompts to send to the API. The class of this object
 should match one of the supported APIs: "groq", "claude" (for the Anthropic
 API), "openai", "gemini", or "llamafile" (for local
-\href{https://github.com/mozilla-ocho/llamafile/}{llamafiles}).}
+\href{https://github.com/mozilla-ocho/llamafile/}{llamafiles}). It will
+typically be the result of a call to \code{\link[=prompt_list]{prompt_list()}}.}
 
-\item{model}{A string specifying the model to use.}
+\item{model}{A string specifying the model to use. Get available models with
+\code{\link[=get_available_models]{get_available_models()}}.}
 
 \item{prompt_name}{An optional string specifying the type of prompt.}
 
 \item{...}{Additional arguments passed to specific \code{call_api} methods, such
 as \code{max_retries}, \code{temperature}, \code{max_tokens}, \code{json_mode}, \code{system},
-\code{pause_cap}, \code{llamafile_path}, or \code{log}.}
+\code{pause_cap}, \code{llamafile_path}, or \code{log}. See the documentation for the
+\code{\link[=openai_single_request]{openai_single_request()}} and \code{\link[=llamafile_single_request]{llamafile_single_request()}} for more.}
 }
 \value{
 A tibble containing the API responses and usage information.
@@ -44,6 +47,8 @@ authentication, and response parsing.
 }
 }
 \seealso{
-\code{\link[=build_prompts_from_files]{build_prompts_from_files()}} for creating prompts to use with this
+\code{\link[=prompt_list]{prompt_list()}} for creating prompts to use with this
 function.
 }
+\concept{generic}
+\concept{multiple requests}

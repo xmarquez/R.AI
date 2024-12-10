@@ -15,7 +15,7 @@ mistral_poll_and_download(
 }
 \arguments{
 \item{batch_response}{A \code{list} containing details about the batch to poll, typically returned by
-\code{\link[=mistral_create_batch]{mistral_create_batch()}} or \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}}.}
+\code{\link[=mistral_batch_job]{mistral_batch_job()}} or \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}}.}
 
 \item{timeout}{An integer specifying the maximum time (in seconds) to wait for the batch to complete. Defaults to \code{3600} (1 hour).}
 

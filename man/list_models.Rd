@@ -4,7 +4,7 @@
 \alias{list_models}
 \title{List Available Models}
 \usage{
-list_models(api, local_path = "models")
+list_models(api, local_dir = "models")
 }
 \arguments{
 \item{api}{\code{character} Specifies the source to query:
@@ -14,7 +14,7 @@ list_models(api, local_path = "models")
 \item \code{"llamafile"} - List locally stored models in a directory.
 }}
 
-\item{local_path}{\code{character} Path to the local directory containing models
+\item{local_dir}{\code{character} Path to the local directory containing models
 (used only when \code{api = "llamafile"}). Defaults to \code{"models"}.}
 }
 \value{
@@ -34,13 +34,11 @@ are set for API queries:
 }
 }
 
-\section{Error Handling}{
- The function throws errors in the following cases:
-\itemize{
-\item Invalid \code{api} parameter.
-\item Missing API key for Mistral or OpenAI queries.
-\item Non-existent local directory when \code{api = "llamafile"}.
-\item HTTP errors during API requests.
+\seealso{
+Other model utilities: 
+\code{\link{get_available_apis}()},
+\code{\link{get_available_models}()},
+\code{\link{get_default_model}()},
+\code{\link{is_api_key_available}()}
 }
-}
-
+\concept{model utilities}

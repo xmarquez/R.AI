@@ -7,18 +7,12 @@
 mistral_check_batch_status(batch_response, quiet = FALSE)
 }
 \arguments{
-\item{batch_response}{A \code{list} returned by \code{\link[=mistral_create_batch]{mistral_create_batch()}}
+\item{batch_response}{A \code{list} returned by \code{\link[=mistral_batch_job]{mistral_batch_job()}}
 containing the batch details. Alternatively, pass an object from
 \code{\link[=mistral_list_batches]{mistral_list_batches()}}, such as \code{mistral_list_batches()$data[[1]]}.}
 
 \item{quiet}{A logical value indicating whether to suppress log messages
 during retries. Defaults to \code{FALSE}.}
-
-\item{max_retries}{An integer specifying the maximum number of retry attempts
-in case of request failures. Defaults to \code{3}.}
-
-\item{pause_cap}{A numeric value representing the maximum pause duration (in
-seconds) between retries. Defaults to \code{1200}.}
 }
 \value{
 A \code{list} containing detailed information about the specified message
@@ -61,7 +55,7 @@ issues encountered during batch processing.
 }
 \seealso{
 \itemize{
-\item \code{\link[=mistral_create_batch]{mistral_create_batch()}} for batch creation.
+\item \code{\link[=mistral_batch_job]{mistral_batch_job()}} for batch creation.
 \item \code{\link[=mistral_download_batch_results]{mistral_download_batch_results()}} for retrieving completed results.
 \item \code{\link[=mistral_list_batches]{mistral_list_batches()}} for listing existing batches.
 }

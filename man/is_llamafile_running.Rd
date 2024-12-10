@@ -13,3 +13,11 @@ TRUE if any Llamafile instance is running, otherwise FALSE.
 This function checks if a Llamafile instance is currently running at
 localhost:8080.
 }
+\seealso{
+Other llamafile: 
+\code{\link{kill_llamafile}()},
+\code{\link{llamafile_single_request}()},
+\code{\link{start_llamafile}()},
+\code{\link{which_llamafile_running}()}
+}
+\concept{llamafile}

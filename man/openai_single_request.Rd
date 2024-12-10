@@ -2,7 +2,7 @@
 % Please edit documentation in R/openai.R
 \name{openai_single_request}
 \alias{openai_single_request}
-\title{Execute a Single Request to the OpenAI API}
+\title{Send a Single Request to the OpenAI API}
 \usage{
 openai_single_request(
   prompt,
@@ -12,20 +12,17 @@ openai_single_request(
   temperature = 0.2,
   max_tokens = 300,
   json_mode = FALSE,
-  system,
-  response_validation_fun,
   content_extraction_fun,
   pause_cap = 1200,
   quiet = FALSE
 )
 }
 \arguments{
-\item{prompt}{A list of messages, each with a role (e.g., "user" or
-"assistant") and content, used as input for the model. Must be in the
-format \code{list(list(role = "user", content = "Hello world!"))}.}
+\item{prompt}{A list containing the prompt message(s). Typically this is the
+output of \code{\link[=prompt]{prompt()}}.}
 
-\item{model}{The model to use for generating responses, e.g.,
-"gpt-3.5-turbo".}
+\item{model}{A string specifying the model to use. Get available models with
+\code{\link[=list_models]{list_models()}} or \code{\link[=get_available_models]{get_available_models()}}.}
 
 \item{n_candidates}{The number of response candidates to generate. Defaults
 to 1.}
@@ -43,13 +40,6 @@ Defaults to 300.}
 \item{json_mode}{A logical value indicating whether the response should be
 parsed as JSON. Defaults to \code{FALSE}.}
 
-\item{system}{Optional system message providing instructions or context for
-the model.}
-
-\item{response_validation_fun}{A function to validate the response received
-from the API. Defaults to \code{openai_default_response_validation()} if not
-provided.}
-
 \item{content_extraction_fun}{A function to extract the desired content from
 the API response. If not provided, a default extraction function is used
 depending on the value of \code{json_mode}.}
@@ -61,11 +51,31 @@ seconds) between retries. Defaults to 1200.}
 messages during retries. Defaults to \code{FALSE}.}
 }
 \value{
-A tibble containing the usage statistics (tokens used) and the
-generated response(s).
+A \code{\link[=tibble]{tibble()}} with a \code{response} column and usage information.
 }
 \description{
-This function sends a single prompt to the OpenAI API for processing,
-allowing users to customize parameters such as model, number of candidates,
-and more. It also handles retries and extracts the relevant response content.
+This function sends a single prompt to the \href{https://platform.openai.com/docs/api-reference/chat}{OpenAI API} for processing. It
+also handles retries and extracts the relevant response content.
 }
+\details{
+See the Openai API documentation at
+\url{https://platform.openai.com/docs/api-reference/chat}
+for more.
+}
+\seealso{
+Other openai: 
+\code{\link{openai_batch_job}()},
+\code{\link{openai_cancel_batch}()},
+\code{\link{openai_check_batch_status}()},
+\code{\link{openai_download_batch_results}()},
+\code{\link{openai_list_batches}()},
+\code{\link{openai_poll_and_download}()}
+
+Other single message: 
+\code{\link{claude_single_request}()},
+\code{\link{groq_single_request}()},
+\code{\link{llamafile_single_request}()},
+\code{\link{mistral_single_request}()}
+}
+\concept{openai}
+\concept{single message}

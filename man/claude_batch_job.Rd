@@ -46,4 +46,34 @@ This function submits a batch of prompts to the Claude API for processing.
 \item \code{\link[=check_batch_status]{check_batch_status()}} for monitoring the status of a batch.
 \item \code{\link[=download_results]{download_results()}} for retrieving the results of a batch.
 }
+
+Other claude: 
+\code{\link{claude_cancel_batch}()},
+\code{\link{claude_check_batch_status}()},
+\code{\link{claude_download_batch_results}()},
+\code{\link{claude_list_batches}()},
+\code{\link{claude_poll_and_download}()},
+\code{\link{claude_single_request}()}
+
+Other batch: 
+\code{\link{batch_job}()},
+\code{\link{call_batch_api}()},
+\code{\link{cancel_batch}()},
+\code{\link{check_batch_status}()},
+\code{\link{claude_cancel_batch}()},
+\code{\link{claude_check_batch_status}()},
+\code{\link{claude_download_batch_results}()},
+\code{\link{claude_list_batches}()},
+\code{\link{claude_poll_and_download}()},
+\code{\link{download_results}()},
+\code{\link{list_batches}()},
+\code{\link{openai_batch_job}()},
+\code{\link{openai_cancel_batch}()},
+\code{\link{openai_check_batch_status}()},
+\code{\link{openai_download_batch_results}()},
+\code{\link{openai_list_batches}()},
+\code{\link{openai_poll_and_download}()},
+\code{\link{poll_and_download}()}
 }
+\concept{batch}
+\concept{claude}

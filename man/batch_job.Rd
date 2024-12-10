@@ -7,31 +7,37 @@
 batch_job(prompts, model, ...)
 }
 \arguments{
-\item{prompts}{A \code{list} of prompts to process. The class of this object
-determines the API used:
+\item{prompts}{A list of prompts to send to the API, typically created via
+\code{\link[=prompt_list]{prompt_list()}}. The class of this object determines the API used:
 \itemize{
-\item \code{"claude"}: Uses the Claude API (\href{https://docs.anthropic.com/en/api/message-batches-beta}{Anthropic}).
-\item \code{"openai"}: Uses the OpenAI API (\href{https://platform.openai.com/docs/api-reference/batch}{OpenAI}).
-\item \code{"mistral"}: Uses the Mistral API (\href{https://docs.mistral.ai/capabilities/batch/}{Mistral}).
+\item \code{"claude"}: Uses the Anthropic Batch API (\href{https://docs.anthropic.com/en/api/creating-message-batches}{Anthropic}).
+\item \code{"openai"}: Uses the OpenAI Batch API (\href{https://platform.openai.com/docs/api-reference/batch}{OpenAI}).
+\item \code{"mistral"}: Uses the Mistral Batch API (\href{https://docs.mistral.ai/capabilities/batch/}{Mistral}).
 }}
 
-\item{model}{A character string specifying the model to use. Refer to API
-documentation for available models.}
+\item{model}{A character string specifying the model to use. Refer to the
+API-specific documentation for available models.}
 
-\item{...}{Additional parameters passed to API-specific methods, including:
+\item{...}{Additional arguments passed to API-specific methods. Common
+options include:
 \itemize{
-\item \strong{\code{max_tokens}}: An integer specifying the maximum number of output tokens per prompt. Defaults to \code{300}.
-\item \strong{\code{temperature}}: A numeric value specifying the temperature per prompt. Defaults to \code{0.2}.
-\item \strong{\code{quiet}}: A logical value indicating whether to suppress log messages. Defaults to \code{FALSE}.
+\item \code{max_tokens}: Maximum number of output tokens (default: 300).
+\item \code{quiet}: Suppresses logging messages during execution (default: \code{FALSE}).
+\item API-specific parameters.
 }}
 }
 \value{
-A \code{list} containing the batch response details. The returned object
-includes:
+A \code{list} containing API-specific response details, including:
 \itemize{
-\item \strong{\code{id}}: A unique identifier for the batch.
-\item \strong{\code{status}}: The initial status of the batch (e.g., \code{"queued"} or \code{"in_progress"}).
-\item Additional metadata depending on the API.
+\item \code{id}: The batch ID (if available).
+\item \code{processing_status}: Current processing status.
+}
+
+For additional details, refer to the relevant API documentation:
+\itemize{
+\item Claude: \href{https://docs.anthropic.com/en/api/creating-message-batches}{Anthropic Message Batch API}
+\item OpenAI: \href{https://platform.openai.com/docs/api-reference/batch}{OpenAI Batch API}
+\item Mistral: \href{https://docs.mistral.ai/capabilities/batch/}{Mistral Batch API}
 }
 }
 \description{
@@ -48,4 +54,25 @@ The returned object is assigned a class that reflects the API used
 \item \code{\link[=check_batch_status]{check_batch_status()}} for verifying the status of a batch.
 \item \code{\link[=download_results]{download_results()}} for retrieving the results of a batch.
 }
+
+Other batch: 
+\code{\link{call_batch_api}()},
+\code{\link{cancel_batch}()},
+\code{\link{check_batch_status}()},
+\code{\link{claude_batch_job}()},
+\code{\link{claude_cancel_batch}()},
+\code{\link{claude_check_batch_status}()},
+\code{\link{claude_download_batch_results}()},
+\code{\link{claude_list_batches}()},
+\code{\link{claude_poll_and_download}()},
+\code{\link{download_results}()},
+\code{\link{list_batches}()},
+\code{\link{openai_batch_job}()},
+\code{\link{openai_cancel_batch}()},
+\code{\link{openai_check_batch_status}()},
+\code{\link{openai_download_batch_results}()},
+\code{\link{openai_list_batches}()},
+\code{\link{openai_poll_and_download}()},
+\code{\link{poll_and_download}()}
 }
+\concept{batch}

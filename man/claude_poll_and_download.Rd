@@ -15,7 +15,7 @@ claude_poll_and_download(
 }
 \arguments{
 \item{batch_response}{A \code{list} containing details about the batch to poll,
-typically returned by \code{\link[=claude_create_batch]{claude_create_batch()}} or
+typically returned by \code{\link[=claude_batch_job]{claude_batch_job()}} or
 \code{\link[=claude_check_batch_status]{claude_check_batch_status()}}.}
 
 \item{timeout}{An integer specifying the maximum time (in seconds) to wait
@@ -55,4 +55,34 @@ downloads the results once the batch is complete.
 \item \code{\link[=claude_batch_job]{claude_batch_job()}} for initiating a batch request.
 \item \code{\link[=claude_download_batch_results]{claude_download_batch_results()}} for downloading results without polling.
 }
+
+Other claude: 
+\code{\link{claude_batch_job}()},
+\code{\link{claude_cancel_batch}()},
+\code{\link{claude_check_batch_status}()},
+\code{\link{claude_download_batch_results}()},
+\code{\link{claude_list_batches}()},
+\code{\link{claude_single_request}()}
+
+Other batch: 
+\code{\link{batch_job}()},
+\code{\link{call_batch_api}()},
+\code{\link{cancel_batch}()},
+\code{\link{check_batch_status}()},
+\code{\link{claude_batch_job}()},
+\code{\link{claude_cancel_batch}()},
+\code{\link{claude_check_batch_status}()},
+\code{\link{claude_download_batch_results}()},
+\code{\link{claude_list_batches}()},
+\code{\link{download_results}()},
+\code{\link{list_batches}()},
+\code{\link{openai_batch_job}()},
+\code{\link{openai_cancel_batch}()},
+\code{\link{openai_check_batch_status}()},
+\code{\link{openai_download_batch_results}()},
+\code{\link{openai_list_batches}()},
+\code{\link{openai_poll_and_download}()},
+\code{\link{poll_and_download}()}
 }
+\concept{batch}
+\concept{claude}

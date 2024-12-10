@@ -13,19 +13,45 @@ mistral_list_batches(
 )
 }
 \arguments{
-\item{status}{An optional filter to specify the status of jobs to return. Defaults to NULL (returns all statuses).}
+\item{page}{An integer specifying the page number to retrieve. Defaults to 0
+(first page).}
 
-\item{quiet}{A logical value indicating whether the function should suppress messages during retries. Defaults to \code{FALSE}.}
+\item{page_size}{An integer specifying the number of jobs to retrieve per
+page. Must be between 1 and 100. Defaults to 100.}
 
-\item{limit}{An integer specifying the maximum number of batches to return. Defaults to 10.}
+\item{model}{An optional string to filter the jobs by a specific model name.
+Defaults to \code{NULL} (no model filter).}
 
-\item{max_retries}{An integer indicating the maximum number of retry attempts in case of request failures. Defaults to 3.}
+\item{status}{An optional string to filter the jobs by status. Defaults to
+\code{NULL} (no status filter).}
 
-\item{pause_cap}{A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to 1200.}
+\item{quiet}{A logical value indicating whether the function should suppress
+messages during retries. Defaults to \code{FALSE}.}
 }
 \value{
-A list containing the details of the batches.
+A list containing the details of the retrieved batch jobs, including
+metadata, job status, and other information.
 }
 \description{
-This function lists all the batch jobs being processed for a user using the Mistral Batch API.
+This function retrieves a paginated list of batch jobs processed for a user
+via the Mistral Batch API.
+}
+\details{
+This function constructs a query based on the provided parameters,
+sends an HTTP GET request to the Mistral API endpoint, and returns the
+parsed JSON response. Use appropriate values for \code{page} and \code{page_size} to
+navigate through the paginated results.
+}
+\examples{
+\dontrun{
+# List all batch jobs with default parameters
+batches <- mistral_list_batches()
+
+# List batch jobs with specific filters
+batches <- mistral_list_batches(page = 1, page_size = 50, status = "completed")
+}
+
+}
+\seealso{
+For more information on the Mistral Batch API, visit the \href{https://docs.mistral.ai}{Mistral documentation}.
 }

@@ -14,7 +14,7 @@ mistral_download_batch_results(
 }
 \arguments{
 \item{batch_response}{A \code{list} containing details about the batch, typically
-returned by \code{\link[=mistral_create_batch]{mistral_create_batch()}} or \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}}. The
+returned by \code{\link[=mistral_batch_job]{mistral_batch_job()}} or \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}}. The
 \code{batch_response} must include a valid \code{output_file}.}
 
 \item{max_retries}{An integer specifying the maximum number of retry attempts
@@ -48,7 +48,7 @@ batch.
 }
 \seealso{
 \itemize{
-\item \code{\link[=mistral_create_batch]{mistral_create_batch()}} for initiating batch requests.
+\item \code{\link[=mistral_batch_job]{mistral_batch_job()}} for initiating batch requests.
 \item \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}} for verifying the status of a batch before downloading results.
 \item \code{\link[=download_results]{download_results()}} for generic batch result handling.
 }

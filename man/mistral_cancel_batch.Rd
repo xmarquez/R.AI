@@ -13,7 +13,7 @@ mistral_cancel_batch(
 }
 \arguments{
 \item{batch_response}{A \code{list} containing details about the batch to cancel, typically returned by
-\code{\link[=mistral_create_batch]{mistral_create_batch()}} or \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}}.}
+\code{\link[=mistral_batch_job]{mistral_batch_job()}} or \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}}.}
 
 \item{max_retries}{An integer specifying the maximum number of retry attempts in case of request failures. Defaults to \code{3}.}
 
@@ -39,7 +39,7 @@ to attempt cancellation of the specified batch. The operation's outcome depends 
 }
 \seealso{
 \itemize{
-\item \code{\link[=mistral_create_batch]{mistral_create_batch()}} for initiating batch requests.
+\item \code{\link[=mistral_batch_job]{mistral_batch_job()}} for initiating batch requests.
 \item \code{\link[=mistral_check_batch_status]{mistral_check_batch_status()}} for checking the status of a batch.
 \item \code{\link[=download_results]{download_results()}} for retrieving results from a batch.
 }

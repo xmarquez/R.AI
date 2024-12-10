@@ -43,4 +43,34 @@ to attempt cancellation of the specified batch. The operation's outcome depends 
 \item \code{\link[=openai_check_batch_status]{openai_check_batch_status()}} for checking the status of a batch.
 \item \code{\link[=download_results]{download_results()}} for retrieving results from a batch.
 }
+
+Other openai: 
+\code{\link{openai_batch_job}()},
+\code{\link{openai_check_batch_status}()},
+\code{\link{openai_download_batch_results}()},
+\code{\link{openai_list_batches}()},
+\code{\link{openai_poll_and_download}()},
+\code{\link{openai_single_request}()}
+
+Other batch: 
+\code{\link{batch_job}()},
+\code{\link{call_batch_api}()},
+\code{\link{cancel_batch}()},
+\code{\link{check_batch_status}()},
+\code{\link{claude_batch_job}()},
+\code{\link{claude_cancel_batch}()},
+\code{\link{claude_check_batch_status}()},
+\code{\link{claude_download_batch_results}()},
+\code{\link{claude_list_batches}()},
+\code{\link{claude_poll_and_download}()},
+\code{\link{download_results}()},
+\code{\link{list_batches}()},
+\code{\link{openai_batch_job}()},
+\code{\link{openai_check_batch_status}()},
+\code{\link{openai_download_batch_results}()},
+\code{\link{openai_list_batches}()},
+\code{\link{openai_poll_and_download}()},
+\code{\link{poll_and_download}()}
 }
+\concept{batch}
+\concept{openai}

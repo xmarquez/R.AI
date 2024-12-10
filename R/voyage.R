@@ -109,14 +109,19 @@ voyage_embedding <- function(
 #'   * `relevance_score`: The relevance score of the document with respect to the query.
 #'   * `document`: (optional) The document string, included if `return_documents = TRUE`.
 #'
-#' @details This function communicates with the Voyage AI reranking API to
-#' prioritize documents based on their relevance to the input query.
+#' @details This function communicates with the [Voyage AI reranking
+#'   API](https://docs.voyageai.com/reference/reranker-api) to prioritize
+#'   documents based on their relevance to the input query. See
+#'   [https://docs.voyageai.com/reference/reranker-api](https://docs.voyageai.com/reference/reranker-api)
+#'   for more.
 #'
-#' Logging can be controlled using the `quiet` parameter. API key must be set in
-#' the `VOYAGE_API_KEY` environment variable.
+#'   Your API key must be set in the `VOYAGE_API_KEY` environment variable.
 #'
 #' @seealso [call_embedding_api()] for embedding queries and documents.
 #'
+#' @family embedding
+#' @family reranking
+#' @family voyage
 #' @export
 voyage_reranker <- function(query, documents, model, top_k = NULL,
                             return_documents = FALSE, truncation = TRUE,

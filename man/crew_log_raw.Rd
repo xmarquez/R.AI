@@ -24,8 +24,3 @@ This function extracts raw log data created by the package
 specified directory. It looks for log files matching the given pattern and
 reads lines containing log entries marked with "\emph{\strong{LOG}}".
 }
-\examples{
-# Extract log data from the current directory
-crew_log_raw()
-
-}

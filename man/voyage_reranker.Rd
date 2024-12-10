@@ -65,12 +65,16 @@ Sends a query and a list of documents to the Voyage AI reranking API and
 retrieves the reranking results.
 }
 \details{
-This function communicates with the Voyage AI reranking API to
-prioritize documents based on their relevance to the input query.
+This function communicates with the \href{https://docs.voyageai.com/reference/reranker-api}{Voyage AI reranking API} to prioritize
+documents based on their relevance to the input query. See
+\url{https://docs.voyageai.com/reference/reranker-api}
+for more.
 
-Logging can be controlled using the \code{quiet} parameter. API key must be set in
-the \code{VOYAGE_API_KEY} environment variable.
+Your API key must be set in the \code{VOYAGE_API_KEY} environment variable.
 }
 \seealso{
 \code{\link[=call_embedding_api]{call_embedding_api()}} for embedding queries and documents.
 }
+\concept{embedding}
+\concept{reranking}
+\concept{voyage}

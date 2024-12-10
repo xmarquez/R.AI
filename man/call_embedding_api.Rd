@@ -11,15 +11,15 @@ call_embedding_api(texts, model, api, ...)
 process. Must not be empty.}
 
 \item{model}{\code{character} A string specifying the embedding model to use. The
-model must be supported by the chosen API.}
+model must be supported by the chosen API. Use \code{get_available_models(mode = "embedding")} to identify the relevant models.}
 
 \item{api}{\code{character} Specifies the API or method for embedding generation.
 Supported values are:
 \itemize{
-\item \code{"mistral"} - Dispatches to the Mistral embedding API.
-\item \code{"openai"} - Dispatches to the OpenAI embedding API.
-\item \code{"cohere"} - Dispatches to the Cohere embedding API.
-\item \code{"voyage"} - Dispatches to the Voyage embedding API.
+\item \code{"mistral"} - Dispatches to the \href{https://docs.mistral.ai/api/#tag/agents/operation/agents_completion_v1_agents_completions_post}{Mistral embedding API}.
+\item \code{"openai"} - Dispatches to the \href{https://platform.openai.com/docs/api-reference/embeddings}{OpenAI embedding API}.
+\item \code{"cohere"} - Dispatches to the \href{https://docs.cohere.com/reference/embed}{Cohere embedding API}.
+\item \code{"voyage"} - Dispatches to the \href{https://docs.voyageai.com/reference/embeddings-api}{Voyage embedding API}.
 \item \code{"llamafile"} - Dispatches to a local LlamaFile instance.
 }}
 
@@ -75,6 +75,12 @@ Additional arguments for specific APIs include:
 }
 }
 }
-\seealso{
-\code{\link[=list_models]{list_models()}} for retrieving available models for specific APIs.
+\note{
+Note that your API keys must be stored in an environment variable so
+they are accessible via \code{\link[=Sys.getenv]{Sys.getenv()}}.
 }
+\seealso{
+\code{\link[=get_available_models]{get_available_models()}} for retrieving available models for
+specific APIs.
+}
+\concept{embeddings}
