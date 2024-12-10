@@ -5,3 +5,4 @@
 ^models$
 ^codebase\.txt$
 ^rstudio.sh$
+^llama.log$
