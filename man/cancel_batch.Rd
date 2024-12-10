@@ -7,15 +7,15 @@
 cancel_batch(batch_response, ...)
 }
 \arguments{
-\item{batch_response}{A \code{list} containing details about the batch to cancel.
-The class of this object determines the API used:
+\item{batch_response}{A \code{list} containing details about the batch. The class
+of this object determines the API used:
 \itemize{
-\item \code{"batch_claude"}: Uses the Claude API (\href{https://docs.anthropic.com/en/api/message-batches-beta}{Anthropic}).
+\item \code{"batch_claude"}: Uses the Anthropic Batch API (\href{https://docs.anthropic.com/en/api/message-batches-beta}{Anthropic}).
 \item \code{"batch_openai"}: Uses the OpenAI API (\href{https://platform.openai.com/docs/api-reference/batch}{OpenAI}).
 \item \code{"batch_mistral"}: Uses the Mistral API (\href{https://docs.mistral.ai/capabilities/batch/}{Mistral}).
 }}
 
-\item{...}{Other parameters passed to API-specific methods, including:
+\item{...}{Other parameters passed to methods, including:
 \itemize{
 \item \strong{\code{max_retries}}: An integer specifying the maximum number of retry attempts in case of request failures. Defaults to \code{3}.
 \item \strong{\code{pause_cap}}: A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to \code{1200}.
@@ -44,4 +44,25 @@ API and the current state of the batch.
 \item \code{\link[=check_batch_status]{check_batch_status()}} for verifying the status of a batch.
 \item \code{\link[=download_results]{download_results()}} for retrieving results from a batch.
 }
+
+Other batch: 
+\code{\link{batch_job}()},
+\code{\link{call_batch_api}()},
+\code{\link{check_batch_status}()},
+\code{\link{claude_batch_job}()},
+\code{\link{claude_cancel_batch}()},
+\code{\link{claude_check_batch_status}()},
+\code{\link{claude_download_batch_results}()},
+\code{\link{claude_list_batches}()},
+\code{\link{claude_poll_and_download}()},
+\code{\link{download_results}()},
+\code{\link{list_batches}()},
+\code{\link{openai_batch_job}()},
+\code{\link{openai_cancel_batch}()},
+\code{\link{openai_check_batch_status}()},
+\code{\link{openai_download_batch_results}()},
+\code{\link{openai_list_batches}()},
+\code{\link{openai_poll_and_download}()},
+\code{\link{poll_and_download}()}
 }
+\concept{batch}

@@ -6,13 +6,14 @@
 #' @param texts `character` A character vector containing the input texts to
 #'   process. Must not be empty.
 #' @param model `character` A string specifying the embedding model to use. The
-#'   model must be supported by the chosen API.
+#'   model must be supported by the chosen API. Use `get_available_models(mode =
+#'   "embedding")` to identify the relevant models.
 #' @param api `character` Specifies the API or method for embedding generation.
 #'   Supported values are:
-#'   * `"mistral"` - Dispatches to the Mistral embedding API.
-#'   * `"openai"` - Dispatches to the OpenAI embedding API.
-#'   * `"cohere"` - Dispatches to the Cohere embedding API.
-#'   * `"voyage"` - Dispatches to the Voyage embedding API.
+#'   * `"mistral"` - Dispatches to the [Mistral embedding API](https://docs.mistral.ai/api/#tag/agents/operation/agents_completion_v1_agents_completions_post).
+#'   * `"openai"` - Dispatches to the [OpenAI embedding API](https://platform.openai.com/docs/api-reference/embeddings).
+#'   * `"cohere"` - Dispatches to the [Cohere embedding API](https://docs.cohere.com/reference/embed).
+#'   * `"voyage"` - Dispatches to the [Voyage embedding API](https://docs.voyageai.com/reference/embeddings-api).
 #'   * `"llamafile"` - Dispatches to a local LlamaFile instance.
 #' @param ... Additional arguments passed to API-specific implementations. See
 #'   details for supported options.
@@ -24,9 +25,9 @@
 #' * `embedding`: A list-column containing the embedding vector for each input text.
 #'
 #' @details The function dispatches requests to API-specific methods based on
-#' the value of `api`.
+#'   the value of `api`.
 #'
-#' Additional arguments for specific APIs include:
+#'   Additional arguments for specific APIs include:
 #' * **LlamaFile**:
 #'   * `llamafile_path`: Path to the LlamaFile model.
 #'   * `quiet`: Logical, suppresses logging (default: `FALSE`).
@@ -46,8 +47,13 @@
 #'   * `encoding_format`: Format for encoding embeddings (e.g., `"base64"` or `NULL` for raw lists).
 #'   * `quiet`: Logical, suppresses logging (default: `FALSE`).
 #'
-#' @seealso [list_models()] for retrieving available models for specific APIs.
+#' @note Note that your API keys must be stored in an environment variable so
+#'   they are accessible via [Sys.getenv()].
 #'
+#' @seealso [get_available_models()] for retrieving available models for
+#'   specific APIs.
+#'
+#' @family embeddings
 #' @export
 call_embedding_api <- function(texts, model, api, ...) {
   class(texts) <- c(api, class(texts))
@@ -62,7 +68,7 @@ call_embedding_api.llamafile <- function(texts, model, ...) {
 
   # Extract additional arguments from ...
   args <- list(...)
-  llamafile_path <- args$llamafile_path %||% fs::dir_ls("models", regexp = "mxbai-embed.+llamafile")
+  llamafile_path <- args$llamafile_path %||% fs::dir_ls(recurse = TRUE, regexp = "mxbai-embed.+llamafile")
   quiet <- args$quiet %||% FALSE
 
   if(is_llamafile_running()) {
@@ -111,6 +117,7 @@ call_embedding_api.llamafile <- function(texts, model, ...) {
 
 #' @export
 call_embedding_api.openai <- function(texts, model, api, ...) {
+  id <- NULL
   api_key <- Sys.getenv("OPENAI_API_KEY")
   if (api_key == "") stop("OpenAI API key is not set in environment variables.")
 
@@ -139,6 +146,7 @@ call_embedding_api.openai <- function(texts, model, api, ...) {
 
 #' @export
 call_embedding_api.mistral <- function(texts, model, api, ...) {
+  id <- NULL
   api_key <- Sys.getenv("MISTRAL_API_KEY")
   if (api_key == "") stop("Mistral API key is not set in environment variables.")
 

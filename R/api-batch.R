@@ -4,11 +4,11 @@
 #' including OpenAI, Claude (Anthropic), and Mistral. It dispatches requests to
 #' the appropriate method based on the class of `prompts`.
 #'
-#' @param prompts A `list` of prompts to send to the API. The class of this
-#'   object determines the API used:
-#'   - `"claude"`: Uses the Claude API ([Anthropic](https://docs.anthropic.com/en/api/creating-message-batches)).
-#'   - `"openai"`: Uses the OpenAI API ([OpenAI](https://platform.openai.com/docs/api-reference/batch)).
-#'   - `"mistral"`: Uses the Mistral API ([Mistral](https://docs.mistral.ai/capabilities/batch/)).
+#' @param prompts A list of prompts to send to the API, typically created via
+#'   [prompt_list()]. The class of this object determines the API used:
+#'   - `"claude"`: Uses the Anthropic Batch API ([Anthropic](https://docs.anthropic.com/en/api/creating-message-batches)).
+#'   - `"openai"`: Uses the OpenAI Batch API ([OpenAI](https://platform.openai.com/docs/api-reference/batch)).
+#'   - `"mistral"`: Uses the Mistral Batch API ([Mistral](https://docs.mistral.ai/capabilities/batch/)).
 #' @param model A character string specifying the model to use. Refer to the
 #'   API-specific documentation for available models.
 #' @param ... Additional arguments passed to API-specific methods. Common
@@ -20,22 +20,17 @@
 #' @return A `list` containing API-specific response details, including:
 #'   - `id`: The batch ID (if available).
 #'   - `processing_status`: Current processing status.
-#'   - `results_url`: URL to retrieve batch results.
 #'
-#' @details The function dispatches to one of the following methods:
-#' - [call_batch_api.claude()]
-#' - [call_batch_api.openai()]
-#' - [call_batch_api.mistral()]
-#'
-#' For additional details, refer to the relevant API documentation:
+#'   For additional details, refer to the relevant API documentation:
 #' - Claude: [Anthropic Message Batch API](https://docs.anthropic.com/en/api/creating-message-batches)
 #' - OpenAI: [OpenAI Batch API](https://platform.openai.com/docs/api-reference/batch)
 #' - Mistral: [Mistral Batch API](https://docs.mistral.ai/capabilities/batch/)
 #'
 #' @seealso
 #' - [call_api()] for single-request API calls.
-#' - [build_prompts_from_files()] for prompt creation utilities.
+#' - [prompt_list()] for prompt creation utilities.
 #'
+#' @family batch
 #' @export
 call_batch_api <- function(prompts, model, ...) {
   UseMethod("call_batch_api", prompts)
@@ -68,6 +63,37 @@ call_batch_api.mistral <- function(prompts, model, ...) {
   mistral_batch_job(prompts = prompts, model = model, max_tokens = max_tokens, quiet = quiet)
 }
 
+#' List Batch Jobs Across APIs
+#'
+#' This function retrieves a list of batch jobs processed by the specified API, delegating the request to the appropriate API-specific function.
+#'
+#' @param api A character string specifying the target API. Supported values are:
+#'   - `"claude"`: Retrieves batch jobs from the Anthropic API.
+#'   - `"openai"`: Retrieves batch jobs from the OpenAI API.
+#'   - `"mistral"`: Retrieves batch jobs from the Mistral API.
+#'
+#' @return A list containing the batch job details returned by the specified API. The structure of the response depends on the API used.
+#'
+#' @details The function dynamically calls the appropriate API-specific batch listing function based on the value of the `api` parameter. Ensure that the necessary authentication and configurations for the specified API are correctly set up before calling this function.
+#'
+#' @seealso
+#' - [claude_list_batches()] for listing batch jobs using the Anthropic API.
+#' - [openai_list_batches()] for listing batch jobs using the OpenAI API.
+#' - [mistral_list_batches()] for listing batch jobs using the Mistral API.
+#'
+#' @family batch
+#' @examples
+#' \dontrun{
+#' # List batch jobs from Claude API
+#' claude_batches <- list_batches("claude")
+#'
+#' # List batch jobs from OpenAI API
+#' openai_batches <- list_batches("openai")
+#'
+#' # List batch jobs from Mistral API
+#' mistral_batches <- list_batches("mistral")
+#' }
+#'
 #' @export
 list_batches <- function(api) {
   switch (api,
@@ -85,7 +111,7 @@ list_batches <- function(api) {
 #'
 #' @param batch_response A `list` containing details about the batch. The class
 #'   of this object determines the API used:
-#'   - `"batch_claude"`: Uses the Claude API ([Anthropic](https://docs.anthropic.com/en/api/message-batches-beta)).
+#'   - `"batch_claude"`: Uses the Anthropic Batch API ([Anthropic](https://docs.anthropic.com/en/api/message-batches-beta)).
 #'   - `"batch_openai"`: Uses the OpenAI API ([OpenAI](https://platform.openai.com/docs/api-reference/batch)).
 #'   - `"batch_mistral"`: Uses the Mistral API ([Mistral](https://docs.mistral.ai/capabilities/batch/)).
 #' @param ... Other parameters passed to methods, including:
@@ -112,6 +138,7 @@ list_batches <- function(api) {
 #'   - [openai_check_batch_status()]
 #'   - [mistral_check_batch_status()]
 #'
+#' @family batch
 #' @export
 check_batch_status <- function(batch_response, ...) {
   UseMethod("check_batch_status")
@@ -166,11 +193,7 @@ check_batch_status.batch_mistral <- function(batch_response, ...) {
 #' from a language model API. It dispatches the request to an API-specific
 #' implementation based on the class of the `batch_response`.
 #'
-#' @param batch_response A `list` containing details about the batch. The class
-#'   of this object determines the API used:
-#'   - `"batch_claude"`: Uses the Claude API ([Anthropic](https://docs.anthropic.com/en/api/message-batches-beta)).
-#'   - `"batch_openai"`: Uses the OpenAI API ([OpenAI](https://platform.openai.com/docs/api-reference/batch)).
-#'   - `"batch_mistral"`: Uses the Mistral API ([Mistral](https://docs.mistral.ai/capabilities/batch/)).
+#' @inheritParams check_batch_status
 #' @param ... Other parameters passed to API-specific methods, including:
 #'   - **`max_retries`**: An integer specifying the maximum number of retry attempts in case of request failures. Defaults to `3`.
 #'   - **`pause_cap`**: A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to `1200`.
@@ -181,12 +204,6 @@ check_batch_status.batch_mistral <- function(batch_response, ...) {
 #'   - If `tidy = TRUE`, the results are returned in a structured format (e.g., a `data.frame` or list, depending on the API).
 #'   - If `tidy = FALSE`, the raw results are returned as they are received from the API.
 #'
-#' @details
-#' The format of the downloaded results depends on the API:
-#' - Claude: Results are typically provided as structured completions for each prompt.
-#' - OpenAI: Results are formatted according to the OpenAI API's completion endpoints.
-#' - Mistral: Results include completions and associated metadata, formatted as JSON or other supported types.
-#'
 #' @seealso
 #' - [check_batch_status()] for verifying the status of a batch before downloading results.
 #' - API-specific download functions:
@@ -194,6 +211,7 @@ check_batch_status.batch_mistral <- function(batch_response, ...) {
 #'   - [openai_download_batch_results()]
 #'   - [mistral_download_batch_results()]
 #'
+#' @family batch
 #' @export
 download_results <- function(batch_response, ...) {
   UseMethod("download_results")
@@ -249,15 +267,7 @@ download_results.batch_mistral <- function(batch_response, ...) {
 #' This generic function cancels a batch of requests sent to a language model API.
 #' It dispatches the request to an API-specific implementation based on the class of the `batch_response`.
 #'
-#' @param batch_response A `list` containing details about the batch to cancel.
-#'   The class of this object determines the API used:
-#'   - `"batch_claude"`: Uses the Claude API ([Anthropic](https://docs.anthropic.com/en/api/message-batches-beta)).
-#'   - `"batch_openai"`: Uses the OpenAI API ([OpenAI](https://platform.openai.com/docs/api-reference/batch)).
-#'   - `"batch_mistral"`: Uses the Mistral API ([Mistral](https://docs.mistral.ai/capabilities/batch/)).
-#' @param ... Other parameters passed to API-specific methods, including:
-#'   - **`max_retries`**: An integer specifying the maximum number of retry attempts in case of request failures. Defaults to `3`.
-#'   - **`pause_cap`**: A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to `1200`.
-#'   - **`quiet`**: A logical value indicating whether to suppress log messages during retries. Defaults to `FALSE`.
+#' @inheritParams check_batch_status
 #'
 #' @return A `list` containing the updated batch status after cancellation. The structure of the returned
 #'   object depends on the API, but typically includes:
@@ -273,6 +283,7 @@ download_results.batch_mistral <- function(batch_response, ...) {
 #' - [check_batch_status()] for verifying the status of a batch.
 #' - [download_results()] for retrieving results from a batch.
 #'
+#' @family batch
 #' @export
 cancel_batch <- function(batch_response, ...) {
   UseMethod("cancel_batch")
@@ -330,23 +341,9 @@ cancel_batch.batch_mistral <- function(batch_response, ...) {
 #' processing. It dispatches the request to an API-specific implementation based
 #' on the class of `prompts`.
 #'
-#' @param prompts A `list` of prompts to process. The class of this object
-#'   determines the API used:
-#'   - `"claude"`: Uses the Claude API ([Anthropic](https://docs.anthropic.com/en/api/message-batches-beta)).
-#'   - `"openai"`: Uses the OpenAI API ([OpenAI](https://platform.openai.com/docs/api-reference/batch)).
-#'   - `"mistral"`: Uses the Mistral API ([Mistral](https://docs.mistral.ai/capabilities/batch/)).
-#' @param model A character string specifying the model to use. Refer to API
-#'   documentation for available models.
-#' @param ... Additional parameters passed to API-specific methods, including:
-#'   - **`max_tokens`**: An integer specifying the maximum number of output tokens per prompt. Defaults to `300`.
-#'   - **`temperature`**: A numeric value specifying the temperature per prompt. Defaults to `0.2`.
-#'   - **`quiet`**: A logical value indicating whether to suppress log messages. Defaults to `FALSE`.
+#' @inheritParams call_batch_api
 #'
-#' @return A `list` containing the batch response details. The returned object
-#'   includes:
-#'   - **`id`**: A unique identifier for the batch.
-#'   - **`status`**: The initial status of the batch (e.g., `"queued"` or `"in_progress"`).
-#'   - Additional metadata depending on the API.
+#' @inherit call_batch_api return
 #'
 #' @details The returned object is assigned a class that reflects the API used
 #' (e.g., `"batch_claude"`, `"batch_openai"`, `"batch_mistral"`).
@@ -355,6 +352,7 @@ cancel_batch.batch_mistral <- function(batch_response, ...) {
 #' - [check_batch_status()] for verifying the status of a batch.
 #' - [download_results()] for retrieving the results of a batch.
 #'
+#' @family batch
 #' @export
 batch_job <- function(prompts, model, ...) {
   UseMethod("batch_job")
@@ -426,26 +424,16 @@ batch_job.mistral <- function(prompts, model, ...) {
 #' results. It dispatches the request to an API-specific implementation based on
 #' the class of `batch_response`.
 #'
-#' @param batch_response A `list` containing details about the batch. The class
-#'   of this object determines the API used:
-#'   - `"batch_claude"`: Uses the Claude API ([Anthropic](https://docs.anthropic.com/en/api/message-batches-beta)).
-#'   - `"batch_openai"`: Uses the OpenAI API ([OpenAI](https://platform.openai.com/docs/api-reference/batch)).
-#'   - `"batch_mistral"`: Uses the Mistral API ([Mistral](https://docs.mistral.ai/capabilities/batch/)).
-#' @param timeout An integer specifying the maximum time (in seconds) to wait
-#'   for the batch to complete. Defaults to `3600` (1 hour).
-#' @param ... Additional parameters passed to API-specific methods, including:
-#'   - **`max_retries`**: An integer specifying the maximum number of retry attempts for status checks or download failures. Defaults to `3`.
-#'   - **`pause_cap`**: A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to `1200`.
-#'   - **`quiet`**: A logical value indicating whether to suppress log messages during polling and downloading. Defaults to `FALSE`.
-#'   - **`tidy`**: A logical value indicating whether to return the results in a tidy format (e.g., a `data.frame`). Defaults to `TRUE`.
+#' @inheritParams download_results
 #'
-#' @return A `list` or `data.frame` containing the results of the batch:
-#'   - If `tidy = TRUE`, the results are returned in a structured format (e.g., a `data.frame` where each row corresponds to a prompt-completion pair).
+#' @param timeout An integer specifying the maximum time (in seconds) to wait
+#'   for the batch to complete or to poll the API again. Defaults to `3600` (1 hour).
+#'
+#' @return A `list` or [tibble()] containing the results of the batch:
+#'   - If `tidy = TRUE`, the results are returned in a structured format (e.g., a [tibble()] where each row corresponds to a prompt-completion pair).
 #'   - If `tidy = FALSE`, the raw results are returned as received from the API.
 #'
-#' @details This function uses `UseMethod("poll_and_download")` to dispatch to
-#'   API-specific implementations.
-#'
+#' @details
 #'   The function repeatedly checks the status of the batch until it is
 #'   completed, canceled, or the timeout is reached. Once the batch is complete,
 #'   the results are downloaded.
@@ -454,6 +442,7 @@ batch_job.mistral <- function(prompts, model, ...) {
 #' - [check_batch_status()] for monitoring batch status.
 #' - [download_results()] for downloading batch results without polling.
 #'
+#' @family batch
 #' @export
 poll_and_download <- function(batch_response, timeout = 3600, ...) {
   UseMethod("poll_and_download")
