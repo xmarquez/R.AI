@@ -8,7 +8,7 @@
 #'   * `"openai"` - Fetch models from the OpenAI API.
 #'   * `"llamafile"` - List locally stored models in a directory.
 #'
-#' @param local_path `character` Path to the local directory containing models
+#' @param local_dir `character` Path to the local directory containing models
 #'   (used only when `api = "llamafile"`). Defaults to `"models"`.
 #'
 #' @return A tidy data frame (`tibble`) for API queries or a `character` vector
@@ -19,14 +19,11 @@
 #' * `MISTRAL_API_KEY`: Required for `"mistral"`.
 #' * `OPENAI_API_KEY`: Required for `"openai"`.
 #'
-#' @section Error Handling: The function throws errors in the following cases:
-#' * Invalid `api` parameter.
-#' * Missing API key for Mistral or OpenAI queries.
-#' * Non-existent local directory when `api = "llamafile"`.
-#' * HTTP errors during API requests.
+#' @family model utilities
 #'
 #' @export
-list_models <- function(api, local_path = "models") {
+list_models <- function(api, local_dir = "models") {
+  id <- max_context_length <- completion_chat <- vision <- NULL
   # Validate the API parameter
   if (!api %in% c("mistral", "openai", "llamafile")) {
     stop("Invalid API option. Choose 'mistral', 'openai', or 'llamafile'.")
@@ -74,7 +71,7 @@ list_models <- function(api, local_path = "models") {
 
   # Handle local "llamafile" API
   if (api == "llamafile") {
-    if (!dir.exists(local_path)) stop("Local path does not exist: ", local_path)
-    return(fs::dir_ls(local_path, glob = "*.llamafile*"))
+    if (!dir.exists(local_dir)) stop("Local path does not exist: ", local_dir)
+    return(fs::dir_ls(local_dir, glob = "*.llamafile*"))
   }
 }

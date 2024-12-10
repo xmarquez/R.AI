@@ -137,6 +137,8 @@ openai_create_batch <- function(upload_response, endpoint = "/v1/chat/completion
 #' - [openai_download_batch_results()] for retrieving completed results.
 #' - [openai_list_batches()] for listing existing batches.
 #'
+#' @family openai
+#' @family batch
 #' @export
 openai_check_batch_status <- function(batch_response, max_retries = 3, pause_cap = 1200, quiet = FALSE) {
   batch_id <- batch_response$id
@@ -192,6 +194,8 @@ openai_check_batch_status <- function(batch_response, max_retries = 3, pause_cap
 #' - [openai_check_batch_status()] for verifying the status of a batch before downloading results.
 #' - [download_results()] for generic batch result handling.
 #'
+#' @family openai
+#' @family batch
 #' @export
 openai_download_batch_results <- function(batch_response, max_retries = 3, pause_cap = 1200, quiet = FALSE, tidy = TRUE) {
   output_file_id <- batch_response$output_file_id
@@ -242,7 +246,7 @@ openai_download_batch_results <- function(batch_response, max_retries = 3, pause
 #' waiting for its completion before downloading the results.
 #'
 #' @param batch_response A `list` containing details about the batch to poll,
-#'   typically returned by [openai_create_batch()] or
+#'   typically returned by [openai_batch_job()] or
 #'   [openai_check_batch_status()].
 #' @param timeout An integer specifying the maximum time (in seconds) to wait
 #'   for the batch to complete. Defaults to `3600` (1 hour).
@@ -269,6 +273,8 @@ openai_download_batch_results <- function(batch_response, max_retries = 3, pause
 #' - [openai_batch_job()] for initiating a batch request.
 #' - [openai_download_batch_results()] for downloading results without polling.
 #'
+#' @family openai
+#' @family batch
 #' @export
 openai_poll_and_download <- function(batch_response, timeout = 3600,
                                              max_retries = 3, pause_cap = 1200,
@@ -330,6 +336,8 @@ openai_poll_and_download <- function(batch_response, timeout = 3600,
 #' - [openai_check_batch_status()] for checking the status of a batch.
 #' - [download_results()] for retrieving results from a batch.
 #'
+#' @family openai
+#' @family batch
 #' @export
 openai_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 1200, quiet = FALSE) {
   batch_id <- batch_response$id
@@ -372,6 +380,9 @@ openai_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 120
 #'   messages during retries. Defaults to `FALSE`.
 #'
 #' @return A list containing the details of the batches.
+#'
+#' @family openai
+#' @family batch
 #' @export
 openai_list_batches <- function(limit = 10, max_retries = 3, pause_cap = 1200, quiet = FALSE) {
   url <- paste0("https://api.openai.com/v1/batches?limit=", limit)
@@ -423,6 +434,8 @@ openai_list_batches <- function(limit = 10, max_retries = 3, pause_cap = 1200, q
 #' - [check_batch_status()] for monitoring the status of a batch.
 #' - [download_results()] for retrieving the results of a batch.
 #'
+#' @family openai
+#' @family batch
 #' @export
 openai_batch_job <- function(prompts, model, max_tokens = 300, temperature = 0.2, quiet = FALSE) {
   checkmate::assert_class(prompts, "openai")

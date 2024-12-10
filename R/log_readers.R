@@ -14,10 +14,6 @@
 #'   `prompt_name`, `prompt_set`, `model`, `current_prompt`, and
 #'   `total_prompts`. If no logs are found, returns an empty tibble.
 #'
-#' @examples
-#' # Extract log data from the current directory
-#' crew_log_raw()
-#'
 #' @export
 crew_log_raw <- function(path = ".", glob = "crew-*.log") {
   # List all log files in the specified directory matching the pattern

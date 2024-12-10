@@ -83,6 +83,9 @@ claude_format_prompts_for_batch <- function(prompts, model, max_tokens, temperat
 #'
 #' @return A list containing information about any message batches,
 #'   including batch IDs, processing status, and URLs for retrieving results.
+#'
+#' @family claude
+#' @family batch
 #' @export
 claude_list_batches <- function(limit = 20, max_retries = 3, pause_cap = 1200, quiet = FALSE) {
 
@@ -160,6 +163,8 @@ claude_list_batches <- function(limit = 20, max_retries = 3, pause_cap = 1200, q
 #' - [claude_download_batch_results()] for retrieving completed results.
 #' - [claude_list_batches()] for listing existing batches.
 #'
+#' @family claude
+#' @family batch
 #' @export
 claude_check_batch_status <- function(batch_response, max_retries = 3, pause_cap = 1200, quiet = FALSE) {
 
@@ -227,6 +232,8 @@ claude_check_batch_status <- function(batch_response, max_retries = 3, pause_cap
 #' - [claude_check_batch_status()] for verifying the status of a batch before downloading results.
 #' - [download_results()] for generic batch result handling.
 #'
+#' @family claude
+#' @family batch
 #' @export
 claude_download_batch_results <- function(batch_response, max_retries = 3, pause_cap = 1200, quiet = FALSE, tidy = TRUE) {
 
@@ -281,7 +288,7 @@ claude_download_batch_results <- function(batch_response, max_retries = 3, pause
 #' for its completion before downloading the results.
 #'
 #' @param batch_response A `list` containing details about the batch to poll,
-#'   typically returned by [claude_create_batch()] or
+#'   typically returned by [claude_batch_job()] or
 #'   [claude_check_batch_status()].
 #' @param timeout An integer specifying the maximum time (in seconds) to wait
 #'   for the batch to complete. Defaults to `3600` (1 hour).
@@ -308,6 +315,8 @@ claude_download_batch_results <- function(batch_response, max_retries = 3, pause
 #' - [claude_batch_job()] for initiating a batch request.
 #' - [claude_download_batch_results()] for downloading results without polling.
 #'
+#' @family claude
+#' @family batch
 #' @export
 claude_poll_and_download <- function(batch_response, timeout = 3600,
                                              max_retries = 3, pause_cap = 1200,
@@ -372,6 +381,8 @@ claude_poll_and_download <- function(batch_response, timeout = 3600,
 #' - [claude_check_batch_status()] for checking the status of a batch.
 #' - [download_results()] for retrieving results from a batch.
 #'
+#' @family claude
+#' @family batch
 #' @export
 claude_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 1200, quiet = FALSE) {
   # Construct the URL for canceling the specific message batch
@@ -429,6 +440,8 @@ claude_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 120
 #' - [check_batch_status()] for monitoring the status of a batch.
 #' - [download_results()] for retrieving the results of a batch.
 #'
+#' @family claude
+#' @family batch
 #' @export
 claude_batch_job <- function(prompts, model, max_tokens = 300, temperature = 0.2, quiet = FALSE) {
   claude_create_batch(prompts = prompts, model = model, max_tokens = max_tokens, temperature = temperature, quiet = quiet)

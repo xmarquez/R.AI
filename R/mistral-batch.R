@@ -88,13 +88,9 @@ mistral_create_batch <- function(upload_response, model, endpoint = "/v1/chat/co
 #' Mistral API. It is useful for monitoring batch progress, checking for errors,
 #' or accessing output files.
 #'
-#' @param batch_response A `list` returned by [mistral_create_batch()]
+#' @param batch_response A `list` returned by [mistral_batch_job()]
 #'   containing the batch details. Alternatively, pass an object from
 #'   [mistral_list_batches()], such as `mistral_list_batches()$data[[1]]`.
-#' @param max_retries An integer specifying the maximum number of retry attempts
-#'   in case of request failures. Defaults to `3`.
-#' @param pause_cap A numeric value representing the maximum pause duration (in
-#'   seconds) between retries. Defaults to `1200`.
 #' @param quiet A logical value indicating whether to suppress log messages
 #'   during retries. Defaults to `FALSE`.
 #'
@@ -128,7 +124,7 @@ mistral_create_batch <- function(upload_response, model, endpoint = "/v1/chat/co
 #' issues encountered during batch processing.
 #'
 #' @seealso
-#' - [mistral_create_batch()] for batch creation.
+#' - [mistral_batch_job()] for batch creation.
 #' - [mistral_download_batch_results()] for retrieving completed results.
 #' - [mistral_list_batches()] for listing existing batches.
 #'
@@ -176,7 +172,7 @@ mistral_check_batch_status <- function(batch_response, quiet = FALSE) {
 #' in a tidy format.
 #'
 #' @param batch_response A `list` containing details about the batch, typically
-#'   returned by [mistral_create_batch()] or [mistral_check_batch_status()]. The
+#'   returned by [mistral_batch_job()] or [mistral_check_batch_status()]. The
 #'   `batch_response` must include a valid `output_file`.
 #' @param max_retries An integer specifying the maximum number of retry attempts
 #'   in case of request failures. Defaults to `3`.
@@ -197,7 +193,7 @@ mistral_check_batch_status <- function(batch_response, quiet = FALSE) {
 #' batch.
 #'
 #' @seealso
-#' - [mistral_create_batch()] for initiating batch requests.
+#' - [mistral_batch_job()] for initiating batch requests.
 #' - [mistral_check_batch_status()] for verifying the status of a batch before downloading results.
 #' - [download_results()] for generic batch result handling.
 #'
@@ -292,7 +288,7 @@ mistral_download_batch_results <- function(batch_response, max_retries = 3, paus
 #' The operation attempts to stop further processing of the batch.
 #'
 #' @param batch_response A `list` containing details about the batch to cancel, typically returned by
-#'   [mistral_create_batch()] or [mistral_check_batch_status()].
+#'   [mistral_batch_job()] or [mistral_check_batch_status()].
 #' @param max_retries An integer specifying the maximum number of retry attempts in case of request failures. Defaults to `3`.
 #' @param pause_cap A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to `1200`.
 #' @param quiet A logical value indicating whether to suppress log messages during retries. Defaults to `FALSE`.
@@ -307,7 +303,7 @@ mistral_download_batch_results <- function(batch_response, max_retries = 3, paus
 #' to attempt cancellation of the specified batch. The operation's outcome depends on the batch's current state.
 #'
 #' @seealso
-#' - [mistral_create_batch()] for initiating batch requests.
+#' - [mistral_batch_job()] for initiating batch requests.
 #' - [mistral_check_batch_status()] for checking the status of a batch.
 #' - [download_results()] for retrieving results from a batch.
 #'
@@ -348,15 +344,40 @@ mistral_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 12
 
 #' List Mistral Batch Jobs
 #'
-#' This function lists all the batch jobs being processed for a user using the Mistral Batch API.
+#' This function retrieves a paginated list of batch jobs processed for a user
+#' via the Mistral Batch API.
 #'
-#' @param status An optional filter to specify the status of jobs to return. Defaults to NULL (returns all statuses).
-#' @param limit An integer specifying the maximum number of batches to return. Defaults to 10.
-#' @param max_retries An integer indicating the maximum number of retry attempts in case of request failures. Defaults to 3.
-#' @param pause_cap A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to 1200.
-#' @param quiet A logical value indicating whether the function should suppress messages during retries. Defaults to `FALSE`.
+#' @param page An integer specifying the page number to retrieve. Defaults to 0
+#'   (first page).
+#' @param page_size An integer specifying the number of jobs to retrieve per
+#'   page. Must be between 1 and 100. Defaults to 100.
+#' @param model An optional string to filter the jobs by a specific model name.
+#'   Defaults to `NULL` (no model filter).
+#' @param status An optional string to filter the jobs by status. Defaults to
+#'   `NULL` (no status filter).
+#' @param quiet A logical value indicating whether the function should suppress
+#'   messages during retries. Defaults to `FALSE`.
 #'
-#' @return A list containing the details of the batches.
+#' @return A list containing the details of the retrieved batch jobs, including
+#'   metadata, job status, and other information.
+#'
+#' @details This function constructs a query based on the provided parameters,
+#'   sends an HTTP GET request to the Mistral API endpoint, and returns the
+#'   parsed JSON response. Use appropriate values for `page` and `page_size` to
+#'   navigate through the paginated results.
+#'
+#' @seealso For more information on the Mistral Batch API, visit the [Mistral
+#'   documentation](https://docs.mistral.ai).
+#'
+#' @examples
+#' \dontrun{
+#' # List all batch jobs with default parameters
+#' batches <- mistral_list_batches()
+#'
+#' # List batch jobs with specific filters
+#' batches <- mistral_list_batches(page = 1, page_size = 50, status = "completed")
+#' }
+#'
 #' @export
 mistral_list_batches <- function(page = 0, page_size = 100, model = NULL, status = NULL, quiet = FALSE) {
   # Validate inputs
@@ -395,7 +416,7 @@ mistral_list_batches <- function(page = 0, page_size = 100, model = NULL, status
 #' This function repeatedly checks the status of a Mistral message batch, waiting for its completion before downloading the results.
 #'
 #' @param batch_response A `list` containing details about the batch to poll, typically returned by
-#'   [mistral_create_batch()] or [mistral_check_batch_status()].
+#'   [mistral_batch_job()] or [mistral_check_batch_status()].
 #' @param timeout An integer specifying the maximum time (in seconds) to wait for the batch to complete. Defaults to `3600` (1 hour).
 #' @param max_retries An integer specifying the maximum number of retry attempts for status checks or download failures. Defaults to `3`.
 #' @param pause_cap A numeric value representing the maximum pause duration (in seconds) between retries. Defaults to `1200`.
