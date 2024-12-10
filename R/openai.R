@@ -1,14 +1,13 @@
-#' Execute a Single Request to the OpenAI API
+#' Send a Single Request to the OpenAI API
 #'
-#' This function sends a single prompt to the OpenAI API for processing,
-#' allowing users to customize parameters such as model, number of candidates,
-#' and more. It also handles retries and extracts the relevant response content.
+#' This function sends a single prompt to the [OpenAI
+#' API](https://platform.openai.com/docs/api-reference/chat) for processing. It
+#' also handles retries and extracts the relevant response content.
 #'
-#' @param prompt A list of messages, each with a role (e.g., "user" or
-#'   "assistant") and content, used as input for the model. Must be in the
-#'   format `list(list(role = "user", content = "Hello world!"))`.
-#' @param model The model to use for generating responses, e.g.,
-#'   "gpt-3.5-turbo".
+#' @param prompt A list containing the prompt message(s). Typically this is the
+#'   output of [prompt()].
+#' @param model A string specifying the model to use. Get available models with
+#'   [list_models()] or [get_available_models()].
 #' @param n_candidates The number of response candidates to generate. Defaults
 #'   to 1.
 #' @param max_retries The maximum number of retry attempts in case of request
@@ -20,11 +19,6 @@
 #'   Defaults to 300.
 #' @param json_mode A logical value indicating whether the response should be
 #'   parsed as JSON. Defaults to `FALSE`.
-#' @param system Optional system message providing instructions or context for
-#'   the model.
-#' @param response_validation_fun A function to validate the response received
-#'   from the API. Defaults to `openai_default_response_validation()` if not
-#'   provided.
 #' @param content_extraction_fun A function to extract the desired content from
 #'   the API response. If not provided, a default extraction function is used
 #'   depending on the value of `json_mode`.
@@ -33,8 +27,14 @@
 #' @param quiet A logical value indicating whether the function should suppress
 #'   messages during retries. Defaults to `FALSE`.
 #'
-#' @return A tibble containing the usage statistics (tokens used) and the
-#'   generated response(s).
+#' @return A [tibble()] with a `response` column and usage information.
+#'
+#' @details See the Openai API documentation at
+#'   [https://platform.openai.com/docs/api-reference/chat](https://platform.openai.com/docs/api-reference/chat)
+#'   for more.
+#'
+#' @family openai
+#' @family single message
 #' @export
 openai_single_request <- function(prompt,
                                   model,
@@ -43,8 +43,6 @@ openai_single_request <- function(prompt,
                                   temperature = 0.2,
                                   max_tokens = 300,
                                   json_mode = FALSE,
-                                  system,
-                                  response_validation_fun,
                                   content_extraction_fun,
                                   pause_cap = 1200,
                                   quiet = FALSE) {
@@ -88,17 +86,6 @@ openai_single_request <- function(prompt,
     dplyr::mutate(response = list(content))
 
   df
-}
-
-openai_default_response_validation <- function(response) {
-  return(TRUE)
-}
-
-openai_json_response_validation <- function(response) {
-  response |>
-    openai_default_content_extraction() |>
-    default_json_content_cleaning() |>
-    jsonlite::validate()
 }
 
 openai_default_content_extraction <- function(response_content) {

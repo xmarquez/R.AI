@@ -1,12 +1,34 @@
+#' Send a Single Request to the Groq API
+#'
+#' This function sends a single prompt to the [Groq
+#' API](https://console.groq.com/docs/overview) for chat. It
+#' also handles retries and extracts the relevant response content.
+#'
+#' @inheritParams openai_single_request
+#' @param json_mode A logical value indicating whether the response should be
+#'   parsed as JSON. Defaults to `FALSE`. In the Groq API, setting `json_mode`
+#'   to `TRUE` should normally result in valid json, as noted in
+#'   [https://console.groq.com/docs/text-chat](https://console.groq.com/docs/text-chat).
+#' @param system A character string providing additional context or instructions
+#'   for the system. If not provided, the function will attempt to extract it
+#'   from the attribute `system` in `prompt` (if it exists); otherwise it will
+#'   default to `NULL`.
+#'
+#' @details See the Groq API documentation at
+#'   [https://console.groq.com/docs/overview](https://console.groq.com/docs/overview)
+#'
+#' @inherit openai_single_request return
+#'
+#' @family groq
+#' @family single message
+#' @export
 groq_single_request <- function(prompt,
                                 model,
-                                n_candidates,
-                                max_retries,
-                                temperature,
-                                max_tokens,
-                                json_mode,
-                                system,
-                                response_validation_fun,
+                                n_candidates = 1,
+                                max_retries = 10,
+                                temperature = 0.2,
+                                max_tokens = 300,
+                                json_mode = FALSE,
                                 content_extraction_fun,
                                 pause_cap = 1200,
                                 quiet = FALSE) {
@@ -49,19 +71,8 @@ groq_single_request <- function(prompt,
 
 }
 
-groq_default_response_validation <- function(response) {
-  return(TRUE)
-}
-
 groq_default_content_extraction <- function(response_content) {
   response_content$choices[[1]]$message$content
-}
-
-groq_json_response_validation <- function(response) {
-  httr::content(response) |>
-    groq_default_content_extraction() |>
-    default_json_content_cleaning() |>
-    jsonlite::validate()
 }
 
 groq_json_content_extraction <- function(response_content) {
