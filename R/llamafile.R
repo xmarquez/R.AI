@@ -143,7 +143,7 @@ start_llamafile <- function(llamafile_path) {
   if (.Platform$OS.type == "windows") {
     shell.exec(shQuote(fs::path_real(llamafile_path)))
   } else {
-    system(sprintf("nohup %s > /dev/null 2>&1 &", shQuote(llamafile_path)), wait = FALSE, invisible = TRUE)
+    system(shQuote(llamafile_path))
   }
 }
 
