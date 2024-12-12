@@ -60,9 +60,19 @@ Other openai:
 \code{\link{openai_batch_job}()},
 \code{\link{openai_cancel_batch}()},
 \code{\link{openai_check_batch_status}()},
+\code{\link{openai_create_assistant}()},
+\code{\link{openai_create_message}()},
+\code{\link{openai_create_run}()},
+\code{\link{openai_create_thread}()},
+\code{\link{openai_create_vector_store}()},
+\code{\link{openai_create_vector_store_file}()},
+\code{\link{openai_create_vector_store_file_batch}()},
 \code{\link{openai_download_batch_results}()},
 \code{\link{openai_list_batches}()},
-\code{\link{openai_single_request}()}
+\code{\link{openai_list_run_steps}()},
+\code{\link{openai_single_request}()},
+\code{\link{openai_submit_tool_outputs}()},
+\code{\link{openai_upload_file}()}
 
 Other batch: 
 \code{\link{batch_job}()},

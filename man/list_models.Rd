@@ -4,25 +4,29 @@
 \alias{list_models}
 \title{List Available Models}
 \usage{
-list_models(api, local_dir = "models")
+list_models(api, local_dir = "models", page_size = 50)
 }
 \arguments{
 \item{api}{\code{character} Specifies the source to query:
 \itemize{
 \item \code{"mistral"} - Fetch models from the Mistral API.
 \item \code{"openai"} - Fetch models from the OpenAI API.
+\item \code{"gemini"} - Fetch models from the Gemini API.
 \item \code{"llamafile"} - List locally stored models in a directory.
 }}
 
 \item{local_dir}{\code{character} Path to the local directory containing models
 (used only when \code{api = "llamafile"}). Defaults to \code{"models"}.}
+
+\item{page_size}{\code{integer} Maximum number of models to return (applies to
+\code{"gemini"} only). Defaults to 50.}
 }
 \value{
 A tidy data frame (\code{tibble}) for API queries or a \code{character} vector
 of filenames for \code{llamafile}.
 }
 \description{
-Fetches model information from Mistral, OpenAI, or a local directory
+Fetches model information from Mistral, OpenAI, Gemini, or a local directory
 (llamafile).
 }
 \section{Environment Variables}{
@@ -31,6 +35,7 @@ are set for API queries:
 \itemize{
 \item \code{MISTRAL_API_KEY}: Required for \code{"mistral"}.
 \item \code{OPENAI_API_KEY}: Required for \code{"openai"}.
+\item \code{GEMINI_API_KEY}: Required for \code{"gemini"}.
 }
 }
 
