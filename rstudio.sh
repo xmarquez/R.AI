@@ -13,7 +13,7 @@ module load GCC/10.2.0 OpenMPI/4.0.5 Singularity/3.10.2
 
 # Start RStudio Server in the Singularity container with $PWD as the working directory
 PASSWORD='yourpassword' singularity exec \
---home $PWD \
+--bind /nfs/scratch/marquexa/R.AI:/nfs/home/marquexa/R.AI \
 --bind /nfs/scratch/marquexa/rstudio-tmp:/tmp \
 --bind /nfs/scratch/marquexa/rstudio-lib:/var/lib/rstudio-server \
 --bind /nfs/scratch/marquexa/rstudio-run:/var/run/rstudio-server \
