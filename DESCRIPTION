@@ -42,7 +42,9 @@ Suggests:
     targets,
     crew,
     countrycode,
-    rtika
+    rtika,
+    DBI,
+    RSQLite
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
