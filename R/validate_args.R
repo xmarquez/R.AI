@@ -42,9 +42,17 @@ validate_single_request <- function(prompts, model, prompt_name, ...) {
     checkmate::assert_choice(model, available_models)
   } else if (!missing(model) && "llamafile" %in% class(prompts) ) {
     checkmate::assert_scalar(model)
+    if(!is.null(llamafile_path)) {
+      existing_llamafile_models <- basename(llamafile_path) |>
+        stringr::str_remove("\\.llamafile.*$")
+    } else {
+      existing_llamafile_models <- fs::dir_ls("models", regexp = "*.llamafile") |>
+        basename() |>
+        stringr::str_remove("\\.llamafile.*$")
+    }
     checkmate::assert_choice(model,
                              c("LLaMA_CPP",
-                               stringr::str_remove(basename(llamafile_path), "\\.llamafile.*$")))
+                               existing_llamafile_models))
   }
 
   # Validate prompt_name if provided
