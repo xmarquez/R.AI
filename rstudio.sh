@@ -2,10 +2,10 @@
 #SBATCH --job-name=rstudio
 #SBATCH --output=rstudio_%j.log
 #SBATCH --error=rstudio_%j.err
-#SBATCH --time=03:00:00
+#SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=16G
-#SBATCH --partition=parallel
+#SBATCH --partition=quicktest
 
 # Load necessary modules
 module purge
@@ -13,7 +13,7 @@ module load GCC/10.2.0 OpenMPI/4.0.5 Singularity/3.10.2
 
 # Start RStudio Server in the Singularity container with $PWD as the working directory
 PASSWORD='yourpassword' singularity exec \
---bind /nfs/scratch/marquexa/R.AI:/nfs/home/marquexa/R.AI \
+--home $PWD \
 --bind /nfs/scratch/marquexa/rstudio-tmp:/tmp \
 --bind /nfs/scratch/marquexa/rstudio-lib:/var/lib/rstudio-server \
 --bind /nfs/scratch/marquexa/rstudio-run:/var/run/rstudio-server \
