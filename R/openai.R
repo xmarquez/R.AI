@@ -68,7 +68,9 @@ openai_single_request <- function(prompt,
                         pause_cap = pause_cap,
                         quiet = quiet)
 
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   df <- openai_usage(response)
@@ -139,7 +141,9 @@ openai_embedding <- function(texts, model, api_key, quiet = FALSE) {
   )
 
   # Handle response
-  httr::stop_for_status(response)
+  if (httr::http_error(response)) {
+    cli::cli_abort("{httr::http_status(response)$message}. {httr::content(response)$error$message}")
+    }
   result <- httr::content(response)
 
   # Extract embeddings into a tibble

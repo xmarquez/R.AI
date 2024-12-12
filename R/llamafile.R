@@ -55,7 +55,9 @@ llamafile_single_request <- function(prompt,
                         pause_cap = pause_cap,
                         quiet = quiet)
 
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   df <- llamafile_usage(response)
@@ -223,7 +225,9 @@ llamafile_embedding <- function(text,
                         pause_cap = pause_cap,
                         quiet = quiet)
 
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   embedding <- response |> purrr::flatten() |>

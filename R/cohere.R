@@ -40,7 +40,9 @@ cohere_embedding <- function(texts, model, api_key, input_type, embedding_types,
     )
 
     # Stop for non-2xx responses
-    httr::stop_for_status(response)
+    if (httr::http_error(response)) {
+      cli::cli_abort("{httr::http_status(response)$message}. {httr::content(response)$error$message}")
+      }
     result <- httr::content(response)
 
     # Parse embeddings dynamically based on embedding types

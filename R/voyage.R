@@ -49,7 +49,7 @@ voyage_embedding <- function(
     )
 
     # Handle response
-    httr::stop_for_status(response)
+    if (httr::http_error(response)) {     cli::cli_abort("{httr::http_status(response)$message}. {httr::content(response)$error$message}")   }
     result <- httr::content(response)
 
     # Parse embeddings based on encoding format
@@ -203,7 +203,7 @@ voyage_reranker <- function(query, documents, model, top_k = NULL,
   )
 
   # Handle response
-  httr::stop_for_status(response)
+  if (httr::http_error(response)) {     cli::cli_abort("{httr::http_status(response)$message}. {httr::content(response)$error$message}")   }
   result <- httr::content(response)
 
   # Parse reranking results

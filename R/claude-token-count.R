@@ -66,7 +66,9 @@ claude_token_count <- function(messages, model, system = NULL, max_retries = 3, 
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   # Return the number of input tokens

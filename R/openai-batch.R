@@ -40,7 +40,9 @@ openai_upload_batch_file <- function(jsonl, max_retries = 3, pause_cap = 1200, q
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   # Return the response details
@@ -74,7 +76,9 @@ openai_create_batch <- function(upload_response, endpoint = "/v1/chat/completion
                         quiet = quiet)
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   class(response) <- c("batch_openai", class(response))
@@ -159,7 +163,9 @@ openai_check_batch_status <- function(batch_response, max_retries = 3, pause_cap
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   # Set the class of the response as a batch object
@@ -196,6 +202,7 @@ openai_check_batch_status <- function(batch_response, max_retries = 3, pause_cap
 #'
 #' @family openai
 #' @family batch
+#' @family files
 #' @export
 openai_download_batch_results <- function(batch_response, max_retries = 3, pause_cap = 1200, quiet = FALSE, tidy = TRUE) {
   output_file_id <- batch_response$output_file_id
@@ -219,7 +226,9 @@ openai_download_batch_results <- function(batch_response, max_retries = 3, pause
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response_content <- httr::content(res, as = "text", encoding = "UTF8")
 
   if(tidy) {
@@ -358,7 +367,9 @@ openai_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 120
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   # Return the response details
@@ -401,7 +412,9 @@ openai_list_batches <- function(limit = 10, max_retries = 3, pause_cap = 1200, q
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   # Return the response details

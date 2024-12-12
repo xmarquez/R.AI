@@ -35,7 +35,9 @@ mistral_upload_batch_file <- function(jsonl, max_retries = 3, pause_cap = 1200, 
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   # Return the response details
@@ -73,7 +75,9 @@ mistral_create_batch <- function(upload_response, model, endpoint = "/v1/chat/co
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   class(response) <- c("batch_mistral", class(response))
@@ -148,7 +152,9 @@ mistral_check_batch_status <- function(batch_response, quiet = FALSE) {
   )
 
   # Check for HTTP errors
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
 
   # Parse the response content
   response <- httr::content(res, as = "parsed", type = "application/json")
@@ -223,7 +229,9 @@ mistral_download_batch_results <- function(batch_response, max_retries = 3, paus
   )
 
   # Check for HTTP errors
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
 
   # Parse and return the response content
   response_content <- httr::content(res, as = "text", encoding = "UTF-8")
@@ -246,7 +254,9 @@ mistral_download_batch_results <- function(batch_response, max_retries = 3, paus
     )
 
     # Check for HTTP errors
-    httr::stop_for_status(res)
+    if (httr::http_error(res)) {
+      cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+    }
 
     # Parse and return the response content
     error_content <- httr::content(res, as = "text", encoding = "UTF-8")
@@ -335,7 +345,9 @@ mistral_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 12
   )
 
   # Check for HTTP errors
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
 
   # Parse and return the response content
   response <- httr::content(res, as = "parsed", type = "application/json")
@@ -403,7 +415,9 @@ mistral_list_batches <- function(page = 0, page_size = 100, model = NULL, status
   )
 
   # Check for HTTP errors
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   # Parse response
   response <- httr::content(res, as = "parsed", type = "application/json")
 

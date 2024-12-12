@@ -41,7 +41,10 @@ claude_create_batch <- function(prompts,
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
+
   response <- httr::content(res)
 
   class(response) <- c("batch_claude", class(response))
@@ -109,7 +112,9 @@ claude_list_batches <- function(limit = 20, max_retries = 3, pause_cap = 1200, q
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+    }
   response <- httr::content(res)
 
   response
@@ -189,7 +194,9 @@ claude_check_batch_status <- function(batch_response, max_retries = 3, pause_cap
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+    }
   response <- httr::content(res)
 
   # Set the class of the response as a batch object
@@ -260,7 +267,9 @@ claude_download_batch_results <- function(batch_response, max_retries = 3, pause
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response_content <- httr::content(res, as = "text", encoding = "UTF8")
 
   if(tidy) {
@@ -406,7 +415,9 @@ claude_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 120
   )
 
   # Check if the response contains an error
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   # Return the response details

@@ -73,7 +73,9 @@ claude_single_request <- function(prompt,
     quiet = quiet
   )
 
-  httr::stop_for_status(res)
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
   response <- httr::content(res)
 
   df <- claude_usage(response)
