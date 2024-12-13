@@ -2,10 +2,10 @@
 #SBATCH --job-name=rstudio
 #SBATCH --output=rstudio_%j.log
 #SBATCH --error=rstudio_%j.err
-#SBATCH --time=01:00:00
+#SBATCH --time=04:00:00
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=16G
-#SBATCH --partition=quicktest
+#SBATCH --partition=parallel
 
 # Load necessary modules
 module purge
