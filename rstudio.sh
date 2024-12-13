@@ -5,7 +5,7 @@
 #SBATCH --time=04:00:00
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=16G
-#SBATCH --partition=longrun
+#SBATCH --partition=quicktest
 
 # Load necessary modules
 module purge
