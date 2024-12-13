@@ -4,13 +4,17 @@
 \alias{start_llamafile}
 \title{Start Llamafile Instance}
 \usage{
-start_llamafile(llamafile_path)
+start_llamafile(llamafile_path, threads = 10)
 }
 \arguments{
 \item{llamafile_path}{The path to the Llamafile executable.}
+
+\item{threads}{The number of threads to allocate for Llamafile. Default is
+10. Doesn't work on Windows}
 }
 \description{
-This function attempts to start the Llamafile executable if it is not already running.
+This function attempts to start the Llamafile executable if it is not already
+running.
 }
 \seealso{
 Other llamafile: 

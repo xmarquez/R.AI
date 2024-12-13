@@ -128,24 +128,41 @@ is_llamafile_running <- function() {
 
 #' Start Llamafile Instance
 #'
-#' This function attempts to start the Llamafile executable if it is not already running.
+#' This function attempts to start the Llamafile executable if it is not already
+#' running.
 #'
 #' @param llamafile_path The path to the Llamafile executable.
+#' @param threads The number of threads to allocate for Llamafile. Default is
+#'   10. Doesn't work on Windows
 #'
 #' @family llamafile
 #' @export
-start_llamafile <- function(llamafile_path) {
+start_llamafile <- function(llamafile_path, threads = 10) {
   checkmate::assert_file_exists(llamafile_path)
-  if(is_llamafile_running()) {
+  checkmate::assert_int(threads, lower = 1, null.ok = FALSE)
+
+  if (is_llamafile_running()) {
     running_model <- which_llamafile_running()
     stop(glue::glue("{running_model} is already running on http://localhost:8080. Kill the current llamafile before starting a new one."))
   }
+
+  # llamafile_path <- fs::path_real(llamafile_path)
+
   if (.Platform$OS.type == "windows") {
-    shell.exec(shQuote(fs::path_real(llamafile_path)))
+    # This works
+    shell.exec(shQuote(llamafile_path))
+    # But this doesn't:
+    # command <- sprintf('start "" /B ./%s -t %d', llamafile_path, threads)
+    # shell(command, wait = FALSE, intern = FALSE)
   } else {
-    system(shQuote(llamafile_path))
+    # Use nohup on Linux
+    nohup_command <- sprintf("bash -c 'nohup %s -t %d > /dev/null 2>&1 &'", shQuote(llamafile_path), threads)
+    system(nohup_command, wait = FALSE, intern = FALSE)
   }
 }
+
+
+
 
 #' Kill the Running Llamafile Process
 #'
