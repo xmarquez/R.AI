@@ -1,16 +1,23 @@
-voyage_embedding <- function(
-    texts, model, api_key,
-    input_type = NULL, truncation = TRUE,
+#' @exportS3Method
+embed.voyage_character <- function(
+    content, model = "voyage-3-lite", input_type = NULL, truncation = TRUE,
     output_dimension = NULL, output_dtype = "float",
     encoding_format = NULL, quiet = FALSE
-) {
+    )
+  {
 
+  # Validate API key
+  api_key <- Sys.getenv("VOYAGE_API_KEY")
+    if (api_key == "") stop("Voyage API key is not set in environment variables.")
 
   # Batch processing: Maximum batch size is 128 texts
   batch_size <- 128
-  text_batches <- split(texts, ceiling(seq_along(texts) / batch_size))
+  text_batches <- split(content, ceiling(seq_along(content) / batch_size))
 
-  all_responses <- dplyr::tibble()
+  all_embeddings <- list()
+
+  total_tokens <- 0
+
   for (batch_idx in seq_along(text_batches)) {
     batch <- text_batches[[batch_idx]]
 
@@ -37,7 +44,7 @@ voyage_embedding <- function(
     )
 
     # Send request using httr::RETRY for robustness
-    response <- httr::RETRY(
+    res <- httr::RETRY(
       verb = "POST",
       url = "https://api.voyageai.com/v1/embeddings",
       headers,
@@ -49,8 +56,10 @@ voyage_embedding <- function(
     )
 
     # Handle response
-    if (httr::http_error(response)) {     cli::cli_abort("{httr::http_status(response)$message}. {httr::content(response)$error$message}")   }
-    result <- httr::content(response)
+    if (httr::http_error(res)) {
+      cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+      }
+    result <- httr::content(res)
 
     # Parse embeddings based on encoding format
     if (is.null(encoding_format)) {
@@ -61,17 +70,13 @@ voyage_embedding <- function(
       stop("Unknown encoding format: ", encoding_format)
     }
 
-    # Organize responses into a tibble
-    batch_responses <- dplyr::tibble(
-      id = seq_along(batch),
-      text_set = digest::digest(batch),
-      embedding = embeddings
-    )
-
-    all_responses <- dplyr::bind_rows(all_responses, batch_responses)
+    # Organize batch embeddings
+    total_tokens <- total_tokens + result$usage$total_tokens
+    all_embeddings <- c(all_embeddings, embeddings)
   }
 
-  return(all_responses)
+  structure(all_embeddings, class = c("embedding", class(all_embeddings)),
+            total_tokens = total_tokens, model = model)
 }
 
 #' Voyage AI Reranker
