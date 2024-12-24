@@ -44,9 +44,10 @@ Suggests:
     countrycode,
     rtika,
     DBI,
-    RSQLite
+    RSQLite,
+    mockery
 Config/testthat/edition: 3
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 URL: https://github.com/xmarquez/R.AI
 BugReports: https://github.com/xmarquez/R.AI/issues
