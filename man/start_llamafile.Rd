@@ -20,7 +20,6 @@ running.
 Other llamafile: 
 \code{\link{is_llamafile_running}()},
 \code{\link{kill_llamafile}()},
-\code{\link{llamafile_single_request}()},
 \code{\link{which_llamafile_running}()}
 }
 \concept{llamafile}

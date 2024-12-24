@@ -4,12 +4,16 @@
 \alias{get_available_apis}
 \title{Check Availability of API Keys for All APIs}
 \usage{
-get_available_apis()
+get_available_apis(mode = "chat")
+}
+\arguments{
+\item{mode}{Can be "chat", "embed", "rerank", or "completion". Default is "chat".}
 }
 \value{
-A data frame with columns \code{api} and \code{key_available}. The \code{api} column
-lists the APIs, and the \code{key_available} column indicates whether an API key
-is available for each API.
+A data frame with columns \code{api}, \code{key_available}, \code{key_needed}, and
+\code{available}. The \code{api} column lists the APIs, and the \code{key_available}
+column indicates whether an API key is available for each API. The
+\code{key_needed} column lists whether an API key is needed to use.
 }
 \description{
 This function returns a data frame that includes the APIs from the internal
@@ -29,8 +33,8 @@ get_available_apis()
 
 }
 \seealso{
-\code{\link[=get_available_models]{get_available_models()}} for retrieving all available models for
-an API.
+\code{\link[=get_available_models]{get_available_models()}} for retrieving all available models for an
+API.
 
 Other model utilities: 
 \code{\link{get_available_models}()},

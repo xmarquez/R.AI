@@ -16,7 +16,6 @@ localhost:8080.
 \seealso{
 Other llamafile: 
 \code{\link{kill_llamafile}()},
-\code{\link{llamafile_single_request}()},
 \code{\link{start_llamafile}()},
 \code{\link{which_llamafile_running}()}
 }

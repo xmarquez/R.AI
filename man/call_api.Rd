@@ -2,53 +2,52 @@
 % Please edit documentation in R/api.R
 \name{call_api}
 \alias{call_api}
+\alias{call_api.default}
+\alias{call_api.llama_cpp}
+\alias{call_api.ollama}
 \title{Call Language Model API}
 \usage{
 call_api(prompts, model, prompt_name, ...)
+
+\method{call_api}{default}(prompts, model, prompt_name, ...)
+
+\method{call_api}{llama_cpp}(prompts, model, prompt_name, ...)
+
+\method{call_api}{ollama}(prompts, model, prompt_name, ...)
 }
 \arguments{
 \item{prompts}{A list of prompts to send to the API. The class of this object
 should match one of the supported APIs: "groq", "claude" (for the Anthropic
 API), "openai", "gemini", or "llamafile" (for local
 \href{https://github.com/mozilla-ocho/llamafile/}{llamafiles}). It will
-typically be the result of a call to \code{\link[=prompt_list]{prompt_list()}}.}
+typically be the result of a call to \code{\link[=format_chat]{format_chat()}}.}
 
 \item{model}{A string specifying the model to use. Get available models with
 \code{\link[=get_available_models]{get_available_models()}}.}
 
 \item{prompt_name}{An optional string specifying the type of prompt.}
 
-\item{...}{Additional arguments passed to specific \code{call_api} methods, such
-as \code{max_retries}, \code{temperature}, \code{max_tokens}, \code{json_mode}, \code{system},
-\code{pause_cap}, \code{llamafile_path}, or \code{log}. See the documentation for the
-\code{\link[=openai_single_request]{openai_single_request()}} and \code{\link[=llamafile_single_request]{llamafile_single_request()}} for more.}
+\item{...}{Additional arguments passed to specific \code{\link[=chat]{chat()}} methods, such as
+\code{max_retries}, \code{temperature}, \code{max_tokens}, \code{json_mode}, \code{system},
+\code{pause_cap}, \code{llamafile_path}, or \code{log}. See the documentation for \code{\link[=chat]{chat()}}
+for more.}
 }
 \value{
-A tibble containing the API responses and usage information.
+A \code{\link[=tibble]{tibble()}} containing the API responses and usage information.
 }
 \description{
-This generic function sends prompts to various language model APIs and
-retrieves responses. It supports multiple APIs, including Groq, OpenAI,
-Claude (Anthropic), and Gemini.
-}
-\details{
-This function is implemented as a generic with methods for different
-APIs:
-\itemize{
-\item call_api.groq
-\item call_api.claude
-\item call_api.openai
-\item call_api.gemini
-\item call_api.mistral
-\item call_api.llamafile
-
-Each method handles API-specific details such as endpoint URLs,
-authentication, and response parsing.
-}
+This generic function takes a list of prompts and sends them sequentially to
+various language model APIs, putting the responses in a tidy \code{\link[=tibble]{tibble()}}. The
+prompts should typically be created via \code{\link[=format_chat]{format_chat()}} so they have the
+appropriate class. For processing a single prompt, rather than a list of
+prompts, use \code{\link[=chat]{chat()}}. For asynchronous batch processing of prompts in the
+\href{https://docs.anthropic.com/en/api/creating-message-batches}{Anthropic},
+\href{https://platform.openai.com/docs/api-reference/batch}{OpenAI}, and
+\href{https://docs.mistral.ai/capabilities/batch/}{Mistral} APIs, use
+\code{\link[=batch_job]{batch_job()}}.
 }
 \seealso{
-\code{\link[=prompt_list]{prompt_list()}} for creating prompts to use with this
-function.
+\code{\link[=format_chat]{format_chat()}} for creating prompts to use with this function.
 }
 \concept{generic}
 \concept{multiple requests}

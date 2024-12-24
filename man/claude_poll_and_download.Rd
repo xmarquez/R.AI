@@ -61,8 +61,7 @@ Other claude:
 \code{\link{claude_cancel_batch}()},
 \code{\link{claude_check_batch_status}()},
 \code{\link{claude_download_batch_results}()},
-\code{\link{claude_list_batches}()},
-\code{\link{claude_single_request}()}
+\code{\link{claude_list_batches}()}
 
 Other batch: 
 \code{\link{batch_job}()},

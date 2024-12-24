@@ -58,7 +58,6 @@ Other openai:
 \code{\link{openai_list_batches}()},
 \code{\link{openai_list_run_steps}()},
 \code{\link{openai_poll_and_download}()},
-\code{\link{openai_single_request}()},
 \code{\link{openai_submit_tool_outputs}()},
 \code{\link{openai_upload_file}()}
 

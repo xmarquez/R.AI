@@ -15,7 +15,6 @@ This function checks if a Llamafile instance is running and attempts to terminat
 \seealso{
 Other llamafile: 
 \code{\link{is_llamafile_running}()},
-\code{\link{llamafile_single_request}()},
 \code{\link{start_llamafile}()},
 \code{\link{which_llamafile_running}()}
 }

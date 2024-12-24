@@ -9,7 +9,6 @@ claude_token_count(
   model,
   system = NULL,
   max_retries = 3,
-  pause_cap = 1200,
   quiet = FALSE
 )
 }
@@ -25,9 +24,6 @@ counted as well.}
 
 \item{max_retries}{An integer indicating the maximum number of retry attempts
 in case of request failures. Defaults to 3.}
-
-\item{pause_cap}{A numeric value representing the maximum pause duration (in
-seconds) between retries. Defaults to 1200.}
 
 \item{quiet}{A logical value indicating whether the function should suppress
 messages during retries. Defaults to \code{FALSE}.}
