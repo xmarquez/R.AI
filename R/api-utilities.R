@@ -34,7 +34,7 @@
 #'
 #' @export
 get_default_model <- function(api, type = "cheapest") {
-  checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini", "mistral"))
+  checkmate::assert_choice(api, get_available_apis(mode = "chat")$api)
   type <- match.arg(type, c("cheapest", "largest", "best"))
 
   model <- preferred_models[preferred_models$api == api, ] |>
@@ -82,19 +82,20 @@ get_default_model <- function(api, type = "cheapest") {
 #' @export
 get_available_models <- function(api, mode = "chat") {
   completion_chat <- NULL
-  checkmate::assert_choice(mode, c("chat", "embedding", "rerank"))
+  checkmate::assert_choice(mode, c("chat", "embedding", "rerank", "completion"))
   if (!missing(api)) {
-    checkmate::assert_choice(api, c("groq", "claude", "openai", "gemini", "mistral", "llamafile"))
-    if(api == "llamafile") {
-      llamafile_models <- fs::dir_ls(recurse = TRUE, regexp = "*.llamafile$|*.llamafile.exe", type = "file") |>
+    checkmate::assert_choice(api, get_available_apis(mode = mode)$api)
+    if(api == "llama_cpp") {
+      llamafile_models <- fs::dir_ls(recurse = TRUE, regexp = "*.llamafile$|*.llamafile.exe|*.gguf$", type = "file") |>
         basename() |>
-        stringr::str_remove(".llamafile.*")
+        stringr::str_remove(".llamafile.*|*.gguf")
       return(llamafile_models)
 
     }
     models <- models_df[models_df$api == api & models_df$mode == mode, ]$model
     if(api == "mistral" && mode == "chat") {
       mistral_models <- list_models("mistral") |>
+        tidyr::unnest(completion_chat) |>
         dplyr::filter(completion_chat)
       models <- unique(c(models, mistral_models$id))
     }
@@ -144,9 +145,12 @@ is_api_key_available <- function(api) {
 #' This function returns a data frame that includes the APIs from the internal
 #' `models_df` data and whether an API key is available for each API.
 #'
-#' @return A data frame with columns `api` and `key_available`. The `api` column
-#'   lists the APIs, and the `key_available` column indicates whether an API key
-#'   is available for each API.
+#' @param mode Can be "chat", "embed", "rerank", or "completion". Default is "chat".
+#'
+#' @return A data frame with columns `api`, `key_available`, `key_needed`, and
+#'   `available`. The `api` column lists the APIs, and the `key_available`
+#'   column indicates whether an API key is available for each API. The
+#'   `key_needed` column lists whether an API key is needed to use.
 #'
 #' @details The function checks the environment variables for the presence of an
 #'   API key corresponding to each API in the `models_df` data frame. The
@@ -155,8 +159,8 @@ is_api_key_available <- function(api) {
 #'   name. (Except for the Claude API, where the environment variable is
 #'   "ANTHROPIC_API_KEY").
 #'
-#' @seealso [get_available_models()] for retrieving all available models for
-#'   an API.
+#' @seealso [get_available_models()] for retrieving all available models for an
+#'   API.
 #'
 #' @examples
 #' # Get the availability of API keys for all APIs
@@ -164,38 +168,18 @@ is_api_key_available <- function(api) {
 #'
 #' @family model utilities
 #' @export
-get_available_apis <- function() {
-  unique_apis <- unique(models_df$api)
+get_available_apis <- function(mode = "chat") {
+  checkmate::assert_choice(mode, c("chat", "embed", "rerank", "completion"))
+  df <- methods(mode) |>
+    stringr::str_remove("(^chat|^embed|^rerank|^completion).") |>
+    stringr::str_remove("_list$|_character$") |>
+    purrr::map_dfr(~tibble::tibble(api = .x, key_available = is_api_key_available(.x)))
+  df <- df |>
+    dplyr::mutate(key_needed = dplyr::case_when(api %in% c("llama_cpp", "ollama") ~ FALSE,
+                                                TRUE ~ TRUE),
+                  available = key_available | !key_needed)
+  df
 
-  api_key_status <- sapply(unique_apis, is_api_key_available)
-
-  tibble::tibble(
-    api = unique_apis,
-    key_available = api_key_status
-  )
-}
-
-resolve_functions <- function(api, prompt_name) {
-  # Set default prompt_name if missing or invalid
-  if (missing(prompt_name) ||
-      !exists(paste0(api, "_", prompt_name, "_content_extraction"), inherits = TRUE)) {
-    prompt_name <- "default"
-  }
-
-  # Generate function names dynamically
-  single_request_fun_name <- paste0(api, "_single_request")
-  content_extraction_fun_name <- paste0(api, "_", prompt_name, "_content_extraction")
-
-  # Ensure the required single_request_fun exists
-  if (!exists(single_request_fun_name, inherits = TRUE)) {
-    stop(glue::glue("The function {single_request_fun_name} does not exist."))
-  }
-
-  # Retrieve functions, inheriting from parent environments if necessary
-  list(
-    single_request_fun = get(single_request_fun_name, inherits = TRUE),
-    content_extraction_fun = get(content_extraction_fun_name, inherits = TRUE)
-  )
 }
 
 
