@@ -1,4 +1,6 @@
-library(tidyverse)
+library(dplyr)
+library(purrr)
+library(tidyr)
 
 test_that("Single prompts work", {
   skip_on_cran()
@@ -119,7 +121,7 @@ test_that("Images are uploaded and described", {
   skip_if_offline()
   skip_on_ci()
 
-  danish_building <- test_path("test-images/building picture.jpeg")
+  danish_building <- test_path("test-images/building-picture.jpeg")
   apis_to_test <- c("openai", "mistral",
                     "gemini",
                     "claude", "groq")
@@ -162,7 +164,7 @@ test_that("PDFs are uploaded and described", {
   skip_if_offline()
   skip_on_ci()
 
-  my_pdf <- test_path("test-images/Márquez - The mechanisms of personalization.pdf")
+  my_pdf <- test_path("test-images/marquez-mechanisms-of-personalization.pdf")
   apis_to_test <- c("gemini",
                     "claude")
   models_to_test <- c("gemini-1.5-flash-latest",
@@ -184,7 +186,7 @@ test_that("PDF text is extracted using Rtika", {
   skip_if_offline()
   skip_on_ci()
 
-  my_pdf <- test_path("test-images/Márquez - The mechanisms of personalization.pdf")
+  my_pdf <- test_path("test-images/marquez-mechanisms-of-personalization.pdf")
   apis_to_test <- c("openai", "gemini", "claude")
   models_to_test <- c("gpt-4o-mini", "gemini-1.5-flash-latest",
                       "claude-3-5-sonnet-20241022")
@@ -204,7 +206,7 @@ test_that("Caching works properly for OpenAI and Claude", {
   skip_if_offline()
   skip_on_ci()
 
-  my_pdf <- test_path("test-images/Márquez - The mechanisms of personalization.pdf")
+  my_pdf <- test_path("test-images/marquez-mechanisms-of-personalization.pdf")
   apis_to_test <- c("openai", "claude")
   models_to_test <- c("gpt-4o-mini",
                       "claude-3-5-sonnet-20241022")
