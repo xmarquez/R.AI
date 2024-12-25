@@ -26,12 +26,14 @@ Imports:
     httr,
     jsonlite,
     lubridate,
+    mime,
     purrr,
     readr,
     rlang,
     stringr,
     tibble,
-    tidyr
+    tidyr,
+    utils
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
