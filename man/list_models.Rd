@@ -2,40 +2,92 @@
 % Please edit documentation in R/list-models.R
 \name{list_models}
 \alias{list_models}
+\alias{list_models.mistral}
+\alias{list_models.openai}
+\alias{list_models.groq}
+\alias{list_models.cerebras}
+\alias{list_models.gemini}
+\alias{list_models.ollama}
+\alias{list_models.claude}
+\alias{list_models.llamafile}
 \title{List Available Models}
 \usage{
 list_models(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{mistral}(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{openai}(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{groq}(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{cerebras}(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{gemini}(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{ollama}(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{claude}(api, local_dir = "models", page_size = 50)
+
+\method{list_models}{llamafile}(api, local_dir = "models", page_size = 50)
 }
 \arguments{
-\item{api}{\code{character} Specifies the source to query:
+\item{api}{\code{character}. Specifies the source to query. Must be one of:
 \itemize{
-\item "mistral" - Fetch models from the Mistral API.
-\item "openai" - Fetch models from the OpenAI API.
-\item "gemini" - Fetch models from the Gemini API.
-\item "claude" - Fetch models from the Claude API.
-\item "llamafile" - List locally stored models in a directory.
+\item \code{"mistral"}
+\item \code{"openai"}
+\item \code{"groq"}
+\item \code{"cerebras"}
+\item \code{"gemini"}
+\item \code{"ollama"}
+\item \code{"claude"}
+\item \code{"llamafile"}
 }}
 
-\item{local_dir}{\code{character} Path to the local directory containing models (used only when \code{api = "llamafile"}). Defaults to "models".}
+\item{local_dir}{\code{character}. Path to the local directory containing models
+(used only when \code{api = "llamafile"}). Defaults to \code{"models"}.}
 
-\item{page_size}{\code{integer} Maximum number of models to return (applies to Gemini and Claude APIs). Defaults to 50.}
+\item{page_size}{\code{integer}. Maximum number of models to return (applies to
+Gemini and Claude APIs). Defaults to 50.}
 }
 \value{
-A tidy data frame (\code{tibble}) for API queries or a \code{character} vector of filenames for \code{llamafile}.
+A tidy data frame (\code{tibble}) when querying remote APIs, or a character
+vector of filenames for \code{"llamafile"}. Ollama returns a tibble of local models
+if you choose \code{"ollama"}.
 }
 \description{
-Fetches model information from Mistral, OpenAI, Gemini, Claude, or a local directory (llamafile).
+A generic function that fetches model information from various sources
+(Mistral, OpenAI, Groq, Cerebras, Gemini, Claude, Ollama, or a local directory
+for Llama files). You specify which backend you want by passing a string
+(e.g., \code{"mistral"}, \code{"openai"}, \code{"gemini"}, \code{"claude"}, \code{"llamafile"}). Internally,
+the class of the string is set so that \code{UseMethod("list_models")} can dispatch
+to the corresponding S3 method.
 }
 \section{Environment Variables}{
- Ensure the following environment variables are set for API queries:
+
+For remote API queries, ensure the relevant environment variable is set:
 \itemize{
-\item \code{MISTRAL_API_KEY}: Required for "mistral".
-\item \code{OPENAI_API_KEY}: Required for "openai".
-\item \code{GEMINI_API_KEY}: Required for "gemini".
-\item \code{ANTHROPIC_API_KEY}: Required for "claude".
+\item \code{MISTRAL_API_KEY} (for \code{"mistral"})
+\item \code{OPENAI_API_KEY} (for \code{"openai"})
+\item \code{GROQ_API_KEY} (for \code{"groq"})
+\item \code{CEREBRAS_API_KEY} (for \code{"cerebras"})
+\item \code{GEMINI_API_KEY} (for \code{"gemini"})
+\item \code{ANTHROPIC_API_KEY} (for \code{"claude"})
 }
 }
 
+\examples{
+\dontrun{
+## List OpenAI models:
+list_models("openai")
+
+## List Claude models:
+list_models("claude", page_size = 20)
+
+## List local llama files:
+list_models("llamafile", local_dir = "my_local_models")
+}
+
+}
 \seealso{
 Other model utilities: 
 \code{\link{get_available_apis}()},

@@ -3,9 +3,7 @@
 \name{health.llama_cpp}
 \alias{health.llama_cpp}
 \alias{props.llama_cpp}
-\alias{completion.llama_cpp_character}
 \alias{tokenize.llama_cpp_character}
-\alias{embed.llama_cpp_character}
 \alias{detokenize.llama_cpp_tokenlist}
 \title{Functions to interact with the llama.cpp server API}
 \usage{
@@ -13,38 +11,14 @@ health.llama_cpp(...)
 
 props.llama_cpp(...)
 
-\method{completion}{llama_cpp_character}(
-  prompt,
-  n_predict = -1,
-  temperature = 0.8,
-  top_k = 40,
-  top_p = 0.95,
-  stream = FALSE,
-  ...
-)
-
 \method{tokenize}{llama_cpp_character}(content, add_special = FALSE, with_pieces = FALSE, ...)
-
-\method{embed}{llama_cpp_character}(content, ...)
 
 \method{detokenize}{llama_cpp_tokenlist}(tokens, ...)
 }
 \arguments{
 \item{...}{Additional arguments passed to the HTTP request.}
 
-\item{prompt}{Text input for generation. Can be a vector of characters.}
-
-\item{n_predict}{Maximum tokens to generate. Use -1 for unlimited.}
-
-\item{temperature}{Sampling temperature.}
-
-\item{top_k}{Top-k sampling.}
-
-\item{top_p}{Top-p sampling.}
-
-\item{stream}{Enable streaming mode.}
-
-\item{content}{Text to generate embeddings for.}
+\item{content}{Text to tokenize.}
 
 \item{add_special}{Include special tokens (default FALSE).}
 

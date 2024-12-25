@@ -31,7 +31,7 @@ e.g. \code{"openai"}, \code{"claude"}, \code{"gemini"}, etc. This is typically s
 automatically by the calling functions or by a \code{class()} on the object.}
 
 \item{user}{A character vector of user inputs. May be file paths, URLs, or
-direct text. Internally, \code{\link[=process_user_prompts]{process_user_prompts()}} attempts to convert
+direct text. Internally, a function attempts to convert
 images and PDFs into base64 or text, depending on the backend capabilities.}
 
 \item{system}{(Optional) A string containing the "system" instructions or
