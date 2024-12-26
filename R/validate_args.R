@@ -31,33 +31,9 @@ validate_single_request <- function(prompts, model, prompt_name, ...) {
 
   api <- class(prompts)[1]
 
-  # Validate prompts - must be one of the supported API classes
-  checkmate::assert_multi_class(prompts, classes = c("groq", "openai", "claude", "gemini", "llamafile", "mistral"))
-
-  available_models <- get_available_models(api)
-
-  # Validate model if provided
-  if (!missing(model) && !"llamafile" %in% class(prompts) ) {
-    checkmate::assert_scalar(model)
-    checkmate::assert_choice(model, available_models)
-  } else if (!missing(model) && "llamafile" %in% class(prompts) ) {
-    checkmate::assert_scalar(model)
-    if(!is.null(llamafile_path)) {
-      existing_llamafile_models <- basename(llamafile_path) |>
-        stringr::str_remove("\\.llamafile.*$")
-    } else {
-      existing_llamafile_models <- fs::dir_ls("models", regexp = "*.llamafile") |>
-        basename() |>
-        stringr::str_remove("\\.llamafile.*$")
-    }
-    checkmate::assert_choice(model,
-                             c("LLaMA_CPP",
-                               existing_llamafile_models))
-  }
-
   # Validate prompt_name if provided
   if (!missing(prompt_name)) {
-    checkmate::assert_scalar(prompt_name)
+    checkmate::assert_string(prompt_name)
   }
 
   # Validate n_candidates - must be a positive integer. Can only be 1 for groq
@@ -89,7 +65,7 @@ validate_single_request <- function(prompts, model, prompt_name, ...) {
 
   # Validate system message if provided
   if (!is.null(system)) {
-    checkmate::assert_scalar(system)
+    checkmate::assert_string(system)
   }
 
   # Validate pause_cap - must be a non-negative numeric value
