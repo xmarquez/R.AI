@@ -9,6 +9,7 @@
 \alias{get_message.llama_cpp_chat}
 \alias{get_message.mistral_chat}
 \alias{get_message.gemini_chat}
+\alias{get_message.cohere_chat}
 \title{Extract Message Objects from a Chat Response}
 \usage{
 get_message(response)
@@ -26,6 +27,8 @@ get_message(response)
 \method{get_message}{mistral_chat}(response)
 
 \method{get_message}{gemini_chat}(response)
+
+\method{get_message}{cohere_chat}(response)
 }
 \arguments{
 \item{response}{A chat response object from a function like

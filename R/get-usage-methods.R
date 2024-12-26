@@ -9,7 +9,7 @@
 #'   This object should contain usage metadata (e.g., `response$usage`,
 #'   `response$usageMetadata`, or related fields), depending on the backend.
 #'
-#' @return A data frame (often a tibble) containing usage statistics. The exact
+#' @return A data frame containing usage statistics. The exact
 #'   columns depend on the backend, but commonly include:
 #'   \itemize{
 #'     \item `input_tokens` (prompt tokens),
@@ -19,29 +19,6 @@
 #'     \item other fields as provided by the specific backend.
 #'   }
 #'
-#' @section Default Method:
-#' The default method (`get_usage.default()`) checks for a `response$usage` object
-#' with fields like `prompt_tokens`, `completion_tokens`, and `total_tokens`.
-#' If present, it also tries to parse any `prompt_tokens_details` or
-#' `completion_tokens_details`.
-#'
-#' @section Claude (`claude_chat`) Method:
-#' The Claude usage method extracts usage from `response$usage` (including fields
-#' like `input_tokens` and `output_tokens`). It also accounts for
-#' `cache_creation_input_tokens` or `cache_read_input_tokens` if present.
-#'
-#' @section Gemini (`gemini_chat`) Method:
-#' The Gemini usage method reads usage data from the `response$usageMetadata` field,
-#' renaming columns to `input_tokens`, `output_tokens`, and `total_tokens` as needed.
-#'
-#' @section Llama.CPP (`llama_cpp_completion`) Method:
-#' The Llama.CPP usage method extracts usage fields such as `tokens_cached`,
-#' `tokens_evaluated`, and `tokens_predicted`.
-#'
-#' @section Ollama (`ollama_chat` and `ollama_completion`) Methods:
-#' Ollama usage methods combine prompt eval counts and output eval counts (or tokens)
-#' into a tibble. For completions, additional fields may be shown as returned
-#' by the Ollama server.
 #'
 #' @examples
 #' \dontrun{
@@ -160,4 +137,18 @@ get_usage.ollama_completion <- function(response) {
   response$response <- NULL
   response$context <- NULL
   dplyr::as_tibble(response)
+}
+
+#' @rdname get_usage
+#' @exportS3Method get_usage cohere_chat
+get_usage.cohere_chat <- function(response) {
+  input_tokens <- output_tokens <- model <- NULL
+  dplyr::tibble(
+    input_tokens = response$usage$tokens$input_tokens,
+    billed_input_tokens = response$usage$billed_units$input_tokens,
+    output_tokens = response$usage$tokens$output_tokens,
+    billed_output_tokens = response$usage$billed_units$output_tokens
+  ) |>
+    dplyr::mutate(total_tokens = input_tokens + output_tokens,
+                  model = "unknown")
 }

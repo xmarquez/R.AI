@@ -305,11 +305,7 @@ format_chat.gemini <- function(api,
   } else {
     # Single expansion => final_prompts is just the first (only) item
     final_prompts <- final_prompts_list[[1]]
-    # Attach a gemini-specific S3 class, e.g. "gemini_list"
-    final_prompts <- structure(
-      final_prompts,
-      class = c(paste(api, class(final_prompts), sep = "_"), class(final_prompts))
-    )
+
   }
 
   final_prompts

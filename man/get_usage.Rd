@@ -8,6 +8,7 @@
 \alias{get_usage.llama_cpp_completion}
 \alias{get_usage.ollama_chat}
 \alias{get_usage.ollama_completion}
+\alias{get_usage.cohere_chat}
 \title{Retrieve Usage Information from a Chat or Completion Response}
 \usage{
 get_usage(response)
@@ -23,6 +24,8 @@ get_usage(response)
 \method{get_usage}{ollama_chat}(response)
 
 \method{get_usage}{ollama_completion}(response)
+
+\method{get_usage}{cohere_chat}(response)
 }
 \arguments{
 \item{response}{A response object returned by a chat or completion call.
@@ -30,7 +33,7 @@ This object should contain usage metadata (e.g., \code{response$usage},
 \code{response$usageMetadata}, or related fields), depending on the backend.}
 }
 \value{
-A data frame (often a tibble) containing usage statistics. The exact
+A data frame containing usage statistics. The exact
 columns depend on the backend, but commonly include:
 \itemize{
 \item \code{input_tokens} (prompt tokens),
@@ -46,40 +49,6 @@ objects returned by various language model (LLM) backends. Calling \code{get_usa
 will return a standardized data frame (commonly a tibble) summarizing usage metrics
 such as prompt tokens, completion tokens, total tokens, etc.
 }
-\section{Default Method}{
-
-The default method (\code{get_usage.default()}) checks for a \code{response$usage} object
-with fields like \code{prompt_tokens}, \code{completion_tokens}, and \code{total_tokens}.
-If present, it also tries to parse any \code{prompt_tokens_details} or
-\code{completion_tokens_details}.
-}
-
-\section{Claude (\code{claude_chat}) Method}{
-
-The Claude usage method extracts usage from \code{response$usage} (including fields
-like \code{input_tokens} and \code{output_tokens}). It also accounts for
-\code{cache_creation_input_tokens} or \code{cache_read_input_tokens} if present.
-}
-
-\section{Gemini (\code{gemini_chat}) Method}{
-
-The Gemini usage method reads usage data from the \code{response$usageMetadata} field,
-renaming columns to \code{input_tokens}, \code{output_tokens}, and \code{total_tokens} as needed.
-}
-
-\section{Llama.CPP (\code{llama_cpp_completion}) Method}{
-
-The Llama.CPP usage method extracts usage fields such as \code{tokens_cached},
-\code{tokens_evaluated}, and \code{tokens_predicted}.
-}
-
-\section{Ollama (\code{ollama_chat} and \code{ollama_completion}) Methods}{
-
-Ollama usage methods combine prompt eval counts and output eval counts (or tokens)
-into a tibble. For completions, additional fields may be shown as returned
-by the Ollama server.
-}
-
 \examples{
 \dontrun{
 ## Claude example:

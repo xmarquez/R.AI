@@ -8,6 +8,7 @@
 #' - **OpenAI**: Dispatches to the [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat).
 #' - **Gemini**: Dispatches to the [Gemini Chat API](https://ai.google.dev/api/generate-content).
 #' - **Claude**: Dispatches to the [Anthropic Claude API](https://docs.anthropic.com/en/api/messages).
+#' - **Cohere**: Dispatches to the [Cohere Chat API](https://docs.cohere.com/v2/reference/chat).
 #' - **Mistral**: Dispatches to the [Mistral Chat API](https://docs.mistral.ai/api/#tag/chat).
 #' - **Groq**: Dispatches to the [Groq Chat API](https://console.groq.com/docs/api-reference#chat).
 #' - **Cerebras**: Dispatches to the [Cerebras Chat API](https://inference-docs.cerebras.ai/api-reference/chat-completions).
@@ -648,3 +649,106 @@ chat.ollama_list <- function(messages,
   response <- httr::content(res)
   structure(response, class = c("ollama_chat", class(response)))
 }
+
+#' @rdname chat
+#' @exportS3Method chat cohere_list
+chat.cohere_list <- function(messages,
+                             model = "command-r-plus-08-2024",
+                             temperature = 0.3,
+                             max_tokens = NULL,
+                             quiet = FALSE,
+                             ...) {
+  # Capture additional user arguments in dots
+  dots <- list(...)
+
+  # Cohere default fields
+  # For v2/chat, the "stream" field is required, defaulting to FALSE
+  stream <- dots$stream %||% FALSE
+
+  # Additional optional parameters from docs:
+  # frequency_penalty, presence_penalty, tools, documents, stop_sequences, etc.
+  frequency_penalty <- dots$frequency_penalty %||% 0.0
+  presence_penalty  <- dots$presence_penalty  %||% 0.0
+  k                 <- dots$k                 %||% 0
+  p                 <- dots$p                 %||% 0.75
+  logprobs          <- dots$logprobs          %||% FALSE
+  strict_tools      <- dots$strict_tools      %||% NULL
+  safety_mode       <- dots$safety_mode       %||% NULL
+  stop_sequences    <- dots$stop_sequences    %||% NULL
+  seed              <- dots$seed              %||% NULL
+
+  # Tools & documents are optional lists or objects
+  tools             <- dots$tools             %||% NULL
+  documents         <- dots$documents         %||% NULL
+
+  # response_format can force JSON output structure
+  response_format   <- dots$response_format   %||% NULL
+
+  # Build the request body per Cohere's v2/chat spec
+  body_list <- list(
+    # Required
+    stream       = stream,
+    model        = model,
+    messages     = messages,  # Must be a list of {role, content} objects
+
+    # Optional
+    tools        = tools,
+    documents    = documents,
+    response_format = response_format,
+    safety_mode  = safety_mode,
+    max_tokens   = max_tokens,
+    stop_sequences = stop_sequences,
+    temperature  = temperature,
+    seed         = seed,
+    frequency_penalty = frequency_penalty,
+    presence_penalty  = presence_penalty,
+    k            = k,
+    p            = p,
+    logprobs     = logprobs,
+    strict_tools = strict_tools
+  )
+  # Remove any NULL fields before JSON-encoding
+  body_list <- purrr::compact(body_list)
+
+  # Convert to JSON
+  json_body <- jsonlite::toJSON(body_list, auto_unbox = TRUE, pretty = TRUE)
+
+  # Retrieve API key
+  cohere_api_key <- Sys.getenv("COHERE_API_KEY")
+  if (!nzchar(cohere_api_key)) {
+    stop("Cohere API key is not set in environment variable COHERE_API_KEY.")
+  }
+
+  # Decide how many times to retry on errors/timeouts (default = 3)
+  max_retries <- dots$max_retries %||% 3
+
+  # Make the request with some retry logic
+  res <- httr::RETRY(
+    verb = "POST",
+    url  = "https://api.cohere.com/v2/chat",
+    config = httr::add_headers(
+      "Authorization" = paste("Bearer", cohere_api_key),
+      "Content-Type"  = "application/json"
+    ),
+    body = json_body,
+    encode = "json",
+    times = max_retries,
+    pause_base = 1,
+    pause_cap = 1200,   # Don’t exceed 20 min
+    quiet = quiet,
+    terminate_on = c(400:499)
+  )
+
+  # Handle errors
+  if (httr::http_error(res)) {
+    err <- httr::content(res)
+    cli::cli_abort("{httr::http_status(res)$message}. {err$message %||% err$error$message}")
+  }
+
+  # Parse and return the result
+  response <- httr::content(res)
+
+  # Wrap the response in an S3 class "cohere_chat"
+  structure(response, class = c("cohere_chat", class(response)))
+}
+

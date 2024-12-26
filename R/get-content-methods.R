@@ -135,3 +135,9 @@ get_content.ollama_completion <- function(response) {
 get_content.ollama_chat <- function(response) {
   response$message$content
 }
+
+#' @rdname get_content
+#' @exportS3Method get_content cohere_chat
+get_content.cohere_chat <- function(response) {
+  response$message$content[[1]]$text
+}

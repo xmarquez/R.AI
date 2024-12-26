@@ -136,5 +136,16 @@ get_message.gemini_chat <- function(response) {
   # Pull from the first candidate’s content
   # If you want multiple candidates, you would map over them
   response$candidates[[1]]$content |>
+    list() |>
     structure(class = c("gemini_list", "list"))
 }
+
+#' @rdname get_message
+#' @exportS3Method get_message cohere_chat
+get_message.cohere_chat <- function(response) {
+  # Pull from the first candidate’s content
+  # If you want multiple candidates, you would map over them
+  response$message |>
+    structure(class = c("cohere_list", "list"))
+}
+
