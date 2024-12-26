@@ -18,8 +18,7 @@ rag_assistant(
 )
 }
 \arguments{
-\item{files}{A list or object containing file paths or file metadata. For
-Zotero collections, use a \code{zotero_collection} object.}
+\item{files}{A list or object containing file paths or file metadata.}
 
 \item{name}{Character. Optional. The name of the assistant. Defaults to the
 name(s) of the provided file collection if not supplied.}
@@ -61,20 +60,4 @@ Creates an OpenAI assistant using the RAG pattern with an associated vector
 store for file search. This function supports creating assistants from
 various types of inputs, including files from a \href{https://zotero.org/}{Zotero}
 collection.
-}
-\details{
-If working with Zotero collections, consider using the helper function
-\code{\link[=zotero_collection_attachments]{zotero_collection_attachments()}} to extract PDFs from your Zotero database.
-}
-\examples{
-\dontrun{
-# Create an assistant from a Zotero collection
-library(dplyr)
-zotero_files <- zotero_collection_attachments("My Research Collection")
-assistant <- rag_assistant(
-  files = zotero_files,
-  name = "Research Assistant",
-  temperature = 0.3
-)
-}
 }

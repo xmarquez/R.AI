@@ -42,15 +42,15 @@
 #'
 #'   Your API key must be set in the `VOYAGE_API_KEY` environment variable.
 #'
-#' @seealso [call_embedding_api()] for embedding queries and documents.
+#' @seealso [embed()] for embedding queries and documents.
 #'
-#' @family embedding
-#' @family reranking
-#' @family voyage
 #' @export
-voyage_reranker <- function(query, documents, model, top_k = NULL,
-                            return_documents = FALSE, truncation = TRUE,
-                            quiet = FALSE) {
+rerank_voyage_ai <- function(query, documents,
+                                    model,
+                                    top_k = NULL,
+                                    return_documents = FALSE,
+                                    truncation = TRUE,
+                                    quiet = FALSE) {
 
   # Validate API key
   api_key <- Sys.getenv("VOYAGE_API_KEY")
@@ -124,11 +124,13 @@ voyage_reranker <- function(query, documents, model, top_k = NULL,
     encode = "json",
     times = 3, # Retry up to 3 times on transient errors
     quiet = quiet,
-    terminate_on = c(400, 401, 403, 404) # Terminate on critical client errors
+    terminate_on = c(400:499) # Terminate on critical client errors
   )
 
   # Handle response
-  if (httr::http_error(response)) {     cli::cli_abort("{httr::http_status(response)$message}. {httr::content(response)$error$message}")   }
+  if (httr::http_error(response)) {
+    cli::cli_abort("{httr::http_status(response)$message}. {httr::content(response)$error$message}")
+    }
   result <- httr::content(response)
 
   # Parse reranking results

@@ -9,26 +9,35 @@
 \alias{list_models.gemini}
 \alias{list_models.ollama}
 \alias{list_models.claude}
-\alias{list_models.llamafile}
+\alias{list_models.llama_cpp}
+\alias{list_models.cohere}
+\alias{list_models.voyage}
+\alias{list_models.all}
 \title{List Available Models}
 \usage{
-list_models(api, local_dir = "models", page_size = 50)
+list_models(api, ...)
 
-\method{list_models}{mistral}(api, local_dir = "models", page_size = 50)
+\method{list_models}{mistral}(api, ...)
 
-\method{list_models}{openai}(api, local_dir = "models", page_size = 50)
+\method{list_models}{openai}(api, ...)
 
-\method{list_models}{groq}(api, local_dir = "models", page_size = 50)
+\method{list_models}{groq}(api, ...)
 
-\method{list_models}{cerebras}(api, local_dir = "models", page_size = 50)
+\method{list_models}{cerebras}(api, ...)
 
-\method{list_models}{gemini}(api, local_dir = "models", page_size = 50)
+\method{list_models}{gemini}(api, ...)
 
-\method{list_models}{ollama}(api, local_dir = "models", page_size = 50)
+\method{list_models}{ollama}(api, ...)
 
-\method{list_models}{claude}(api, local_dir = "models", page_size = 50)
+\method{list_models}{claude}(api, ...)
 
-\method{list_models}{llamafile}(api, local_dir = "models", page_size = 50)
+\method{list_models}{llama_cpp}(api, local_dir = "models", ...)
+
+\method{list_models}{cohere}(api, ...)
+
+\method{list_models}{voyage}(api, ...)
+
+\method{list_models}{all}(api, mode = "chat", ...)
 }
 \arguments{
 \item{api}{\code{character}. Specifies the source to query. Must be one of:
@@ -40,31 +49,34 @@ list_models(api, local_dir = "models", page_size = 50)
 \item \code{"gemini"}
 \item \code{"ollama"}
 \item \code{"claude"}
-\item \code{"llamafile"}
+\item \code{"llama_cpp"}
 }}
 
-\item{local_dir}{\code{character}. Path to the local directory containing models
-(used only when \code{api = "llamafile"}). Defaults to \code{"models"}.}
+\item{...}{Other parameters passed on to methods}
 
-\item{page_size}{\code{integer}. Maximum number of models to return (applies to
-Gemini and Claude APIs). Defaults to 50.}
+\item{local_dir}{\code{character}. Path to the local directory containing models
+(used only when \code{api = "llama_cpp"}). Defaults to \code{"models"}.}
+
+\item{mode}{If you set \code{api = "all"}, \code{mode} can be any of \code{"chat"},
+\code{"embed"}, \code{"completion"}, \code{"rerank"}}
 }
 \value{
-A tidy data frame (\code{tibble}) when querying remote APIs, or a character
-vector of filenames for \code{"llamafile"}. Ollama returns a tibble of local models
-if you choose \code{"ollama"}.
+A tidy data frame (\code{tibble}) when querying remote APIs, or a
+character vector of filenames for \code{"llama_cpp"}. Ollama returns a tibble of
+local models if you choose \code{"ollama"}.
 }
 \description{
 A generic function that fetches model information from various sources
-(Mistral, OpenAI, Groq, Cerebras, Gemini, Claude, Ollama, or a local directory
-for Llama files). You specify which backend you want by passing a string
-(e.g., \code{"mistral"}, \code{"openai"}, \code{"gemini"}, \code{"claude"}, \code{"llamafile"}). Internally,
-the class of the string is set so that \code{UseMethod("list_models")} can dispatch
-to the corresponding S3 method.
+(Mistral, OpenAI, Groq, Cerebras, Gemini, Claude, Ollama, or a local
+directory for Llama files). You specify which backend you want by passing a
+string (e.g., \code{"mistral"}, \code{"openai"}, \code{"gemini"}, \code{"claude"},
+\code{"llamafile"}). Internally, the class of the string is set so that
+\code{UseMethod("list_models")} can dispatch to the corresponding S3 method.
+\code{"all"} returns all models.
 }
 \section{Environment Variables}{
-
-For remote API queries, ensure the relevant environment variable is set:
+ For remote API queries, ensure the relevant
+environment variable is set:
 \itemize{
 \item \code{MISTRAL_API_KEY} (for \code{"mistral"})
 \item \code{OPENAI_API_KEY} (for \code{"openai"})
@@ -72,6 +84,7 @@ For remote API queries, ensure the relevant environment variable is set:
 \item \code{CEREBRAS_API_KEY} (for \code{"cerebras"})
 \item \code{GEMINI_API_KEY} (for \code{"gemini"})
 \item \code{ANTHROPIC_API_KEY} (for \code{"claude"})
+\item \code{COHERE_API_KEY} (for \code{"cohere"})
 }
 }
 
@@ -81,7 +94,7 @@ For remote API queries, ensure the relevant environment variable is set:
 list_models("openai")
 
 ## List Claude models:
-list_models("claude", page_size = 20)
+list_models("claude")
 
 ## List local llama files:
 list_models("llamafile", local_dir = "my_local_models")

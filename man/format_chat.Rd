@@ -9,19 +9,19 @@
 \usage{
 format_chat(api, user, system, data, rtika, quiet, ...)
 
-\method{format_chat}{default}(api, user, data, system, rtika = FALSE, quiet = TRUE, ...)
+\method{format_chat}{default}(api, user, system, data, rtika = FALSE, quiet = TRUE, ...)
 
-\method{format_chat}{claude}(api, user, data, system, cache, rtika = FALSE, quiet = TRUE, ...)
+\method{format_chat}{claude}(api, user, system, data, rtika = FALSE, quiet = TRUE, cache, ...)
 
 \method{format_chat}{gemini}(
   api,
   user,
-  data,
   system,
-  cache = NULL,
-  cache_name = NULL,
+  data,
   rtika = FALSE,
   quiet = TRUE,
+  cache = NULL,
+  cache_name = NULL,
   ...
 )
 }

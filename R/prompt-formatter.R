@@ -20,7 +20,7 @@
 #'   e.g. `"openai"`, `"claude"`, `"gemini"`, etc. This is typically set
 #'   automatically by the calling functions or by a `class()` on the object.
 #' @param user A character vector of user inputs. May be file paths, URLs, or
-#'   direct text. Internally, [process_user_prompts()] attempts to convert
+#'   direct text. Internally, a function attempts to convert
 #'   images and PDFs into base64 or text, depending on the backend capabilities.
 #' @param system (Optional) A string containing the "system" instructions or
 #'   context. Some backends (e.g. OpenAI, Claude) treat system prompts as a
@@ -99,7 +99,13 @@ format_chat <- function(api, user, system, data, rtika, quiet, ...) {
 
 #' @rdname format_chat
 #' @exportS3Method
-format_chat.default <- function(api, user, data, system, rtika = FALSE, quiet = TRUE, ...) {
+format_chat.default <- function(api,
+                                user,
+                                system,
+                                data,
+                                rtika = FALSE,
+                                quiet = TRUE,
+                                ...) {
 
   if(missing(system)) {
     system <- NULL
@@ -133,7 +139,14 @@ format_chat.default <- function(api, user, data, system, rtika = FALSE, quiet = 
 
 #' @rdname format_chat
 #' @exportS3Method
-format_chat.claude <- function(api, user, data, system, cache, rtika = FALSE, quiet = TRUE, ...) {
+format_chat.claude <- function(api,
+                               user,
+                               system,
+                               data,
+                               rtika = FALSE,
+                               quiet = TRUE,
+                               cache,
+                               ...) {
   if (!missing(system)) {
     checkmate::assert_string(system)
   } else {
@@ -195,18 +208,17 @@ format_chat.claude <- function(api, user, data, system, cache, rtika = FALSE, qu
   final_prompts
 }
 
-#' @rdname format_chat
-#' @exportS3Method
+
 #' @rdname format_chat
 #' @exportS3Method
 format_chat.gemini <- function(api,
                                user,
-                               data,
                                system,
-                               cache = NULL,      # row indices to extract as cache
-                               cache_name = NULL, # optional: a friendly name
+                               data,
                                rtika = FALSE,
                                quiet = TRUE,
+                               cache = NULL,
+                               cache_name = NULL,
                                ...) {
 
   # Validate system
@@ -225,7 +237,7 @@ format_chat.gemini <- function(api,
   prompts_df <- process_user_prompts(user, rtika, quiet)
 
   # 2) Tag each row with row_index **before** any data expansions
-  prompts_df <- prompts_df %>%
+  prompts_df <- prompts_df |>
     dplyr::mutate(row_index = dplyr::row_number())
 
   # 3) If user supplied data, glue each row -> multiple expanded tibbles
@@ -301,6 +313,19 @@ format_chat.gemini <- function(api,
   }
 
   final_prompts
+}
+
+#' Format a character vector for dispatch to embedding, tokenize, completion,
+#' and detokenize APIs.
+#'
+#' @param api The specific api to use, such as "openai".
+#'
+#' @param content A character vector.
+#'
+#' @export
+format_character <- function(api, content) {
+  checkmate::assert_character(content)
+  structure(content, class = c(paste0(api, "_", class(content)), class(content)))
 }
 
 process_user_prompts <- function(user, rtika = FALSE, quiet = TRUE) {
@@ -393,6 +418,7 @@ is_pdf <- function(x, allowed_extensions = c("pdf")) {
 }
 
 glue_data <- function(prompts_df, data) {
+  content <- NULL
   checkmate::assert_data_frame(data)
   final_data <- list(nrow(data))
   for(i in 1:nrow(data)) {

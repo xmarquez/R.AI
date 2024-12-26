@@ -34,10 +34,8 @@ test_that("chat.openai_list works with function (tool) calls scenario", {
   # tool_choice = "auto" means the model can decide whether to call a tool
   res <- chat(messages = messages, model = "gpt-4o", tools = tools, tool_choice = "auto")
   expect_s3_class(res, "openai_chat")
-  tool_calls <- tool_calls(res)
-  expect_type(tool_calls, "list")
-  expect_true(tool_calls[[1]][[1]]$type == "function")
-  expect_true(tool_calls[[1]][[1]]$`function`$name == "get_current_weather")
+  expect_true(res$choices[[1]]$message$tool_calls[[1]]$type == "function")
+  expect_true(res$choices[[1]]$message$tool_calls[[1]]$`function`$name == "get_current_weather")
 })
 
 test_that("chat.openai_list works with logprobs", {
@@ -65,7 +63,7 @@ test_that("embed.openai_character works for a simple text input", {
 
   # Simple text input for embedding
   content <- c("Hello world!", "Another string to embed.")
-  content <- format_embedding("openai", content)
+  content <- format_character("openai", content)
 
   expect_true(nzchar(Sys.getenv("OPENAI_API_KEY")),
               info = "OPENAI_API_KEY is not set")

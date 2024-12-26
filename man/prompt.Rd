@@ -20,7 +20,7 @@ into the \code{user} content using \code{stringr::str_glue_data()}.}
 }
 \value{
 A structured prompt for use with single-request API functions like
-\code{\link[=openai_single_request]{openai_single_request()}} or \code{\link[=claude_single_request]{claude_single_request()}}. The exact structure
+\code{\link[=chat]{chat()}}. The exact structure
 depends on the specified API.
 }
 \description{

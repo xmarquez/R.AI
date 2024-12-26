@@ -94,7 +94,7 @@ call_api.default <- function(prompts,
     res <- chat(messages = prompts[[i]],
                 model = model, ...)
 
-    response <- get_usage(res, model)
+    response <- get_usage(res)
     response$response <- list(get_content(res))
 
     # Add prompt ID to the response
@@ -130,7 +130,7 @@ call_api.llama_cpp <- function(prompts, model, prompt_name, ...) {
 #' @export
 call_api.ollama <- function(prompts, model, prompt_name, ...) {
 
-  running_models <- list_running_models.ollama()
+  running_models <- ollama_list_running_models()
 
   if(length(running_models$models) == 0) {
     cli::cli_abort(

@@ -169,8 +169,9 @@ is_api_key_available <- function(api) {
 #' @family model utilities
 #' @export
 get_available_apis <- function(mode = "chat") {
+  key_available <- key_needed <- NULL
   checkmate::assert_choice(mode, c("chat", "embed", "rerank", "completion"))
-  df <- methods(mode) |>
+  df <- utils::methods(mode) |>
     stringr::str_remove("(^chat|^embed|^rerank|^completion).") |>
     stringr::str_remove("_list$|_character$") |>
     purrr::map_dfr(~tibble::tibble(api = .x, key_available = is_api_key_available(.x)))

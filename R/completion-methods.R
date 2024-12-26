@@ -2,21 +2,32 @@
 #'
 #' A generic function to produce text completions from various backends.
 #' Currently supports Llama.CPP and Ollama. By dispatching on the class of
-#' `prompt` (e.g., `"llama_cpp_character"`, `"ollama_character"`), the
-#' appropriate method is chosen.
+#' `prompt` (e.g., `"llama_cpp_character"`, `"ollama_character"`),
+#' the appropriate method is chosen.
 #'
 #' @param prompt Character string(s) serving as the prompt(s). Must be a
-#'   character vector of length one or more. The S3 method for each backend
-#'   may support different additional parameters.
-#' @param ... Additional arguments passed to the specific backend method.
-#'   For instance:
-#'   \itemize{
-#'     \item Llama.CPP: `n_predict`, `temperature`, `top_k`, `top_p`, `stream`
-#'     \item Ollama: `model`, `suffix`, `images`, `options`, `system`, etc.
-#'   }
+#'   character vector of length one or more.
+#' @param n_predict (Llama.CPP only) Integer. Number of tokens to predict.
+#'   Defaults to `-1` (until stopping criteria).
+#' @param temperature (Llama.CPP only) Numeric. Sampling temperature,
+#'   typically between `0.0` and `1.0`.
+#' @param top_k (Llama.CPP only) Integer. Top-k sampling.
+#' @param top_p (Llama.CPP only) Numeric. Top-p (nucleus) sampling.
+#' @param stream Logical. If `TRUE`, stream tokens as they are generated.
 #'
-#' @return Each method returns a structure containing the completion text or a
-#'   list of tokens, depending on the backend. Typically, the object has a class
+#' @param model (Ollama only) Character string specifying the Ollama model name.
+#' @param suffix (Ollama only) Character string appended to the prompt (if any).
+#' @param images (Ollama only) Optional path(s) to images or a list of image data.
+#' @param options (Ollama only) Additional options list for advanced usage.
+#' @param system (Ollama only) Character string with system-level instructions.
+#' @param template (Ollama only) Template string for instruction-based prompting.
+#' @param raw (Ollama only) Logical, if `TRUE`, return the raw JSON response.
+#' @param keep_alive (Ollama only) Character. Time (e.g. `"5m"`) the request stays open.
+#'
+#' @param ... Additional arguments passed to methods (either Llama.CPP or Ollama).
+#'
+#' @return Each method returns a structure containing the completion text or
+#'   a list of tokens, depending on the backend. Typically, the object has class
 #'   like `"llama_cpp_completion"` or `"ollama_completion"`.
 #'
 #' @examples
@@ -50,7 +61,6 @@ completion.llama_cpp_character <- function(prompt,
                                            stream = FALSE,
                                            ...) {
   checkmate::assert_string(prompt)
-
   body <- list(
     prompt = prompt,
     n_predict = n_predict,

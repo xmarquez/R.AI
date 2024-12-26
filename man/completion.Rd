@@ -34,29 +34,50 @@ completion(prompt, ...)
 }
 \arguments{
 \item{prompt}{Character string(s) serving as the prompt(s). Must be a
-character vector of length one or more. The S3 method for each backend
-may support different additional parameters.}
+character vector of length one or more.}
 
-\item{...}{Additional arguments passed to the specific backend method.
-For instance:
-\itemize{
-\item Llama.CPP: \code{n_predict}, \code{temperature}, \code{top_k}, \code{top_p}, \code{stream}
-\item Ollama: \code{model}, \code{suffix}, \code{images}, \code{options}, \code{system}, etc.
-}}
+\item{...}{Additional arguments passed to methods (either Llama.CPP or Ollama).}
+
+\item{n_predict}{(Llama.CPP only) Integer. Number of tokens to predict.
+Defaults to \code{-1} (until stopping criteria).}
+
+\item{temperature}{(Llama.CPP only) Numeric. Sampling temperature,
+typically between \code{0.0} and \code{1.0}.}
+
+\item{top_k}{(Llama.CPP only) Integer. Top-k sampling.}
+
+\item{top_p}{(Llama.CPP only) Numeric. Top-p (nucleus) sampling.}
+
+\item{stream}{Logical. If \code{TRUE}, stream tokens as they are generated.}
+
+\item{model}{(Ollama only) Character string specifying the Ollama model name.}
+
+\item{suffix}{(Ollama only) Character string appended to the prompt (if any).}
+
+\item{images}{(Ollama only) Optional path(s) to images or a list of image data.}
+
+\item{options}{(Ollama only) Additional options list for advanced usage.}
+
+\item{system}{(Ollama only) Character string with system-level instructions.}
+
+\item{template}{(Ollama only) Template string for instruction-based prompting.}
+
+\item{raw}{(Ollama only) Logical, if \code{TRUE}, return the raw JSON response.}
+
+\item{keep_alive}{(Ollama only) Character. Time (e.g. \code{"5m"}) the request stays open.}
 }
 \value{
-Each method returns a structure containing the completion text or a
-list of tokens, depending on the backend. Typically, the object has a class
+Each method returns a structure containing the completion text or
+a list of tokens, depending on the backend. Typically, the object has class
 like \code{"llama_cpp_completion"} or \code{"ollama_completion"}.
 }
 \description{
 A generic function to produce text completions from various backends.
 Currently supports Llama.CPP and Ollama. By dispatching on the class of
-\code{prompt} (e.g., \code{"llama_cpp_character"}, \code{"ollama_character"}), the
-appropriate method is chosen.
+\code{prompt} (e.g., \code{"llama_cpp_character"}, \code{"ollama_character"}),
+the appropriate method is chosen.
 }
-\section{Examples}{
-
+\examples{
 \dontrun{
 # Example calling Llama.CPP:
 prompt_llama <- "Tell me a story about dragons."
@@ -68,5 +89,5 @@ prompt_ollama <- "What are the main differences between cats and dogs?"
 class(prompt_ollama) <- c("ollama_character", "character")
 resp_ollama <- completion(prompt_ollama, model="my-cool-model")
 }
-}
 
+}

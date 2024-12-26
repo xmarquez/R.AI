@@ -3,28 +3,14 @@
 \name{health.llama_cpp}
 \alias{health.llama_cpp}
 \alias{props.llama_cpp}
-\alias{tokenize.llama_cpp_character}
-\alias{detokenize.llama_cpp_tokenlist}
 \title{Functions to interact with the llama.cpp server API}
 \usage{
 health.llama_cpp(...)
 
 props.llama_cpp(...)
-
-\method{tokenize}{llama_cpp_character}(content, add_special = FALSE, with_pieces = FALSE, ...)
-
-\method{detokenize}{llama_cpp_tokenlist}(tokens, ...)
 }
 \arguments{
 \item{...}{Additional arguments passed to the HTTP request.}
-
-\item{content}{Text to tokenize.}
-
-\item{add_special}{Include special tokens (default FALSE).}
-
-\item{with_pieces}{Return token pieces (default FALSE).}
-
-\item{tokens}{A vector of token IDs to detokenize into text.}
 }
 \description{
 See
