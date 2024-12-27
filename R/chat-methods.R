@@ -267,7 +267,7 @@ chat.gemini_list <- function(messages,
     pause_base = 1,
     pause_cap = 1200,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
   if (httr::http_error(res)) {
     cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
@@ -374,7 +374,7 @@ chat.claude_list <- function(messages,
     pause_base = 1,
     pause_cap = 1200,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
   if (httr::http_error(res)) {
     cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
@@ -737,7 +737,7 @@ chat.cohere_list <- function(messages,
     pause_base = 1,
     pause_cap = 1200,   # Don’t exceed 20 min
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
 
   # Handle errors
@@ -830,7 +830,7 @@ chat.deepseek_list <- function(messages,
     pause_base = 1,
     pause_cap = 1200,   # e.g. up to 20 min
     quiet = quiet,
-    terminate_on = c(400:499) # any 4xx we won't retry
+    terminate_on = c(400:404) # any 4xx we won't retry
   )
 
   # Check for errors

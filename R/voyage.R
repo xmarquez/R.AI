@@ -124,7 +124,7 @@ rerank_voyage_ai <- function(query, documents,
     encode = "json",
     times = 3, # Retry up to 3 times on transient errors
     quiet = quiet,
-    terminate_on = c(400:499) # Terminate on critical client errors
+    terminate_on = c(400:404) # Terminate on critical client errors
   )
 
   # Handle response

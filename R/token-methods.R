@@ -192,7 +192,7 @@ token_count.claude_list <- function(content, model, quiet = FALSE, ...) {
     times = 3,
     pause_base = 1,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
 
   if (httr::http_error(res)) {

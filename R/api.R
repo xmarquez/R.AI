@@ -162,7 +162,7 @@ retry_response <- function(base_url,
     pause_base = 1,
     pause_cap = pause_cap,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
 
   res

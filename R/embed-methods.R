@@ -148,7 +148,7 @@ embed.mistral_character <- function(content,
     encode = "json",
     times = max_retries,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
 
   if (httr::http_error(response)) {
@@ -202,7 +202,7 @@ embed.gemini_character <- function(content,
     pause_base = 1,
     pause_cap = 1200,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
 
   if (httr::http_error(res)) {
@@ -282,7 +282,7 @@ embed.cohere_character <- function(content,
       encode = "json",
       times = max_retries,
       quiet = quiet,
-      terminate_on = c(400:499)
+      terminate_on = c(400:404)
     )
 
     if (httr::http_error(response)) {
@@ -418,7 +418,7 @@ embed.llama_cpp_character <- function(content,
     pause_min = 1,
     pause_cap = 10,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
   handle_errors(res)
   response <- httr::content(res)$results
@@ -457,7 +457,7 @@ embed.ollama_character <- function(content,
     encode = "json",
     times = max_retries,
     quiet = quiet,
-    terminate_on = c(400:499)
+    terminate_on = c(400:404)
   )
   handle_errors(res)
   response <- httr::content(res)
