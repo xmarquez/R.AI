@@ -1,4 +1,7 @@
 mistral_format_prompts_for_batch <- function(prompts, max_tokens = 100, temperature = 0.2) {
+  if(is.null(names(prompts))) {
+    names(prompts) <- seq_along(prompts)
+  }
   json_lines <- lapply(names(prompts), function(name) {
     list(
       custom_id = name,
@@ -31,7 +34,8 @@ mistral_upload_batch_file <- function(jsonl, max_retries = 3, pause_cap = 1200, 
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check if the response contains an error
@@ -71,7 +75,8 @@ mistral_create_batch <- function(upload_response, model, endpoint = "/v1/chat/co
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check if the response contains an error
@@ -250,7 +255,8 @@ mistral_download_batch_results <- function(batch_response, max_retries = 3, paus
       times = max_retries,
       pause_base = 1,
       pause_cap = pause_cap,
-      quiet = quiet
+      quiet = quiet,
+      terminate_on = c(400:404)
     )
 
     # Check for HTTP errors
@@ -341,7 +347,8 @@ mistral_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 12
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check for HTTP errors

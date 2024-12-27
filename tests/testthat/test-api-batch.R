@@ -1,0 +1,32 @@
+test_that("Batch job creation works for Claude", {
+  skip("Only for development purposes - batches can take 24 hours to complete")
+  data <- dplyr::tibble(country = countrycode::codelist$country.name.en[1:10])
+  prompts <- format_chat("claude", "What is the capital of {country}", data = data)
+  batch_claude <- batch_job(prompts, "claude-3-haiku-20240307")
+  expect_equal(batch_claude$request_counts$processing, 10)
+  expect_equal(check_batch_status(batch_claude)$processing_status, "in_progress")
+  expect_message(result <- poll_and_download(batch_claude, 60))
+  expect_s3_class(result, "tbl_df")
+  expect_error(result <- cancel_batch(batch_claude))
+})
+
+test_that("Batch job creation works for Mistral", {
+  skip("Only for development purposes - batches can take 24 hours to complete")
+  data <- dplyr::tibble(country = countrycode::codelist$country.name.en[1:10])
+  prompts <- format_chat("mistral", "What is the capital of {country}", data = data)
+  batch_mistral <- batch_job(prompts, "mistral-small")
+  expect_equal(check_batch_status(batch_mistral)$status, "QUEUED")
+  expect_message(result <- poll_and_download(batch_mistral, 60))
+  expect_s3_class(result, "tbl_df")
+})
+
+test_that("Batch job creation works for Openai", {
+  skip("Only for development purposes - batches can take 24 hours to complete")
+  data <- dplyr::tibble(country = countrycode::codelist$country.name.en[1:10])
+  prompts <- format_chat("openai", "What is the capital of {country}", data = data)
+  batch_openai <- batch_job(prompts, "gpt-4o-mini")
+  expect_equal(check_batch_status(batch_openai)$status, "validating")
+  expect_message(result <- poll_and_download(batch_openai, 60))
+  expect_s3_class(result, "tbl_df")
+  cancel_batch(batch_openai)
+})

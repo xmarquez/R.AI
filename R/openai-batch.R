@@ -1,4 +1,7 @@
 openai_format_prompts_for_batch <- function(prompts, model, max_tokens = 300, temperature = 0.2) {
+  if(is.null(names(prompts))) {
+    names(prompts) <- seq_along(prompts)
+  }
   json_lines <- lapply(names(prompts), function(name) {
     list(
       custom_id = name,

@@ -37,7 +37,8 @@ claude_create_batch <- function(prompts,
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check if the response contains an error
@@ -54,6 +55,9 @@ claude_create_batch <- function(prompts,
 }
 
 claude_format_prompts_for_batch <- function(prompts, model, max_tokens, temperature) {
+  if(is.null(names(prompts))) {
+    names(prompts) <- seq_along(prompts)
+  }
   lapply(names(prompts), function(name) {
     list(
       custom_id = name,
@@ -108,7 +112,8 @@ claude_list_batches <- function(limit = 20, max_retries = 3, pause_cap = 1200, q
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check if the response contains an error
@@ -190,7 +195,8 @@ claude_check_batch_status <- function(batch_response, max_retries = 3, pause_cap
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check if the response contains an error
@@ -263,7 +269,8 @@ claude_download_batch_results <- function(batch_response, max_retries = 3, pause
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check if the response contains an error
@@ -411,7 +418,8 @@ claude_cancel_batch <- function(batch_response, max_retries = 3, pause_cap = 120
     times = max_retries,
     pause_base = 1,
     pause_cap = pause_cap,
-    quiet = quiet
+    quiet = quiet,
+    terminate_on = c(400:404)
   )
 
   # Check if the response contains an error
