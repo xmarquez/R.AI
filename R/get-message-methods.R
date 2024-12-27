@@ -167,4 +167,16 @@ get_message.deepseek_chat <- function(response) {
     structure(class = c("deepseek_list", "list"))
 }
 
-
+# ----------------------------
+# get_message for QWEN
+# ----------------------------
+#' @rdname get_message
+#' @exportS3Method get_message qwen_chat
+get_message.qwen_chat <- function(response) {
+  # By default, extract the *first* choice's message, wrapping it in a list
+  if (is.null(response$choices) || length(response$choices) == 0) {
+    return(structure(list(), class = c("qwen_list", "list")))
+  }
+  first_msg <- response$choices[[1]]$message
+  structure(list(first_msg), class = c("qwen_list", "list"))
+}

@@ -846,3 +846,81 @@ chat.deepseek_list <- function(messages,
   structure(response, class = c("deepseek_chat", class(response)))
 }
 
+# ----------------------------
+# QWEN Chat Method
+# ----------------------------
+#' @rdname chat
+#' @exportS3Method chat qwen_list
+chat.qwen_list <- function(messages,
+                           model = "qwen-plus",
+                           temperature = 0.8,
+                           max_tokens = NULL,
+                           quiet = FALSE,
+                           ...) {
+
+  # Additional parameters from the docs:
+  dots <- list(...)
+  stream           <- dots$stream           %||% FALSE
+  stream_options   <- dots$stream_options   %||% NULL
+  top_p            <- dots$top_p            %||% NULL
+  presence_penalty <- dots$presence_penalty %||% NULL
+  seed             <- dots$seed             %||% NULL
+  stop             <- dots$stop             %||% NULL
+  tools            <- dots$tools            %||% NULL
+
+  # Retrieve the Qwen (DashScope) API key from the environment
+  dashscope_api_key <- Sys.getenv("QWEN_API_KEY")
+  if (!nzchar(dashscope_api_key)) {
+    stop("DashScope/Qwen API key is not set in environment variable QWEN_API_KEY.")
+  }
+
+  # Build the request body
+  body_list <- list(
+    model       = model,
+    messages    = messages,
+    temperature = temperature,
+    max_tokens  = max_tokens,
+    stream      = stream,
+    stream_options   = stream_options,
+    top_p            = top_p,
+    presence_penalty = presence_penalty,
+    seed             = seed,
+    stop             = stop,
+    tools            = tools
+  )
+  # Remove NULL fields before JSON-encoding
+  body_list <- purrr::compact(body_list)
+  json_body <- jsonlite::toJSON(body_list, auto_unbox = TRUE, pretty = TRUE)
+
+  # Decide how many times to retry
+  max_retries <- dots$max_retries %||% 3
+
+  # Make POST request
+  base_url <- "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions"
+  res <- httr::RETRY(
+    verb = "POST",
+    url  = base_url,
+    config = httr::add_headers(
+      "Authorization" = paste("Bearer", dashscope_api_key),
+      "Content-Type"  = "application/json"
+    ),
+    body = json_body,
+    encode = "json",
+    times = max_retries,
+    pause_base = 1,
+    pause_cap  = 1200,
+    quiet = quiet,
+    terminate_on = c(400:404)
+  )
+
+  if (httr::http_error(res)) {
+    err <- httr::content(res)
+    cli::cli_abort("{httr::http_status(res)$message}. {err$error$message %||% err$message}")
+  }
+
+  # Parse content
+  response <- httr::content(res)
+
+  # Return object with class "qwen_chat"
+  structure(response, class = c("qwen_chat", class(response)))
+}

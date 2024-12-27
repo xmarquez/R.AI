@@ -42,6 +42,7 @@
 #'   \item `ANTHROPIC_API_KEY` (for `"claude"`)
 #'   \item `COHERE_API_KEY` (for `"cohere"`)
 #'   \item `DEEPSEEK_API_KEY` (for `"deepseek"`)
+#'   \item `QWEN_API_KEY` (for `"qwen"` - or Alibaba)
 #' }
 #'
 #' @examples
@@ -519,6 +520,27 @@ list_models.deepseek <- function(api, ...) {
     dplyr::relocate(id, .before = dplyr::everything())
 }
 
+#' @rdname list_models
+#' @exportS3Method list_models qwen
+list_models.qwen <- function(api, ...) {
+  dplyr::tribble(
+    ~id,                         ~display_name,                ~mode,
+    "qwen-max",                  "Qwen-Max",                   "chat",
+    "qwen-plus",                 "Qwen-Plus",                  "chat",
+    "qwen-turbo",                "Qwen-Turbo",                 "chat",
+    "qwen-vl-max",               "Qwen-VL-Max",                "chat",
+    "qwen-vl-plus",              "Qwen-VL-Plus",               "chat",
+    "qwen2-72b-instruct",        "Qwen2-72B-Instruct",         "chat",
+    "qwen2-57b-a14b-instruct",   "Qwen2-57B-A14B-Instruct",    "chat",
+    "qwen2-7b-instruct",         "Qwen2-7B-Instruct",          "chat",
+    "qwen1.5-110b-chat",         "Qwen1.5-110B-Chat",          "chat",
+    "text-embedding-v3",         "Text-Embedding-v3",          "embed",
+    "qwen1.5-7b-chat",           "Qwen1.5-7B-Chat",            "chat",
+    "qwen1.5-72b-chat",          "Qwen1.5-72B-Chat",           "chat",
+    "qwen1.5-32b-chat",          "Qwen1.5-32B-Chat",           "chat",
+    "qwen1.5-14b-chat",          "Qwen1.5-14B-Chat",           "chat"
+  )
+}
 
 #' @rdname list_models
 #' @exportS3Method list_models all

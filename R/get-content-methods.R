@@ -160,3 +160,19 @@ get_content.deepseek_chat <- function(response) {
     purrr::map_chr(\(x) x$message$content %||% "")
 }
 
+# ----------------------------
+# get_content for QWEN
+# ----------------------------
+#' @rdname get_content
+#' @exportS3Method get_content qwen_chat
+get_content.qwen_chat <- function(response) {
+  # Qwen returns a "choices" array, each containing a "message"
+  # with "content". We'll map over those, returning all content strings.
+  if (is.null(response$choices) || length(response$choices) == 0) {
+    return(character(0))
+  }
+  response$choices |>
+    purrr::map_chr(\(x) x$message$content %||% "")
+}
+
+

@@ -23,19 +23,19 @@ models_df <- models |>
 
 preferred_models <- tibble(
   api = c("groq", "claude", "openai", "gemini",
-           "mistral", "cerebras", "deepseek", "cohere"),
+           "mistral", "cerebras", "deepseek", "cohere", "qwen"),
   cheapest = c("llama-3.1-8b-instant", "claude-3-haiku-20240307",
                "gpt-4o-mini", "gemini-1.5-flash-latest",
                "ministral-3b-latest", "llama3.1-8b", "deepseek-chat",
-               "command-r"),
+               "command-r", "qwen2-7b-instruct"),
   largest = c("llama-3.1-70b-versatile", "claude-3-5-sonnet-20241022",
            "o1-preview", "gemini-2.0-flash-thinking-exp",
            "mistral-large-latest","llama3.3-70b",
-           "deepseek-chat", "command-r-plus"),
+           "deepseek-chat", "command-r-plus", "qwen-max"),
   best = c("llama-3.1-70b-versatile", "claude-3-5-sonnet-20241022",
            "o1-preview", "gemini-2.0-flash-thinking-exp",
            "mistral-large-latest","llama3.3-70b",
-           "deepseek-chat", "command-r-plus")
+           "deepseek-chat", "command-r-plus", "qwen-plus")
 
 )
 

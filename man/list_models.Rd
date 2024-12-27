@@ -13,6 +13,7 @@
 \alias{list_models.cohere}
 \alias{list_models.voyage}
 \alias{list_models.deepseek}
+\alias{list_models.qwen}
 \alias{list_models.all}
 \title{List Available Models}
 \usage{
@@ -40,6 +41,8 @@ list_models(api, ...)
 
 \method{list_models}{deepseek}(api, ...)
 
+\method{list_models}{qwen}(api, ...)
+
 \method{list_models}{all}(api, mode = "chat", ...)
 }
 \arguments{
@@ -50,6 +53,7 @@ list_models(api, ...)
 \item \code{"groq"}
 \item \code{"cerebras"}
 \item \code{"cohere"}
+\item \code{"deepseek"}
 \item \code{"gemini"}
 \item \code{"ollama"}
 \item \code{"claude"}
@@ -90,6 +94,7 @@ environment variable is set:
 \item \code{ANTHROPIC_API_KEY} (for \code{"claude"})
 \item \code{COHERE_API_KEY} (for \code{"cohere"})
 \item \code{DEEPSEEK_API_KEY} (for \code{"deepseek"})
+\item \code{QWEN_API_KEY} (for \code{"qwen"} - or Alibaba)
 }
 }
 

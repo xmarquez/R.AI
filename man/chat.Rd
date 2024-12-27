@@ -12,6 +12,7 @@
 \alias{chat.ollama_list}
 \alias{chat.cohere_list}
 \alias{chat.deepseek_list}
+\alias{chat.qwen_list}
 \title{Create a Chat Completion}
 \usage{
 chat(messages, model, temperature, max_tokens, quiet, ...)
@@ -95,6 +96,15 @@ chat(messages, model, temperature, max_tokens, quiet, ...)
   model = "deepseek-chat",
   temperature = 1,
   max_tokens = 2048,
+  quiet = FALSE,
+  ...
+)
+
+\method{chat}{qwen_list}(
+  messages,
+  model = "qwen-plus",
+  temperature = 0.8,
+  max_tokens = NULL,
   quiet = FALSE,
   ...
 )

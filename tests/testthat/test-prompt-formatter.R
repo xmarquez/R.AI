@@ -7,7 +7,7 @@ test_that("Single prompts work", {
   skip_if_offline()
   skip_on_ci()
 
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek")
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek", "qwen")
   test_prompts <- apis_to_test |> purrr::map(~ format_chat(.x, "What is the capital of France?"))
 
   test_responses <- purrr::map(test_prompts, chat)
@@ -30,7 +30,7 @@ test_that("Prompts with data work", {
   skip_on_ci()
 
   data <- dplyr::tibble(country = c("France", "United States", "Paraguay"))
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek" )
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek", "qwen" )
   test_prompts <- apis_to_test |>
     purrr::map(~ format_chat(.x, "What is the capital of {country}?", data = data))
 
@@ -54,7 +54,7 @@ test_that("Single prompts with system messages work", {
   skip_if_offline()
   skip_on_ci()
 
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek")
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek", "qwen")
   test_prompts <- apis_to_test |>
     purrr::map(~ format_chat(.x, "What is the capital of France?",
                              system = "You always respond with witty and delightful riddles whose solution is the answer to the question. Never mention the capital city of France."))
@@ -75,7 +75,7 @@ test_that("Prompts with data and system messages work", {
   skip_on_ci()
 
   data <- dplyr::tibble(country = c("France", "United States", "Paraguay"))
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek")
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek", "qwen")
   test_prompts <- apis_to_test |>
     purrr::map(~ format_chat(.x, "What is the capital of {country}?", data = data,
                              system = "You always respond with witty and delightful riddles whose solution is the answer to the question. Never mention any capital cities, especially not Paris, Asunción, or Washington DC."))

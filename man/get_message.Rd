@@ -11,6 +11,7 @@
 \alias{get_message.gemini_chat}
 \alias{get_message.cohere_chat}
 \alias{get_message.deepseek_chat}
+\alias{get_message.qwen_chat}
 \title{Extract Message Objects from a Chat Response}
 \usage{
 get_message(response)
@@ -32,6 +33,8 @@ get_message(response)
 \method{get_message}{cohere_chat}(response)
 
 \method{get_message}{deepseek_chat}(response)
+
+\method{get_message}{qwen_chat}(response)
 }
 \arguments{
 \item{response}{A chat response object from a function like

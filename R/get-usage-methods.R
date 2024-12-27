@@ -182,3 +182,29 @@ get_usage.deepseek_chat <- function(response) {
     model                    = response$model %||% NA_character_
   )
 }
+
+# ----------------------------
+# get_usage for QWEN
+# ----------------------------
+#' @rdname get_usage
+#' @exportS3Method get_usage qwen_chat
+get_usage.qwen_chat <- function(response) {
+  # usage typically has prompt_tokens, completion_tokens, total_tokens
+  usage <- response$usage
+  if (is.null(usage)) {
+    return(
+      tibble::tibble(
+        input_tokens  = NA_integer_,
+        output_tokens = NA_integer_,
+        total_tokens  = NA_integer_,
+        model         = response$model %||% NA_character_
+      )
+    )
+  }
+  tibble::tibble(
+    input_tokens  = usage$prompt_tokens     %||% 0,
+    output_tokens = usage$completion_tokens %||% 0,
+    total_tokens  = usage$total_tokens      %||% 0,
+    model         = response$model %||% NA_character_
+  )
+}
