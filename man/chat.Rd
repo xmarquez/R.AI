@@ -154,6 +154,7 @@ backend has its own method, but all methods share the same formal signature.
 \item \strong{Mistral}: Dispatches to the \href{https://docs.mistral.ai/api/#tag/chat}{Mistral Chat API}.
 \item \strong{Groq}: Dispatches to the \href{https://console.groq.com/docs/api-reference#chat}{Groq Chat API}.
 \item \strong{Cerebras}: Dispatches to the \href{https://inference-docs.cerebras.ai/api-reference/chat-completions}{Cerebras Chat API}.
+\item \strong{Qwen}: Dispatches to the \href{https://www.alibabacloud.com/help/en/model-studio/developer-reference/use-qwen-by-calling-api?spm=a2c63.p38356.help-menu-2400256.d_3_3_0.36fea52fWmUxfz}{Qwen (Alibaba Cloud) API}
 \item \strong{Llama.cpp}: Dispatches to a local LlamaFile instance or an Llama.CPP server running a GGUF model.
 \item \strong{Ollama}: Dispatches to a local model via the \href{https://github.com/ollama/ollama/blob/main/docs/api.md#generate-a-chat-completion}{Ollama server}.
 }

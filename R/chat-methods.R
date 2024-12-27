@@ -13,6 +13,7 @@
 #' - **Mistral**: Dispatches to the [Mistral Chat API](https://docs.mistral.ai/api/#tag/chat).
 #' - **Groq**: Dispatches to the [Groq Chat API](https://console.groq.com/docs/api-reference#chat).
 #' - **Cerebras**: Dispatches to the [Cerebras Chat API](https://inference-docs.cerebras.ai/api-reference/chat-completions).
+#' - **Qwen**: Dispatches to the [Qwen (Alibaba Cloud) API](https://www.alibabacloud.com/help/en/model-studio/developer-reference/use-qwen-by-calling-api?spm=a2c63.p38356.help-menu-2400256.d_3_3_0.36fea52fWmUxfz)
 #' - **Llama.cpp**: Dispatches to a local LlamaFile instance or an Llama.CPP server running a GGUF model.
 #' - **Ollama**: Dispatches to a local model via the [Ollama server](https://github.com/ollama/ollama/blob/main/docs/api.md#generate-a-chat-completion).
 #'
