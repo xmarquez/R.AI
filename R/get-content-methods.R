@@ -141,3 +141,22 @@ get_content.ollama_chat <- function(response) {
 get_content.cohere_chat <- function(response) {
   response$message$content[[1]]$text
 }
+
+#' @rdname get_content
+#' @exportS3Method get_content deepseek_chat
+get_content.deepseek_chat <- function(response) {
+  # DeepSeek Chat returns a "choices" array, each with:
+  #   choices[[i]]$message$content     (a string)
+  #   or possibly tool_calls, logprobs, etc.
+  # We'll extract the content from each choice and return a character vector.
+
+  # If there's no `choices` field or it's empty, return character(0)
+  if (is.null(response$choices) || length(response$choices) == 0) {
+    return(character(0))
+  }
+
+  # Map over the choices to pull out message$content
+  response$choices |>
+    purrr::map_chr(\(x) x$message$content %||% "")
+}
+

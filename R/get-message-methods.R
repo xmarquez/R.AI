@@ -149,3 +149,22 @@ get_message.cohere_chat <- function(response) {
     structure(class = c("cohere_list", "list"))
 }
 
+#' @rdname get_message
+#' @exportS3Method get_message deepseek_chat
+get_message.deepseek_chat <- function(response) {
+  # If 'choices' is empty or missing, return an empty list
+  if (is.null(response$choices) || length(response$choices) == 0) {
+    return(
+      structure(list(), class = c("deepseek_list", "list"))
+    )
+  }
+
+  # Extract the first choice's "message"
+  msg <- response$choices[[1]]$message
+
+  # Wrap in a single-element list for consistency with other backends
+  list(msg) |>
+    structure(class = c("deepseek_list", "list"))
+}
+
+

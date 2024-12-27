@@ -13,6 +13,7 @@
 \alias{get_content.ollama_completion}
 \alias{get_content.ollama_chat}
 \alias{get_content.cohere_chat}
+\alias{get_content.deepseek_chat}
 \title{Extract Main Text Content from a Response}
 \usage{
 get_content(response)
@@ -38,6 +39,8 @@ get_content(response)
 \method{get_content}{ollama_chat}(response)
 
 \method{get_content}{cohere_chat}(response)
+
+\method{get_content}{deepseek_chat}(response)
 }
 \arguments{
 \item{response}{A response object returned by a chat or completion method. Each

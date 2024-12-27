@@ -9,6 +9,7 @@
 #' - **Gemini**: Dispatches to the [Gemini Chat API](https://ai.google.dev/api/generate-content).
 #' - **Claude**: Dispatches to the [Anthropic Claude API](https://docs.anthropic.com/en/api/messages).
 #' - **Cohere**: Dispatches to the [Cohere Chat API](https://docs.cohere.com/v2/reference/chat).
+#' - **DeepSeek**: Dispatches to the [DeepSeek Chat API](https://api.deepseek.com/chat/completions).
 #' - **Mistral**: Dispatches to the [Mistral Chat API](https://docs.mistral.ai/api/#tag/chat).
 #' - **Groq**: Dispatches to the [Groq Chat API](https://console.groq.com/docs/api-reference#chat).
 #' - **Cerebras**: Dispatches to the [Cerebras Chat API](https://inference-docs.cerebras.ai/api-reference/chat-completions).
@@ -750,5 +751,98 @@ chat.cohere_list <- function(messages,
 
   # Wrap the response in an S3 class "cohere_chat"
   structure(response, class = c("cohere_chat", class(response)))
+}
+
+#' @rdname chat
+#' @exportS3Method chat deepseek_list
+chat.deepseek_list <- function(messages,
+                               model = "deepseek-chat",
+                               temperature = 1,
+                               max_tokens = 2048,
+                               quiet = FALSE,
+                               ...) {
+  # Capture additional user arguments in dots
+  dots <- list(...)
+
+  # Look up API key from environment
+  deepseek_api_key <- Sys.getenv("DEEPSEEK_API_KEY")
+  if (!nzchar(deepseek_api_key)) {
+    stop("DeepSeek API key is not set in environment variable DEEPSEEK_API_KEY.")
+  }
+
+  # Additional optional parameters from DeepSeek docs:
+  frequency_penalty  <- dots$frequency_penalty  %||% 0
+  presence_penalty   <- dots$presence_penalty   %||% 0
+  top_p              <- dots$top_p              %||% 1
+  response_format    <- dots$response_format    %||% list(type = "text")
+  stop_sequences     <- dots$stop               %||% NULL       # can be a string or list
+  stream             <- dots$stream             %||% FALSE
+  stream_options     <- dots$stream_options     %||% NULL
+  tools              <- dots$tools              %||% NULL
+  tool_choice        <- dots$tool_choice        %||% "none"
+  logprobs           <- dots$logprobs           %||% FALSE
+  top_logprobs       <- dots$top_logprobs       %||% NULL
+  json_mode          <- dots$json_mode          %||% FALSE
+
+  if (isTRUE(json_mode)) {
+    response_format <- list(type = "json_object")
+  }
+
+  # Build the request body
+  body_list <- list(
+    messages          = messages,        # required
+    model             = model,           # required
+    frequency_penalty = frequency_penalty,
+    presence_penalty  = presence_penalty,
+    max_tokens        = max_tokens,
+    response_format   = response_format, # e.g. { "type": "json_object" }
+    stop              = stop_sequences,  # can be null, a string, or an array
+    stream            = stream,
+    stream_options    = stream_options,
+    temperature       = temperature,
+    top_p             = top_p,
+    tools             = tools,
+    tool_choice       = tool_choice,
+    logprobs          = logprobs,
+    top_logprobs      = top_logprobs
+  )
+  # Remove any NULL fields
+  body_list <- purrr::compact(body_list)
+
+  # Convert to JSON
+  json_body <- jsonlite::toJSON(body_list, auto_unbox = TRUE, pretty = TRUE)
+
+  # Decide how many times to retry on errors/timeouts (default = 3)
+  max_retries <- dots$max_retries %||% 3
+
+  # Send request with retries
+  res <- httr::RETRY(
+    verb = "POST",
+    url  = "https://api.deepseek.com/chat/completions",
+    config = httr::add_headers(
+      "Authorization" = paste("Bearer", deepseek_api_key),
+      "Content-Type"  = "application/json",
+      "Accept"        = "application/json"
+    ),
+    body = json_body,
+    encode = "json",
+    times = max_retries,
+    pause_base = 1,
+    pause_cap = 1200,   # e.g. up to 20 min
+    quiet = quiet,
+    terminate_on = c(400:499) # any 4xx we won't retry
+  )
+
+  # Check for errors
+  if (httr::http_error(res)) {
+    err <- httr::content(res)
+    cli::cli_abort("{httr::http_status(res)$message}. {err$message %||% err$error$message}")
+  }
+
+  # Parse the response
+  response <- httr::content(res)
+
+  # Wrap the response in an S3 class "deepseek_chat"
+  structure(response, class = c("deepseek_chat", class(response)))
 }
 

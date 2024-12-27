@@ -152,3 +152,33 @@ get_usage.cohere_chat <- function(response) {
     dplyr::mutate(total_tokens = input_tokens + output_tokens,
                   model = "unknown")
 }
+
+#' @rdname get_usage
+#' @exportS3Method get_usage deepseek_chat
+get_usage.deepseek_chat <- function(response) {
+  usage <- response$usage
+
+  if (is.null(usage)) {
+    # If there's no usage info, return an NA-filled row with the model at least
+    return(
+      tibble::tibble(
+        input_tokens              = NA_integer_,
+        output_tokens             = NA_integer_,
+        total_tokens              = NA_integer_,
+        prompt_cache_hit_tokens   = NA_integer_,
+        prompt_cache_miss_tokens  = NA_integer_,
+        model                     = response$model %||% NA_character_
+      )
+    )
+  }
+
+  tibble::tibble(
+    # These fields come from DeepSeek's usage object
+    input_tokens             = usage$prompt_tokens            %||% 0,
+    output_tokens            = usage$completion_tokens         %||% 0,
+    total_tokens             = usage$total_tokens              %||% 0,
+    prompt_cache_hit_tokens  = usage$prompt_cache_hit_tokens   %||% 0,
+    prompt_cache_miss_tokens = usage$prompt_cache_miss_tokens  %||% 0,
+    model                    = response$model %||% NA_character_
+  )
+}

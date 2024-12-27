@@ -9,6 +9,7 @@
 \alias{get_usage.ollama_chat}
 \alias{get_usage.ollama_completion}
 \alias{get_usage.cohere_chat}
+\alias{get_usage.deepseek_chat}
 \title{Retrieve Usage Information from a Chat or Completion Response}
 \usage{
 get_usage(response)
@@ -26,6 +27,8 @@ get_usage(response)
 \method{get_usage}{ollama_completion}(response)
 
 \method{get_usage}{cohere_chat}(response)
+
+\method{get_usage}{deepseek_chat}(response)
 }
 \arguments{
 \item{response}{A response object returned by a chat or completion call.

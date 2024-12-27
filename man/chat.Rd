@@ -11,6 +11,7 @@
 \alias{chat.llama_cpp_list}
 \alias{chat.ollama_list}
 \alias{chat.cohere_list}
+\alias{chat.deepseek_list}
 \title{Create a Chat Completion}
 \usage{
 chat(messages, model, temperature, max_tokens, quiet, ...)
@@ -88,6 +89,15 @@ chat(messages, model, temperature, max_tokens, quiet, ...)
   quiet = FALSE,
   ...
 )
+
+\method{chat}{deepseek_list}(
+  messages,
+  model = "deepseek-chat",
+  temperature = 1,
+  max_tokens = 2048,
+  quiet = FALSE,
+  ...
+)
 }
 \arguments{
 \item{messages}{A list of user and system messages in the correct format for
@@ -130,6 +140,7 @@ backend has its own method, but all methods share the same formal signature.
 \item \strong{Gemini}: Dispatches to the \href{https://ai.google.dev/api/generate-content}{Gemini Chat API}.
 \item \strong{Claude}: Dispatches to the \href{https://docs.anthropic.com/en/api/messages}{Anthropic Claude API}.
 \item \strong{Cohere}: Dispatches to the \href{https://docs.cohere.com/v2/reference/chat}{Cohere Chat API}.
+\item \strong{DeepSeek}: Dispatches to the \href{https://api.deepseek.com/chat/completions}{DeepSeek Chat API}.
 \item \strong{Mistral}: Dispatches to the \href{https://docs.mistral.ai/api/#tag/chat}{Mistral Chat API}.
 \item \strong{Groq}: Dispatches to the \href{https://console.groq.com/docs/api-reference#chat}{Groq Chat API}.
 \item \strong{Cerebras}: Dispatches to the \href{https://inference-docs.cerebras.ai/api-reference/chat-completions}{Cerebras Chat API}.
