@@ -18,6 +18,7 @@ test_that("Batch job creation works for Mistral", {
   expect_equal(check_batch_status(batch_mistral)$status, "QUEUED")
   expect_message(result <- poll_and_download(batch_mistral, 60))
   expect_s3_class(result, "tbl_df")
+  cancel_batch(batch_mistral)
 })
 
 test_that("Batch job creation works for Openai", {
