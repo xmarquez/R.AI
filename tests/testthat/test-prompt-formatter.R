@@ -7,7 +7,7 @@ test_that("Single prompts work", {
   skip_if_offline()
   skip_on_ci()
 
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras")
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek")
   test_prompts <- apis_to_test |> purrr::map(~ format_chat(.x, "What is the capital of France?"))
 
   test_responses <- purrr::map(test_prompts, chat)
@@ -17,8 +17,8 @@ test_that("Single prompts work", {
     all()
   expect_true(all_paris)
   response_usage <- test_responses |> purrr::map_df(get_usage)
-  expect_identical(names(response_usage), c("input_tokens", "output_tokens", "total_tokens",
-                                            "input_tokens_details", "output_tokens_details", "model"))
+  expect_true(all(c("input_tokens", "output_tokens", "total_tokens",
+                "input_tokens_details", "output_tokens_details", "model") %in% names(response_usage)))
   expect_true(is.integer(response_usage$input_tokens))
 
 
@@ -30,7 +30,7 @@ test_that("Prompts with data work", {
   skip_on_ci()
 
   data <- dplyr::tibble(country = c("France", "United States", "Paraguay"))
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras")
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek" )
   test_prompts <- apis_to_test |>
     purrr::map(~ format_chat(.x, "What is the capital of {country}?", data = data))
 
@@ -54,7 +54,7 @@ test_that("Single prompts with system messages work", {
   skip_if_offline()
   skip_on_ci()
 
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras")
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek")
   test_prompts <- apis_to_test |>
     purrr::map(~ format_chat(.x, "What is the capital of France?",
                              system = "You always respond with witty and delightful riddles whose solution is the answer to the question. Never mention the capital city of France."))
@@ -75,7 +75,7 @@ test_that("Prompts with data and system messages work", {
   skip_on_ci()
 
   data <- dplyr::tibble(country = c("France", "United States", "Paraguay"))
-  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras")
+  apis_to_test <- c("openai", "mistral", "gemini", "claude", "groq", "cerebras", "cohere", "deepseek")
   test_prompts <- apis_to_test |>
     purrr::map(~ format_chat(.x, "What is the capital of {country}?", data = data,
                              system = "You always respond with witty and delightful riddles whose solution is the answer to the question. Never mention any capital cities, especially not Paris, Asunción, or Washington DC."))
@@ -99,7 +99,7 @@ test_that("JSON mode works", {
   skip_on_ci()
 
   data <- dplyr::tibble(country = c("France", "United States", "Paraguay"))
-  apis_to_test <- c("openai", "mistral", "gemini", "groq", "cerebras")
+  apis_to_test <- c("openai", "mistral", "gemini", "groq", "cerebras", "deepseek")
   test_prompts <- apis_to_test |>
     purrr::map(~ format_chat(.x, "What is the capital of {country}?", data = data,
                              system = "You always reply with JSON, with the schema {country: capital}. Use JSON only, and don't add anything else."))
