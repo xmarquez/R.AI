@@ -180,3 +180,17 @@ get_message.qwen_chat <- function(response) {
   first_msg <- response$choices[[1]]$message
   structure(list(first_msg), class = c("qwen_list", "list"))
 }
+
+#' @rdname get_message
+#' @exportS3Method get_message default
+get_message.default <- function(response) {
+  # For an OpenAI-like structure, the single "primary" message is usually:
+  #   response$choices[[1]]$message
+  # We wrap that in a single-element list, so you can attach a class if you want.
+  if (is.null(response$choices) || length(response$choices) == 0) {
+    return(list())
+  }
+  first_msg <- response$choices[[1]]$message
+  list(first_msg)
+}
+

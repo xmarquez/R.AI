@@ -107,6 +107,117 @@ chat <- function(messages, model, temperature, max_tokens, quiet, ...) {
   UseMethod("chat")
 }
 
+#' @rdname chat
+#' @exportS3Method chat default
+chat.default <- function(messages,
+                         model = "gpt-3.5-turbo",
+                         temperature = 0.2,
+                         max_tokens = NULL,
+                         quiet = FALSE,
+                         base_url = "https://api.openai.com/v1/chat/completions",
+                         api_key = NULL,
+                         ...) {
+
+  dots <- list(...)
+
+  # Attempt to parse the name of the "api" from messages or dots.
+  api <- dots$api %||% NULL
+  if (is.null(api)) {
+    first_class <- class(messages)[1]
+    if (grepl("_list$", first_class)) {
+      api <- sub("_list$", "", first_class)
+    } else {
+      api <- "openai" # fallback
+    }
+  }
+
+  # If user hasn't provided an api_key here, fall back to environment variable
+  # named e.g. OPENAI_API_KEY or MYSERVICE_API_KEY depending on `api`.
+  if (is.null(api_key)) {
+    api_key <- Sys.getenv(paste0(toupper(api), "_API_KEY"), unset = "")
+  }
+
+  # Additional arguments
+  store                 <- dots$store %||% NULL
+  metadata              <- dots$metadata %||% NULL
+  frequency_penalty     <- dots$frequency_penalty %||% NULL
+  logit_bias            <- dots$logit_bias %||% NULL
+  logprobs              <- dots$logprobs %||% NULL
+  top_logprobs          <- dots$top_logprobs %||% NULL
+  max_completion_tokens <- dots$max_completion_tokens %||% NULL
+  n                     <- dots$n %||% 1
+  modalities            <- dots$modalities %||% NULL
+  prediction            <- dots$prediction %||% NULL
+  audio                 <- dots$audio %||% NULL
+  presence_penalty      <- dots$presence_penalty %||% NULL
+  response_format       <- dots$response_format %||% NULL
+  seed                  <- dots$seed %||% NULL
+  service_tier          <- dots$service_tier %||% NULL
+  stop                  <- dots$stop %||% NULL
+  temperature           <- dots$temperature %||% temperature
+  top_p                 <- dots$top_p %||% NULL
+  tools                 <- dots$tools %||% NULL
+  tool_choice           <- dots$tool_choice %||% NULL
+  parallel_tool_calls   <- dots$parallel_tool_calls %||% NULL
+  user                  <- dots$user %||% NULL
+  json_mode             <- dots$json_mode %||% FALSE
+  max_retries           <- dots$max_retries %||% 3
+  quiet                 <- dots$quiet %||% quiet
+
+  if (json_mode) {
+    response_format <- list(type = "json_object")
+  }
+
+  args_list <- list(
+    messages = messages,
+    model = model,
+    store = store,
+    metadata = metadata,
+    frequency_penalty = frequency_penalty,
+    logit_bias = logit_bias,
+    logprobs = logprobs,
+    top_logprobs = top_logprobs,
+    max_tokens = max_tokens,
+    max_completion_tokens = max_completion_tokens,
+    n = n,
+    modalities = modalities,
+    prediction = prediction,
+    audio = audio,
+    presence_penalty = presence_penalty,
+    response_format = response_format,
+    seed = seed,
+    service_tier = service_tier,
+    stop = stop,
+    temperature = temperature,
+    top_p = top_p,
+    tools = tools,
+    tool_choice = tool_choice,
+    parallel_tool_calls = parallel_tool_calls,
+    user = user
+  )
+  args_list <- args_list[!vapply(args_list, is.null, logical(1))]
+  body <- jsonlite::toJSON(args_list, auto_unbox = TRUE, pretty = TRUE)
+
+  # Make the request
+  res <- retry_response(
+    base_url = base_url,
+    api_key = api_key,
+    response_format = NULL,  # no streaming in this default example
+    body = body,
+    max_retries = max_retries,
+    pause_cap = 1200,
+    quiet = quiet
+  )
+
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}. {httr::content(res)$error$message}")
+  }
+  response <- httr::content(res)
+
+  # Return an object whose class is <api>_chat
+  structure(response, class = c(paste0(api, "_chat"), class(response)))
+}
+
 # --------------------------
 # All the methods now simply inherit the documentation via @rdname chat:
 # --------------------------

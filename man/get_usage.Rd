@@ -32,6 +32,8 @@ get_usage(response)
 \method{get_usage}{deepseek_chat}(response)
 
 \method{get_usage}{qwen_chat}(response)
+
+\method{get_usage}{default}(response)
 }
 \arguments{
 \item{response}{A response object returned by a chat or completion call.

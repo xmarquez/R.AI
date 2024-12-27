@@ -208,3 +208,27 @@ get_usage.qwen_chat <- function(response) {
     model         = response$model %||% NA_character_
   )
 }
+
+#' @rdname get_usage
+#' @exportS3Method get_usage default
+get_usage.default <- function(response) {
+  # Typical usage structure:
+  #   response$usage$prompt_tokens, $completion_tokens, $total_tokens
+  usage <- response$usage
+  if (is.null(usage)) {
+    return(tibble::tibble(
+      input_tokens = NA_integer_,
+      output_tokens = NA_integer_,
+      total_tokens = NA_integer_,
+      model = response$model %||% NA_character_
+    ))
+  }
+  tibble::tibble(
+    input_tokens = usage$prompt_tokens %||% NA_integer_,
+    output_tokens = usage$completion_tokens %||% NA_integer_,
+    total_tokens = usage$total_tokens %||% NA_integer_,
+    model = response$model %||% NA_character_
+  )
+}
+
+

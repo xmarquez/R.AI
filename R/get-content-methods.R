@@ -176,3 +176,15 @@ get_content.qwen_chat <- function(response) {
 }
 
 
+#' @rdname get_content
+#' @exportS3Method get_content default
+get_content.default <- function(response) {
+  # This fallback assumes OpenAI-like structure:
+  #   response$choices[[i]]$message$content
+  if (is.null(response$choices) || length(response$choices) == 0) {
+    return(character(0))
+  }
+  purrr::map_chr(response$choices, ~ .x$message$content %||% "")
+}
+
+

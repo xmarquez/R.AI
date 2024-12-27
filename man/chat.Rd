@@ -2,6 +2,7 @@
 % Please edit documentation in R/chat-methods.R
 \name{chat}
 \alias{chat}
+\alias{chat.default}
 \alias{chat.openai_list}
 \alias{chat.gemini_list}
 \alias{chat.claude_list}
@@ -16,6 +17,17 @@
 \title{Create a Chat Completion}
 \usage{
 chat(messages, model, temperature, max_tokens, quiet, ...)
+
+\method{chat}{default}(
+  messages,
+  model = "gpt-3.5-turbo",
+  temperature = 0.2,
+  max_tokens = NULL,
+  quiet = FALSE,
+  base_url = "https://api.openai.com/v1/chat/completions",
+  api_key = NULL,
+  ...
+)
 
 \method{chat}{openai_list}(
   messages,

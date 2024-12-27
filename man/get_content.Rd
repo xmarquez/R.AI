@@ -15,6 +15,7 @@
 \alias{get_content.cohere_chat}
 \alias{get_content.deepseek_chat}
 \alias{get_content.qwen_chat}
+\alias{get_content.default}
 \title{Extract Main Text Content from a Response}
 \usage{
 get_content(response)
@@ -44,6 +45,8 @@ get_content(response)
 \method{get_content}{deepseek_chat}(response)
 
 \method{get_content}{qwen_chat}(response)
+
+\method{get_content}{default}(response)
 }
 \arguments{
 \item{response}{A response object returned by a chat or completion method. Each
