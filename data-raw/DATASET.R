@@ -13,35 +13,30 @@ models <- jsonlite::fromJSON(json_file) |>
 models_df <- models |>
   filter(litellm_provider %in% c("groq", "openai", "gemini", "cerebras",
                                  "anthropic", "mistral", "cohere",
-                                 "voyage")) |>
+                                 "voyage", "deepseek")) |>
   mutate(api = dplyr::case_when(litellm_provider == "anthropic" ~ "claude",
                          TRUE ~ litellm_provider),
-         model = stringr::str_remove(model, "anthropic/|gemini/|groq/|mistral/|cohere/|voyage/"),
+         model = stringr::str_remove(model, "anthropic/|gemini/|groq/|mistral/|cohere/|voyage/|deepseek/"),
          input_cost = input_cost_per_token,
          output_cost = output_cost_per_token) |>
   distinct()
 
-preferred_models <- models_df |>
-  dplyr::filter(mode == "chat") |>
-  dplyr::mutate(cheapest = dplyr::case_when(api == "groq" ~ "llama-3.1-8b-instant",
-                                            api == "claude" ~ "claude-3-haiku-20240307",
-                                            api == "openai" ~ "gpt-4o-mini",
-                                            api == "gemini" ~ "gemini-1.5-flash-latest",
-                                            api == "mistral" ~ "ministral-3b-latest",
-                                            api == "cerebras" ~ "llama3.1-8b"),
-                largest = dplyr::case_when(api == "groq" ~ "llama-3.2-90b-text-preview",
-                                           api == "claude" ~ "claude-3-opus-20240229",
-                                           api == "openai" ~ "gpt-4o",
-                                           api == "gemini" ~ "gemini-1.5-pro-latest",
-                                           api == "mistral" ~ "mistral-large-latest",
-                                           api == "cerebras" ~ "llama3.3-70b"),
-                best = dplyr::case_when(api == "groq" ~ "llama-3.1-70b-versatile",
-                                        api == "claude" ~ "claude-3-5-sonnet-20241022",
-                                        api == "openai" ~ "o1-preview",
-                                        api == "gemini" ~ "gemini-2.0-flash-thinking-exp",
-                                        api == "mistral" ~ "mistral-large-latest",
-                                        api == "cerebras" ~ "llama3.3-70b")) |>
-  dplyr::select(dplyr::all_of(c("api", "cheapest", "largest", "best"))) |>
-  dplyr::distinct()
+preferred_models <- tibble(
+  api = c("groq", "claude", "openai", "gemini",
+           "mistral", "cerebras", "deepseek", "cohere"),
+  cheapest = c("llama-3.1-8b-instant", "claude-3-haiku-20240307",
+               "gpt-4o-mini", "gemini-1.5-flash-latest",
+               "ministral-3b-latest", "llama3.1-8b", "deepseek-chat",
+               "command-r"),
+  largest = c("llama-3.1-70b-versatile", "claude-3-5-sonnet-20241022",
+           "o1-preview", "gemini-2.0-flash-thinking-exp",
+           "mistral-large-latest","llama3.3-70b",
+           "deepseek-chat", "command-r-plus"),
+  best = c("llama-3.1-70b-versatile", "claude-3-5-sonnet-20241022",
+           "o1-preview", "gemini-2.0-flash-thinking-exp",
+           "mistral-large-latest","llama3.3-70b",
+           "deepseek-chat", "command-r-plus")
+
+)
 
 usethis::use_data(models_df, preferred_models, overwrite = TRUE, internal = TRUE)

@@ -12,6 +12,7 @@
 \alias{list_models.llama_cpp}
 \alias{list_models.cohere}
 \alias{list_models.voyage}
+\alias{list_models.deepseek}
 \alias{list_models.all}
 \title{List Available Models}
 \usage{
@@ -37,6 +38,8 @@ list_models(api, ...)
 
 \method{list_models}{voyage}(api, ...)
 
+\method{list_models}{deepseek}(api, ...)
+
 \method{list_models}{all}(api, mode = "chat", ...)
 }
 \arguments{
@@ -46,6 +49,7 @@ list_models(api, ...)
 \item \code{"openai"}
 \item \code{"groq"}
 \item \code{"cerebras"}
+\item \code{"cohere"}
 \item \code{"gemini"}
 \item \code{"ollama"}
 \item \code{"claude"}
@@ -67,9 +71,9 @@ local models if you choose \code{"ollama"}.
 }
 \description{
 A generic function that fetches model information from various sources
-(Mistral, OpenAI, Groq, Cerebras, Gemini, Claude, Ollama, or a local
-directory for Llama files). You specify which backend you want by passing a
-string (e.g., \code{"mistral"}, \code{"openai"}, \code{"gemini"}, \code{"claude"},
+(Mistral, OpenAI, Groq, Cerebras, Cohere, Gemini, Claude, Ollama, or a local
+directory for Llama.cpp compatible files). You specify which backend you want
+by passing a string (e.g., \code{"mistral"}, \code{"openai"}, \code{"gemini"}, \code{"claude"},
 \code{"llamafile"}). Internally, the class of the string is set so that
 \code{UseMethod("list_models")} can dispatch to the corresponding S3 method.
 \code{"all"} returns all models.
@@ -85,6 +89,7 @@ environment variable is set:
 \item \code{GEMINI_API_KEY} (for \code{"gemini"})
 \item \code{ANTHROPIC_API_KEY} (for \code{"claude"})
 \item \code{COHERE_API_KEY} (for \code{"cohere"})
+\item \code{DEEPSEEK_API_KEY} (for \code{"deepseek"})
 }
 }
 

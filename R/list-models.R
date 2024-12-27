@@ -1,9 +1,9 @@
 #' List Available Models
 #'
 #' A generic function that fetches model information from various sources
-#' (Mistral, OpenAI, Groq, Cerebras, Gemini, Claude, Ollama, or a local
-#' directory for Llama files). You specify which backend you want by passing a
-#' string (e.g., `"mistral"`, `"openai"`, `"gemini"`, `"claude"`,
+#' (Mistral, OpenAI, Groq, Cerebras, Cohere, Gemini, Claude, Ollama, or a local
+#' directory for Llama.cpp compatible files). You specify which backend you want
+#' by passing a string (e.g., `"mistral"`, `"openai"`, `"gemini"`, `"claude"`,
 #' `"llamafile"`). Internally, the class of the string is set so that
 #' `UseMethod("list_models")` can dispatch to the corresponding S3 method.
 #' `"all"` returns all models.
@@ -13,6 +13,8 @@
 #'   * `"openai"`
 #'   * `"groq"`
 #'   * `"cerebras"`
+#'   * `"cohere"`
+#'   * `"deepseek"`
 #'   * `"gemini"`
 #'   * `"ollama"`
 #'   * `"claude"`
@@ -39,6 +41,7 @@
 #'   \item `GEMINI_API_KEY` (for `"gemini"`)
 #'   \item `ANTHROPIC_API_KEY` (for `"claude"`)
 #'   \item `COHERE_API_KEY` (for `"cohere"`)
+#'   \item `DEEPSEEK_API_KEY` (for `"deepseek"`)
 #' }
 #'
 #' @examples
@@ -463,6 +466,59 @@ cost_info <- function() {
 
   models_df
 }
+
+# -------------------------------------------------------------------------
+# DeepSeek method
+# -------------------------------------------------------------------------
+#' @rdname list_models
+#' @exportS3Method list_models deepseek
+list_models.deepseek <- function(api, ...) {
+  # Retrieve API key from environment
+  deepseek_api_key <- Sys.getenv("DEEPSEEK_API_KEY")
+  if (!nzchar(deepseek_api_key)) {
+    stop("DeepSeek API key is not set in environment variables (DEEPSEEK_API_KEY).")
+  }
+
+  base_url <- "https://api.deepseek.com/models"
+
+  # Send GET request
+  res <- httr::GET(
+    url = base_url,
+    httr::add_headers(
+      "Authorization" = paste("Bearer", deepseek_api_key),
+      "Accept"        = "application/json"
+    )
+  )
+  if (httr::http_error(res)) {
+    cli::cli_abort("{httr::http_status(res)$message}")
+  }
+
+  # Parse response, which should have shape:
+  # {
+  #   "object": "list",
+  #   "data": [
+  #     {
+  #       "id": "deepseek-chat",
+  #       "object": "model",
+  #       "owned_by": "deepseek"
+  #     },
+  #     ...
+  #   ]
+  # }
+  content <- httr::content(res)
+  models <- content$data
+
+  # Convert each model’s list to a tibble, then row-bind
+  purrr::map(models, dplyr::as_tibble) |>
+    purrr::list_rbind() |>
+    dplyr::mutate(
+      # You can rename or reorder columns as desired
+      created = NA,  # If the API doesn't provide a 'created' field
+      mode    = "chat"
+    ) |>
+    dplyr::relocate(id, .before = dplyr::everything())
+}
+
 
 #' @rdname list_models
 #' @exportS3Method list_models all
